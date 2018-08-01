@@ -6,7 +6,7 @@ $(document).ready(function () {
         let childUl = li.children("ul");
         if (0 === childUl.length) {
             $.ajax({
-                url: "api/products/" + li.children("span:last").text() + "/bomRecords",
+                url: "api/machines/" + li.children("span:last").text() + "/materials",
                 dataType: "json",
                 type: "get",
                 contentType: "application/json",
@@ -264,18 +264,18 @@ $(document).ready(function () {
         if (currentNode.sequenceNo === null) {
             _detail +=
                 '<tr>' +
-                '   <td>序列号</td>' +
+                '   <td>排序号</td>' +
                 '   <td></td>' +
                 '<tr/>';
         } else {
             _detail +=
                 '<tr>' +
-                '   <td>序列号</td>' +
+                '   <td>排序号</td>' +
                 '   <td>' + currentNode.sequenceNo + '</td>' +
                 '<tr/>';
         }
 
-        if (currentNode.modification === null) {
+        if (currentNode.modifyNote === null) {
             _detail +=
                 '<tr>' +
                 '   <td>更改通知</td>' +
@@ -285,7 +285,7 @@ $(document).ready(function () {
             _detail +=
                 '<tr>' +
                 '   <td>更改通知</td>' +
-                '   <td>' + currentNode.modification + '</td>' +
+                '   <td>' + currentNode.modifyNote + '</td>' +
                 '<tr/>';
         }
 
@@ -299,7 +299,7 @@ $(document).ready(function () {
         table.append(_detail);
         if (0 === childUl.length) {
             $.ajax({
-                url: "api/bomRecords?parentId=" + currentNode.objectId,
+                url: "api/materials?parentId=" + currentNode.objectId,
                 dataType: "json",
                 type: "get",
                 contentType: "application/json",
@@ -348,94 +348,17 @@ $(document).ready(function () {
             }
         }
     });
-
-    $(document).on('click', "#updateLevel", function (event) {
-        let parentMaterialNo = $("#parentMaterialNo").val();
-        if ("" === parentMaterialNo || null === parentMaterialNo || undefined === parentMaterialNo) {
-            alert("请输入新父级物料号");
-            return;
-        }
-        let currentNodeId = $("#currentNodeId").val();
-        $.ajax({
-            url: "api/bomRecords/updateLevel",
-            dataType: "json", // 预期服务器返回的数据类型
-            type: "put", // 请求方式 POST或GET
-            contentType: "application/json", // 发送信息至服务器时的内容编码类型
-            // 发送到服务器的数据。
-            data: JSON.stringify({id: currentNodeId, parentMaterialNo: parentMaterialNo}),
-            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
-            // 请求成功后的回调函数。
-            success: function (data) {
-                if (200 === data.statusCode) {
-                    alert("数据更新成功");
-                } else if (601 === data.statusCode) {
-                    alert("父物料号参数错误");
-                } else if (9001 === data.statusCode) {
-                    alert("新父级物料号与原父级物料号重复");
-                } else {
-                    alert("系统错误");
-                }
-            },
-            // 请求出错时调用的函数
-            error: function () {
-                alert("数据发送失败");
-            }
-        });
-    });
-
-    $(document).on('click', "#updateRecord", function (event) {
-        $.ajax({
-            url: "api/bomRecords",
-            dataType: "json", // 预期服务器返回的数据类型
-            type: "put", // 请求方式POST或GET
-            contentType: "application/json", // 发送信息至服务器时的内容编码类型
-            // 发送到服务器的数据。
-            data: JSON.stringify({
-                id: $("#currentNodeId").val(),
-                name: $("#name").val(),
-                structureNo: $("#structureNo").val(),
-                revision: $("#revision").val(),
-                materialNo: $("#materialNo").val(),
-                materialVersion: $("#materialVersion").val(),
-                material: $("#material").val(),
-                materialJis: $("#materialJis").val(),
-                materialWin: $("#materialWin").val(),
-                drawingNo: $("#drawingNo").val(),
-                drawingVersion: $("#drawingVersion").val(),
-                drawingSize: $("#drawingSize").val(),
-                positionNo: $("#positionNo").val(),
-                weight: $("#weight").val(),
-                amount: $("#amount").val(),
-                absoluteAmount: $("#absoluteAmount").val(),
-                sequenceNo: $("#sequenceNo").val(),
-                modification: $("#modification").val()
-            }),
-            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
-            // 请求成功后的回调函数。
-            success: function (data) {
-                if (200 === data.statusCode) {
-                    alert("数据更新成功");
-                } else {
-                    alert("系统错误");
-                }
-            },
-            // 请求出错时调用的函数
-            error: function () {
-                alert("数据发送失败");
-            }
-        });
-    });
 });
 
-function useLatestVersion(productName, structureNo) {
+function useLatestVersion(machineName, structureNo) {
     $.ajax({
-        url: "api/bomRecords/useLatestVersion",
+        url: "api/materials/useLatestVersion",
         dataType: "json", // 预期服务器返回的数据类型
         type: "put", // 请求方式PUT
         contentType: "application/json", // 发送信息至服务器时的内容编码类型
         // 发送到服务器的数据。
         data: JSON.stringify({
-            productName: productName,
+            machineName: machineName,
             structureNo: structureNo
         }),
         async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求

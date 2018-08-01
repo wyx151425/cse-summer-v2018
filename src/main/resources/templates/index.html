@@ -35,20 +35,21 @@
 <main class="container">
     <div class="material-detail">
         <div class="table-wrap">
-            <table class="table">
+            <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                    <th class="col-lg-5 col-md-5">名称</th>
-                    <th class="col-lg-7 col-md-7">操作</th>
+                    <th class="col-lg-4 col-md-4">名称</th>
+                    <th class="col-lg-4 col-md-4">机型</th>
+                    <th class="col-lg-4 col-md-4">操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="machine, machineStat : ${machineList}">
                     <td th:text="${machine.name}"></td>
+                    <td th:text="${machine.type}"></td>
                     <td>
                         <a th:href="@{|/machine?machineId=${machine.id}|}">查看</a>
-                        <a style="margin-left: 50px"
-                           th:href="@{|/api/files/export/machine?machineName=${machine.name}|}">导出</a>
+                        <a th:href="@{|/api/files/export/machine?machineName=${machine.name}|}">导出</a>
                     </td>
                 </tr>
                 </tbody>
@@ -64,7 +65,7 @@
                 </button>
                 <h4 class="modal-title" id="ManXmlLabel">导入MAN XML文件</h4>
             </div>
-            <form>
+            <form id="manXmlForm">
                 <div class="modal-body">
                     <label for="machineName1" class="control-label col-lg-2 col-md-2">机器</label>
                     <div class="form-group col-lg-10 col-md-10">
@@ -80,6 +81,11 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </form>
+            <div id="manXmlConfirm" style="display: none">
+                <div class="modal-body">
+                    <p id="manXmlProgress" class="progress-prompt">文件上传中...</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -91,7 +97,7 @@
                 </button>
                 <h4 class="modal-title" id="WinGDExcelLabel">导入WinGD Excel文件</h4>
             </div>
-            <form>
+            <form  id="winGDExcelForm">
                 <div class="modal-body">
                     <label for="machineName2" class="control-label col-lg-2 col-md-2">机器</label>
                     <div class="form-group col-lg-10 col-md-10">
@@ -107,21 +113,10 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </form>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="progress" tabindex="-1" role="dialog" aria-labelledby="progressLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="progressLabel">提示信息</h4>
-            </div>
-            <div class="modal-body">
-                <p id="progress-prompt" class="progress-prompt">文件上传中...</p>
-            </div>
-            <div id="modal-footer" class="modal-footer" style="display: none">
-                <button id="confirm" type="button" class="btn btn-primary"
-                        data-dismiss="modal" aria-label="Close">确定</button>
+            <div id="winGDExcelConfirm" style="display: none">
+                <div class="modal-body">
+                    <p id="winGDExcelProgress" class="progress-prompt">文件上传中...</p>
+                </div>
             </div>
         </div>
     </div>

@@ -11,9 +11,13 @@ import java.util.List;
 @Table(name = "cse_machine")
 public class Machine extends Entity {
     private String name;
+    private String type;
 
     @Transient
     private List<Material> materialList;
+
+    public Machine() {
+    }
 
     public String getName() {
         return name;
@@ -21,6 +25,14 @@ public class Machine extends Entity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public List<Material> getMaterialList() {

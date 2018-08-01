@@ -39,3 +39,5 @@ CREATE TABLE `cse_material` (
   `active` boolean,
   PRIMARY KEY (`id`)
 )  ENGINE=INNODB DEFAULT CHARSET=UTF8;
+
+ALTER TABLE cse_machine ADD `type` varchar(255);

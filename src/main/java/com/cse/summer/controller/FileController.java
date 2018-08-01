@@ -51,7 +51,7 @@ public class FileController extends BaseFacade {
             @RequestParam("machineName") String machineName,
             @RequestParam("winGDExcel") MultipartFile winGDExcel
     ) {
-        if (SummerConst.DocType.XLSX.equals(winGDExcel.getContentType())) {
+        if (!SummerConst.DocType.XLSX.equals(winGDExcel.getContentType())) {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
@@ -80,7 +80,7 @@ public class FileController extends BaseFacade {
             @RequestParam("structureNo") String structureNo,
             @RequestParam("structureExcel") MultipartFile structureExcel
     ) {
-        if (SummerConst.DocType.XLSX.equals(structureExcel.getContentType())) {
+        if (!SummerConst.DocType.XLSX.equals(structureExcel.getContentType())) {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {

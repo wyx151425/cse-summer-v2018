@@ -71,7 +71,7 @@ ul li span:nth-child(2) {
     border: 1px solid #e7e7e7;
     width: 1400px;
     min-height: 798px;
-    margin-bottom: 40px;
+    margin: 40px auto;
 }
 
 .table-wrap {

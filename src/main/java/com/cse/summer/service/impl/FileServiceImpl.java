@@ -225,19 +225,18 @@ public class FileServiceImpl implements FileService {
     public void importWinGDExcel(String machineName, MultipartFile file) throws IOException, InvalidFormatException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         List<Material> materialList = new ArrayList<>(1000);
-        winGDExcelProcess(workbook, materialList);
+        winGDExcelProcess(machineName, workbook, materialList);
         materialRepository.saveAll(materialList);
     }
 
-    private void winGDExcelProcess(Workbook workbook, List<Material> materialList) {
+    private void winGDExcelProcess(String machineName, Workbook workbook, List<Material> materialList) {
         // 建立维护层级关系的数组
         Material[] levelArray = new Material[10];
         Sheet sheet = workbook.getSheetAt(1);
-        String productName = sheet.getRow(0).getCell(0).toString();
         Machine machine = new Machine();
         machine.setObjectId(Generator.getObjectId());
         machine.setStatus(1);
-        machine.setName(productName);
+        machine.setName(machineName);
         machineRepository.save(machine);
         int index = 0;
         for (Row row : sheet) {
@@ -245,7 +244,7 @@ public class FileServiceImpl implements FileService {
                 index++;
             } else {
                 Material material = new Material(2);
-                material.setMachineName(productName);
+                material.setMachineName(machineName);
                 material.setObjectId(Generator.getObjectId());
                 material.setStatus(1);
                 material.setVersion(0);
@@ -311,7 +310,7 @@ public class FileServiceImpl implements FileService {
                         Material parentMat = levelArray[level - 1];
                         parentMat.setChildCount(parentMat.getChildCount() + 1);
                         // 根据最上级节点设置部套号
-                        material.setStructureNo(levelArray[0].getStructureNo());
+                        material.setStructureNo(parentMat.getStructureNo());
                         // 设置该节点所属上级节点的ID
                         material.setParentId(parentMat.getObjectId());
                         // 将该节点覆盖数组中相同层级的上一个节点

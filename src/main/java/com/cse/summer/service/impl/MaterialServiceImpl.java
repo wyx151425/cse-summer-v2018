@@ -31,7 +31,7 @@ public class MaterialServiceImpl implements MaterialService {
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List<Material> findDirectLevelMaterialListByMachineName(String productName) {
-        return materialRepository.findAllByMachineNameAndParentId(productName, null);
+        return materialRepository.findAllByMachineNameAndLevelAndActiveOrderByStructureNo(productName, 0, true);
     }
 
     @Override
