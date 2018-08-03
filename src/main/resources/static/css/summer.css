@@ -39,6 +39,7 @@ body {
     width: 300px;
     height: 100%;
     z-index: 1000;
+    overflow-y: auto;
 }
 
 @media (min-width: 1400px) {

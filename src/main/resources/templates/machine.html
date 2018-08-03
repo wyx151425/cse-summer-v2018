@@ -75,7 +75,9 @@
                     </div>
                     <label for="structureNo" class="control-label col-lg-2 col-md-2">部套号</label>
                     <div class="form-group col-lg-10 col-md-10">
-                        <input id="structureNo" type="text" class="form-control" name="structureNo"/>
+                        <select id="structureNo" class="form-control" name="structureNo">
+                            <option th:value="${record.structureNo}" th:each="record, recordStat : ${materialList}" th:text="${record.structureNo}"></option>
+                        </select>
                     </div>
                     <label for="structureExcel" class="control-label col-lg-2 col-md-2">文件</label>
                     <div class="form-group col-lg-10 col-md-10">

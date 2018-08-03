@@ -325,7 +325,12 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public XSSFWorkbook exportMachineExcel(String machineName) {
-        List<Material> materialList = materialRepository.findAllByMachineName(machineName);
+        List<Material> structureList = materialRepository.findAllByMachineNameAndLevelAndActiveOrderByStructureNo(machineName, 0, true);
+        List<Material> materialList = new ArrayList<>();
+        for (Material material : structureList) {
+            List<Material> materials = materialRepository.findAllByMachineNameAndStructureNoAndActive(machineName, material.getStructureNo(), true);
+            materialList.addAll(materials);
+        }
         return buildExcelWorkbook(materialList);
     }
 
