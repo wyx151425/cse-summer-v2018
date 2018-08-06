@@ -22,60 +22,39 @@ public interface MaterialRepository extends JpaRepository<Material, Integer> {
     List<Material> findAllByParentId(String parentId);
 
     /**
-     * 根据产品名获取所有所属的物料
+     * 精准查询MAN/WinGD顶层物料的所有版本
      *
-     * @param productName 产品名
-     * @return 查询获得的记录列表
+     * @param materialNo  物料号
+     * @param materialVersion    物料号版本
+     * @param type        物料所属专利方，此处只能为0
+     * @param level       物料层级，此处只能为0
+     * @return 物料数据
      */
-    List<Material> findAllByMachineName(String productName);
-
+    List<Material> findMaterialByMaterialNoAndMaterialVersionAndTypeAndLevel(String materialNo, String materialVersion, Integer type, Integer level);
     /**
-     * 根据产品名获取所有所属的物料
+     * 根据层级、部套号和版本号获取指定物料
      *
-     * @param machineName 产品名
-     * @param structureNo 部套号
-     * @return 查询获得的记录列表
-     */
-    List<Material> findAllByMachineNameAndStructureNo(String machineName, String structureNo);
-
-    /**
-     * 根据产品名获取所有所属的物料
-     *
-     * @param machineName 机器名
-     * @param structureNo 部套号
-     * @param active      该部套是否在使用
-     * @return 查询获得的记录列表
-     */
-    List<Material> findAllByMachineNameAndStructureNoAndActive(String machineName, String structureNo, Boolean active);
-
-    /**
-     * 根据产品名和父级ObjectId获取父级所属的直接字级数据
-     *
-     * @param machineName 产品名
      * @param level       层级
-     * @param active      是否在用
-     * @return 查询获得的BomRecord数据列表
-     */
-
-    List<Material> findAllByMachineNameAndLevelAndActiveOrderByStructureNo(String machineName, Integer level, Boolean active);
-
-    /**
-     * 根据产品名和父级ObjectId获取父级所属的直接字级数据
-     *
-     * @param machineName 产品名
-     * @param parentId    父级ObjectId
-     * @param active      该部套是否在使用
-     * @return 查询获得的BomRecord数据列表
-     */
-    List<Material> findAllByMachineNameAndParentIdAndActiveOrderByStructureNo(String machineName, String parentId, Boolean active);
-
-    /**
-     * 根据产品名部套号和版本获取记录
-     *
-     * @param machineName 产品名
      * @param structureNo 部套号
-     * @param version     版本
-     * @return 记录列表
+     * @param version     版本号
+     * @return 物料数据
      */
-    List<Material> findAllByMachineNameAndStructureNoAndVersion(String machineName, String structureNo, Integer version);
+    Material findMaterialByLevelAndStructureNoAndVersion(Integer level, String structureNo, Integer version);
+
+    /**
+     * 根据部套号获取指定的部套
+     *
+     * @param structureNo 部套号
+     * @return 部套数据集合
+     */
+    List<Material> findAllByStructureNo(String structureNo);
+
+    /**
+     * 根据部套号和版本号获取指定的部套
+     *
+     * @param structureNo 部套号
+     * @param version     版本号
+     * @return 部套数据集合
+     */
+    List<Material> findAllByStructureNoAndVersion(String structureNo, Integer version);
 }

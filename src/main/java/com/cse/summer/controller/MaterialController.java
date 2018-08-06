@@ -38,11 +38,11 @@ public class MaterialController {
         return new Response<>(materialList);
     }
 
-    @PutMapping(value = "materials/useLatestVersion")
-    public Response<Material> actionUseLatestVersion(
-        @RequestBody Material material
-    ) {
-        materialService.useLatestVersionStructure(material.getMachineName(), material.getStructureNo());
-        return new Response<>();
-    }
+//    @PutMapping(value = "materials/useLatestVersion")
+//    public Response<Material> actionUseLatestVersion(
+//        @RequestBody Material material
+//    ) {
+//        materialService.useLatestVersionStructure(material.getMachineName(), material.getStructureNo());
+//        return new Response<>();
+//    }
 }

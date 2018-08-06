@@ -9,4 +9,9 @@ public class SummerConst {
         public static final String XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         public static final String XLSX_UTF8 = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
     }
+
+    public static final class MachineType {
+        public static final String MAN = "MAN";
+        public static final String WIN_GD = "WinGD";
+    }
 }

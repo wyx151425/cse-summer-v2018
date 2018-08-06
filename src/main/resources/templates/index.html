@@ -39,7 +39,7 @@
                 <thead>
                 <tr>
                     <th class="col-lg-4 col-md-4">名称</th>
-                    <th class="col-lg-4 col-md-4">机型</th>
+                    <th class="col-lg-4 col-md-4">类型</th>
                     <th class="col-lg-4 col-md-4">操作</th>
                 </tr>
                 </thead>
@@ -48,7 +48,7 @@
                     <td th:text="${machine.name}"></td>
                     <td th:text="${machine.type}"></td>
                     <td>
-                        <a th:href="@{|/machine?machineId=${machine.id}|}">查看</a>
+                        <a th:href="@{|/machine?machineId=${machine.id}|}" style="margin-right: 16px">查看</a>
                         <a th:href="@{|/api/files/export/machine?machineName=${machine.name}|}">导出</a>
                     </td>
                 </tr>

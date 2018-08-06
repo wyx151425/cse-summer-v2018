@@ -1,12 +1,12 @@
 package com.cse.summer.controller;
 
 import com.cse.summer.context.exception.SummerException;
+import com.cse.summer.domain.Excel;
 import com.cse.summer.domain.Response;
 import com.cse.summer.service.FileService;
-import com.cse.summer.util.SummerConst;
 import com.cse.summer.util.StatusCode;
+import com.cse.summer.util.SummerConst;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 
 /**
  * @author 王振琦
@@ -64,19 +65,20 @@ public class FileController extends BaseFacade {
 
     @GetMapping(value = "files/export/machine")
     public void actionExportMachineExcel(@RequestParam("machineName") String machineName) throws IOException {
-        XSSFWorkbook workbook = fileService.exportMachineExcel(machineName);
+        Excel excel = fileService.exportMachineExcel(machineName);
         getHttpServletResponse().reset();
+        getHttpServletResponse().setHeader("content-disposition", "attachment;filename="
+                + URLEncoder.encode(excel.getName(), "UTF-8"));
         getHttpServletResponse().setContentType(SummerConst.DocType.XLSX_UTF8);
-        OutputStream output = getHttpServletResponse().getOutputStream();
-        BufferedOutputStream bufferedOutPut = new BufferedOutputStream(output);
-        bufferedOutPut.flush();
-        workbook.write(bufferedOutPut);
-        bufferedOutPut.close();
+        OutputStream out = getHttpServletResponse().getOutputStream();
+        BufferedOutputStream buffer = new BufferedOutputStream(out);
+        buffer.flush();
+        excel.getWorkbook().write(buffer);
+        buffer.close();
     }
 
     @PostMapping(value = "files/import/structure/newVersion")
     public Response<Object> actionImportNewVersionStructureExcel(
-            @RequestParam("machineName") String machineName,
             @RequestParam("structureNo") String structureNo,
             @RequestParam("structureExcel") MultipartFile structureExcel
     ) {
@@ -84,7 +86,7 @@ public class FileController extends BaseFacade {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
-            fileService.importNewVersionStructureExcel(machineName, structureNo, structureExcel);
+            fileService.importNewVersionStructureExcel(structureNo, structureExcel);
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
@@ -93,17 +95,18 @@ public class FileController extends BaseFacade {
 
     @GetMapping(value = "files/export/structure")
     public void actionExportStructureExcel(
-            @RequestParam("machineName") String machineName,
             @RequestParam("structureNo") String structureNo,
             @RequestParam("version") Integer version
     ) throws IOException {
-        XSSFWorkbook workbook = fileService.exportStructureExcel(machineName, structureNo, version);
+        Excel excel = fileService.exportStructureExcel(structureNo, version);
         getHttpServletResponse().reset();
+        getHttpServletResponse().setHeader("content-disposition", "attachment;filename="
+                + URLEncoder.encode(excel.getName(), "UTF-8"));
         getHttpServletResponse().setContentType(SummerConst.DocType.XLSX_UTF8);
-        OutputStream output = getHttpServletResponse().getOutputStream();
-        BufferedOutputStream bufferedOutPut = new BufferedOutputStream(output);
-        bufferedOutPut.flush();
-        workbook.write(bufferedOutPut);
-        bufferedOutPut.close();
+        OutputStream out = getHttpServletResponse().getOutputStream();
+        BufferedOutputStream buffer = new BufferedOutputStream(out);
+        buffer.flush();
+        excel.getWorkbook().write(buffer);
+        buffer.close();
     }
 }

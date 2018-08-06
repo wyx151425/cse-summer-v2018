@@ -13,10 +13,10 @@ public class Material extends Entity implements Serializable {
      * 物料名称
      */
     private String name;
-    /**
-     * 机器名称
-     */
-    private String machineName;
+//    /**
+//     * 机器名称
+//     */
+//    private String machineName;
     /**
      * 父物料的objectId
      */
@@ -45,10 +45,10 @@ public class Material extends Entity implements Serializable {
      * 排序号
      */
     private String sequenceNo;
-    /**
-     * MAN专用版本号
-     */
-    private String revision;
+//    /**
+//     * MAN专用版本号
+//     */
+//    private String revision;
     /**
      * 当前版本号
      */
@@ -117,10 +117,10 @@ public class Material extends Entity implements Serializable {
      * 子节点数量
      */
     private Integer childCount;
-    /**
-     * 是否正在使用
-     */
-    private Boolean active;
+//    /**
+//     * 是否正在使用
+//     */
+//    private Boolean active;
 
     public Material() {
     }
@@ -135,14 +135,6 @@ public class Material extends Entity implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getMachineName() {
-        return machineName;
-    }
-
-    public void setMachineName(String machineName) {
-        this.machineName = machineName;
     }
 
     public String getParentId() {
@@ -199,14 +191,6 @@ public class Material extends Entity implements Serializable {
 
     public void setSequenceNo(String sequenceNo) {
         this.sequenceNo = sequenceNo;
-    }
-
-    public String getRevision() {
-        return revision;
-    }
-
-    public void setRevision(String revision) {
-        this.revision = revision;
     }
 
     public Integer getVersion() {
@@ -335,13 +319,5 @@ public class Material extends Entity implements Serializable {
 
     public void setChildCount(Integer childCount) {
         this.childCount = childCount;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
     }
 }
