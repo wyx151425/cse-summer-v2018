@@ -26,12 +26,4 @@ public interface MaterialService {
      * @return 查询获得的BomRecord列表对象
      */
     List<Material> findDirectLevelMaterialListByMachineName(String machineName);
-
-    /**
-     * 更新机器 使用最新版本的部套
-     *
-     * @param machineName 机器名
-     * @param structureNo 部套号
-     */
-    void useLatestVersionStructure(String machineName, String structureNo);
 }

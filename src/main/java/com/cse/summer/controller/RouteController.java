@@ -24,7 +24,7 @@ public class RouteController {
         this.machineService = machineService;
     }
 
-    @RequestMapping(value = {"/", "index"})
+    @RequestMapping(value = {"", "/", "index"})
     public ModelAndView routeIndexPage() {
         ModelAndView mv = new ModelAndView();
         List<Machine> machineList = machineService.findMachineList();

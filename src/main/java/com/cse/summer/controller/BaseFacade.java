@@ -22,15 +22,15 @@ public class BaseFacade {
     @Autowired
     private HttpSession session;
 
-    protected HttpServletRequest getHttpServletRequest() {
+    HttpServletRequest getHttpServletRequest() {
         return request;
     }
 
-    protected HttpServletResponse getHttpServletResponse() {
+    HttpServletResponse getHttpServletResponse() {
         return response;
     }
 
-    protected HttpSession getHttpSession() {
+    HttpSession getHttpSession() {
         return session;
     }
 }

@@ -31,18 +31,8 @@ public class MaterialController {
     }
 
     @GetMapping(value = "machines/{machineName}/materials")
-    public Response<List<Material>> actionQueryBomRecordListByProductName(
-            @PathVariable(value = "machineName") String machineName
-    ) {
+    public Response<List<Material>> actionQueryBomRecordListByProductName(@PathVariable(value = "machineName") String machineName) {
         List<Material> materialList = materialService.findDirectLevelMaterialListByMachineName(machineName);
         return new Response<>(materialList);
     }
-
-//    @PutMapping(value = "materials/useLatestVersion")
-//    public Response<Material> actionUseLatestVersion(
-//        @RequestBody Material material
-//    ) {
-//        materialService.useLatestVersionStructure(material.getMachineName(), material.getStructureNo());
-//        return new Response<>();
-//    }
 }
