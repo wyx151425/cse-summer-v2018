@@ -25,9 +25,13 @@
     <main class="container">
         <div class="material-detail">
             <div class="table-wrap">
-                <button type="button" data-target="#importNewVersionStructure" data-toggle="modal"
+                <button id="addNewVersion" type="button" data-target="#importNewVersionStructure" data-toggle="modal"
                         class="btn btn-primary pull-right"
                         style="margin-bottom: 20px">导入新版本部套
+                </button>
+                <button id="addDbButton" type="button" data-target="#addDbStructure" data-toggle="modal"
+                        class="btn btn-primary pull-right"
+                        style="margin-bottom: 20px; margin-right: 16px">添加库中部套
                 </button>
                 <table id="table" class="table table-bordered table-hover">
                     <thead>
@@ -152,6 +156,42 @@
         </div>
     </main>
 </div>
+<div class="modal fade" id="addDbStructure" tabindex="-1" role="dialog" aria-labelledby="addDbStructureLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="addDbStructureLabel">添加库中部套</h4>
+            </div>
+            <form id="addDbStructureForm">
+                <div class="modal-body">
+                    <label for="machineName7" class="control-label col-lg-2 col-md-2">机器名</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="machineName7" type="text" class="form-control" th:value="${machine.name}" readonly="readonly"/>
+                    </div>
+                    <label for="structureNo7" class="control-label col-lg-2 col-md-2">部套号</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="structureNo7" type="text" class="form-control"/>
+                    </div>
+                    <label for="version7" class="control-label col-lg-2 col-md-2">版本号</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="version7" type="text" class="form-control"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="addDbStructureFile" type="button" class="btn btn-primary">添加</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </form>
+            <div id="addDbStructureConfirm" style="display: none">
+                <div class="modal-body">
+                    <p id="addDbStructureProgress" class="progress-prompt">数据更新中...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="importNewVersionStructure" tabindex="-1" role="dialog" aria-labelledby="StructureLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -167,9 +207,9 @@
                         <input id="machineName3" type="text" class="form-control" name="machineName"
                                th:value="${machine.name}" readonly="readonly"/>
                     </div>
-                    <label for="structureNo" class="control-label col-lg-2 col-md-2">部套号</label>
+                    <label for="structureNo3" class="control-label col-lg-2 col-md-2">部套号</label>
                     <div class="form-group col-lg-10 col-md-10">
-                        <select id="structureNo" class="form-control" name="structureNo">
+                        <select id="structureNo3" class="form-control" name="structureNo">
                             <option th:value="${record.structureNo}" th:each="record, recordStat : ${materialList}"
                                     th:text="${record.structureNo}"></option>
                         </select>
@@ -207,13 +247,13 @@
                         <input id="machineName4" type="text" class="form-control" th:value="${machine.name}"
                                readonly="readonly"/>
                     </div>
-                    <label for="structureNo2" class="control-label col-lg-2 col-md-2">部套号</label>
+                    <label for="structureNo4" class="control-label col-lg-2 col-md-2">部套号</label>
                     <div class="form-group col-lg-10 col-md-10">
-                        <input id="structureNo2" type="text" class="form-control" readonly="readonly"/>
+                        <input id="structureNo4" type="text" class="form-control" readonly="readonly"/>
                     </div>
-                    <label for="version" class="control-label col-lg-2 col-md-2">版本号</label>
+                    <label for="version4" class="control-label col-lg-2 col-md-2">版本号</label>
                     <div class="form-group col-lg-10 col-md-10">
-                        <select id="version" class="form-control">
+                        <select id="version4" class="form-control">
                         </select>
                     </div>
                 </div>
@@ -245,13 +285,13 @@
                         <input id="machineName5" type="text" class="form-control" th:value="${machine.name}"
                                readonly="readonly"/>
                     </div>
-                    <label for="structureNo3" class="control-label col-lg-2 col-md-2">部套号</label>
+                    <label for="structureNo5" class="control-label col-lg-2 col-md-2">部套号</label>
                     <div class="form-group col-lg-10 col-md-10">
-                        <input id="structureNo3" type="text" class="form-control" readonly="readonly"/>
+                        <input id="structureNo5" type="text" class="form-control" readonly="readonly"/>
                     </div>
-                    <label for="version2" class="control-label col-lg-2 col-md-2">版本号</label>
+                    <label for="version5" class="control-label col-lg-2 col-md-2">版本号</label>
                     <div class="form-group col-lg-10 col-md-10">
-                        <select id="version2" class="form-control">
+                        <select id="version5" class="form-control">
                         </select>
                     </div>
                 </div>

@@ -7,6 +7,13 @@ import com.cse.summer.domain.Structure;
  */
 public interface StructureService {
     /**
+     * 添加库中的部套
+     *
+     * @param structure 部套对象
+     */
+    void addDbStructure(Structure structure);
+
+    /**
      * 修改部套版本
      *
      * @param structure 部套对象

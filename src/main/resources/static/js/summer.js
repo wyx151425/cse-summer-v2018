@@ -35,6 +35,11 @@ $(document).ready(function () {
         });
     });
 
+    $("#addNewVersion").click(function () {
+        $("#structureExcelForm").css("display", "block");
+        $("#structureExcelConfirm").css("display", "none");
+    });
+
     $("#importFile").click(function () {
         $("#structureExcelForm").css("display", "none");
         $("#structureExcelConfirm").css("display", "block");
@@ -43,7 +48,7 @@ $(document).ready(function () {
             secureuri: false,  // 是否需要安全协议，一般设置为false
             fileElementId: 'structureExcel',  // 文件上传域的ID
             dataType: 'json',  // 返回值类型 一般设置为json
-            data: {machineName: $("#machineName3").val(), structureNo: $("#structureNo").val()},
+            data: {machineName: $("#machineName3").val(), structureNo: $("#structureNo3").val()},
             success: function (data) {
                 successCallback(data);
             },
@@ -55,8 +60,7 @@ $(document).ready(function () {
 
     function successCallback(data) {
         if (200 === data.statusCode) {
-            $(".progress-prompt").text("上传成功");
-            window.location.href = 'index';
+            $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
         } else if (8001 === data.statusCode) {
             $(".progress-prompt").text("文件格式错误");
         } else if (8002 === data.statusCode) {

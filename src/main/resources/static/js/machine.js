@@ -131,6 +131,8 @@ $(document).ready(function () {
     });
 
     $("#updateVersion").click(function () {
+        $("#versionChooseForm").css("display", "none");
+        $("#versionChooseConfirm").css("display", "block");
         $.ajax({
             url: "api/structures/version",
             dataType: "json", // 预期服务器返回的数据类型
@@ -139,32 +141,71 @@ $(document).ready(function () {
             // 发送到服务器的数据。
             data: JSON.stringify({
                 machineName: $("#machineName4").val(),
-                structureNo: $("#structureNo2").val(),
-                version: $("#version").val()
+                structureNo: $("#structureNo4").val(),
+                version: $("#version4").val()
             }),
             async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
             // 请求成功后的回调函数。
             success: function (data) {
                 if (200 === data.statusCode) {
-                    alert("更新成功，请刷新界面");
+                    $("#versionChooseProgress").text("更新成功，请刷新界面查看更新");
                 } else {
-                    alert("系统错误");
+                    $("#versionChooseProgress").text("系统错误");
                 }
             },
             // 请求出错时调用的函数
             error: function () {
-                alert("数据发送失败");
+                $("#versionChooseProgress").text("系统错误");
             }
         });
     });
 
     $("#exportStructure").click(function () {
-        let structureNo = $("#structureNo3").val();
-        let version = $("#version2").val();
+        let structureNo = $("#structureNo5").val();
+        let version = $("#version5").val();
         let url = "api/files/export/structure?structureNo=" + structureNo + "&version=" + version;
         let link= $('<a href="'+ url +'"></a>');
         link.get(0).click();
     });
+
+    $("#addDbButton").click(function () {
+        $("#addDbStructureForm").css("display", "block");
+        $("#addDbStructureConfirm").css("display", "none");
+    });
+
+    $("#addDbStructureFile").click(function () {
+        $("#addDbStructureForm").css("display", "none");
+        $("#addDbStructureConfirm").css("display", "block");
+        $.ajax({
+            url: "api/structures/db",
+            dataType: "json", // 预期服务器返回的数据类型
+            type: "post", // 请求方式PUT
+            contentType: "application/json", // 发送信息至服务器时的内容编码类型
+            // 发送到服务器的数据。
+            data: JSON.stringify({
+                machineName: $("#machineName7").val(),
+                structureNo: $("#structureNo7").val(),
+                version: $("#version7").val()
+            }),
+            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
+            // 请求成功后的回调函数。
+            success: function (data) {
+                if (200 === data.statusCode) {
+                    $("#addDbStructureProgress").text("更新成功，请刷新页面查看更新");
+                } else if (9001 === data.statusCode) {
+                    $("#addDbStructureProgress").text("部套不存在");
+                } else {
+                    $("#addDbStructureProgress").text("系统错误");
+                }
+            },
+            // 请求出错时调用的函数
+            error: function () {
+                $("#addDbStructureProgress").text("系统错误");
+            }
+        });
+    });
+
+
 });
 
 function deleteStructure(machineName, structureNo) {
@@ -195,8 +236,10 @@ function deleteStructure(machineName, structureNo) {
 }
 
 function versionList(structureNo, latestVersion) {
-    $("#structureNo2").attr("value", structureNo);
-    let select = $("#version");
+    $("#versionChooseForm").css("display", "block");
+    $("#versionChooseConfirm").css("display", "none");
+    $("#structureNo4").attr("value", structureNo);
+    let select = $("#version4");
     select.empty();
     for (let index = 0; index <= latestVersion; index++) {
         select.append('<option value="' + index + '">' + index +'</option>');
@@ -204,8 +247,8 @@ function versionList(structureNo, latestVersion) {
 }
 
 function structureExport(structureNo, latestVersion) {
-    $("#structureNo3").attr("value", structureNo);
-    let select = $("#version2");
+    $("#structureNo5").attr("value", structureNo);
+    let select = $("#version5");
     select.empty();
     for (let index = 0; index <= latestVersion; index++) {
         select.append('<option value="' + index + '">' + index +'</option>');

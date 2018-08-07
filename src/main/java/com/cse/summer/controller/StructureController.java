@@ -17,6 +17,12 @@ public class StructureController extends BaseFacade {
         this.structureService = structureService;
     }
 
+    @PostMapping(value = "structures/db")
+    public Response<Structure> actionAddDbStructure(@RequestBody Structure structure) {
+        structureService.addDbStructure(structure);
+        return new Response<>();
+    }
+
     @PutMapping(value = "structures/version")
     public Response<Structure> actionUpdateStructureBersion(@RequestBody Structure structure) {
         structureService.updateStructureVersion(structure);
