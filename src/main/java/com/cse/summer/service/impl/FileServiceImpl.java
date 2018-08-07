@@ -61,13 +61,13 @@ public class FileServiceImpl implements FileService {
         Element root = doc.getRootElement();
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
-        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, null, machineName, -1);
+        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, null, machineName, -1, 1);
 
         Machine machine = new Machine();
         machine.setObjectId(Generator.getObjectId());
         machine.setStatus(1);
         machine.setName(machineName);
-        machine.setType(SummerConst.MachineType.MAN);
+        machine.setPatent(SummerConst.MachineType.MAN);
         machineRepository.save(machine);
 
         materialRepository.saveAll(materialList);
@@ -75,14 +75,14 @@ public class FileServiceImpl implements FileService {
     }
 
     @SuppressWarnings("unchecked")
-    private void xmlRecursiveTraversal(Element element, List<Material> materialList, List<Structure> structureList, String structureNo, String parentId, String machineName, int parentLevel) {
+    private void xmlRecursiveTraversal(Element element, List<Material> materialList, List<Structure> structureList, String structureNo, String parentId, String machineName, int parentLevel, int amount) {
         if ("designSpec".equals(element.getName())) {
             logger.info("装置号id: " + element.attributeValue("id"));
             Element revision = element.element("revision");
             Element modules = revision.element("moduleList");
             List<Element> moduleList = modules.elements("module");
             for (Element module : moduleList) {
-                xmlRecursiveTraversal(module, materialList, structureList, null, null, machineName, parentLevel);
+                xmlRecursiveTraversal(module, materialList, structureList, null, null, machineName, parentLevel, amount);
             }
         } else if ("module".equals(element.getName())) {
             Element revision = element.element("revision");
@@ -113,9 +113,11 @@ public class FileServiceImpl implements FileService {
                 material.setWeight(revision.element("mass").getText());
                 material.setStructureNo(revision.element("structureNo").getText());
                 material.setAmount(revision.element("quantity").getText());
+                material.setAbsoluteAmount(revision.element("quantity").getText());
                 materialList.add(material);
                 Element parts = revision.element("partList");
-                int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getStructureNo(), material.getObjectId(), machineName, level);
+                amount = Integer.parseInt(revision.element("quantity").getText());
+                int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getStructureNo(), material.getObjectId(), machineName, level, amount);
                 material.setChildCount(childCount);
 
                 structure.setVersion(0);
@@ -139,7 +141,10 @@ public class FileServiceImpl implements FileService {
                 material.setWeight(revision.element("mass").getText());
             }
             if (null != revision.element("quantity")) {
-                material.setAmount(revision.element("quantity").getText());
+                int absoluteAmount = (int) Double.parseDouble(revision.element("quantity").getText());
+                material.setAbsoluteAmount(String.valueOf(absoluteAmount));
+                amount = absoluteAmount * amount;
+                material.setAmount(String.valueOf(amount));
             }
             if (null != revision.element("drawingSize")) {
                 material.setDrawingSize(revision.element("drawingSize").getText());
@@ -155,7 +160,7 @@ public class FileServiceImpl implements FileService {
             }
             materialList.add(material);
             Element parts = revision.element("partList");
-            int childCount = xmlPartsRecursiveTraversal(parts, materialList, structureNo, material.getObjectId(), machineName, level);
+            int childCount = xmlPartsRecursiveTraversal(parts, materialList, structureNo, material.getObjectId(), machineName, level, amount);
 
             material.setChildCount(childCount);
         } else if ("standardPart".equals(element.getName()) || "document".equals(element.getName())
@@ -177,7 +182,10 @@ public class FileServiceImpl implements FileService {
                 material.setWeight(revision.element("mass").getText());
             }
             if (null != revision.element("quantity")) {
-                material.setAmount(revision.element("quantity").getText());
+                int absoluteAmount = (int) Double.parseDouble(revision.element("quantity").getText());
+                material.setAbsoluteAmount(String.valueOf(absoluteAmount));
+                amount = absoluteAmount * amount;
+                material.setAmount(String.valueOf(amount));
             }
             if (null != revision.element("drawingSize")) {
                 material.setDrawingSize(revision.element("drawingSize").getText());
@@ -197,42 +205,42 @@ public class FileServiceImpl implements FileService {
     }
 
     @SuppressWarnings("unchecked")
-    private int xmlPartsRecursiveTraversal(Element parts, List<Material> materialList, String structureNo, String parentId, String machineName, int parentLevel) {
+    private int xmlPartsRecursiveTraversal(Element parts, List<Material> materialList, String structureNo, String parentId, String machineName, int parentLevel, int amount) {
         int childCount = 0;
         if (null != parts) {
             List<Element> partList = parts.elements("part");
             if (partList.size() > 0) {
                 childCount += partList.size();
                 for (Element part : partList) {
-                    xmlRecursiveTraversal(part, materialList, null, structureNo, parentId, machineName, parentLevel);
+                    xmlRecursiveTraversal(part, materialList, null, structureNo, parentId, machineName, parentLevel, amount);
                 }
             }
             List<Element> standardParts = parts.elements("standardPart");
             if (standardParts.size() > 0) {
                 childCount += standardParts.size();
                 for (Element standardPart : standardParts) {
-                    xmlRecursiveTraversal(standardPart, materialList, null, structureNo, parentId, machineName, parentLevel);
+                    xmlRecursiveTraversal(standardPart, materialList, null, structureNo, parentId, machineName, parentLevel, amount);
                 }
             }
             List<Element> documents = parts.elements("document");
             if (documents.size() > 0) {
                 childCount += documents.size();
                 for (Element document : documents) {
-                    xmlRecursiveTraversal(document, materialList, null, structureNo, parentId, machineName, parentLevel);
+                    xmlRecursiveTraversal(document, materialList, null, structureNo, parentId, machineName, parentLevel, amount);
                 }
             }
             List<Element> supDrawings = parts.elements("supDrawing");
             if (supDrawings.size() > 0) {
                 childCount += supDrawings.size();
                 for (Element supDrawing : supDrawings) {
-                    xmlRecursiveTraversal(supDrawing, materialList, null, structureNo, parentId, machineName, parentLevel);
+                    xmlRecursiveTraversal(supDrawing, materialList, null, structureNo, parentId, machineName, parentLevel, amount);
                 }
             }
             List<Element> licData = parts.elements("licData");
             if (licData.size() > 0) {
                 childCount += licData.size();
                 for (Element aLicData : licData) {
-                    xmlRecursiveTraversal(aLicData, materialList, null, structureNo, parentId, machineName, parentLevel);
+                    xmlRecursiveTraversal(aLicData, materialList, null, structureNo, parentId, machineName, parentLevel, amount);
                 }
             }
         }
@@ -250,7 +258,7 @@ public class FileServiceImpl implements FileService {
         machine.setObjectId(Generator.getObjectId());
         machine.setStatus(1);
         machine.setName(machineName);
-        machine.setType(SummerConst.MachineType.WIN_GD);
+        machine.setPatent(SummerConst.MachineType.WIN_GD);
         machineRepository.save(machine);
         structureRepository.saveAll(structureList);
         materialRepository.saveAll(materialList);

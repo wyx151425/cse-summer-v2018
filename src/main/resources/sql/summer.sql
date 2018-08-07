@@ -3,7 +3,11 @@ CREATE TABLE `cse_machine` (
   `object_id` CHAR(32),
   `status` INT(1),
   `name` VARCHAR(255),
+  `patent` varchar(255),
+  `number` varchar(255),
   `type` varchar(255),
+  `cylinder_amount` varchar(255),
+  `classification_society` varchar(255),
   PRIMARY KEY (`id`)
 )  ENGINE=INNODB DEFAULT CHARSET=UTF8;
 
@@ -25,7 +29,7 @@ CREATE TABLE `cse_material` (
   `name` varchar(255),
   `parent_id` char(32),
   `level` int(11),
-  `type` int(11),
+  `patent` int(11),
   `src_level` varchar(255),
   `structure_no` varchar(255),
   `position_no` varchar(255),

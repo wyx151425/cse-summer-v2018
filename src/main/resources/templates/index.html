@@ -38,18 +38,27 @@
             <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                    <th class="col-lg-4 col-md-4">名称</th>
-                    <th class="col-lg-4 col-md-4">类型</th>
-                    <th class="col-lg-4 col-md-4">操作</th>
+                    <th class="col-lg-1 col-md-1">名称</th>
+                    <th class="col-lg-2 col-md-2">机号</th>
+                    <th class="col-lg-2 col-md-2">机型</th>
+                    <th class="col-lg-1 col-md-1">缸数</th>
+                    <th class="col-lg-2 col-md-2">船号</th>
+                    <th class="col-lg-2 col-md-2">船级社</th>
+                    <th class="col-lg-2 col-md-2">操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="machine, machineStat : ${machineList}">
                     <td th:text="${machine.name}"></td>
+                    <td th:text="${machine.number}"></td>
                     <td th:text="${machine.type}"></td>
+                    <td th:text="${machine.cylinderAmount}"></td>
+                    <td th:text="${machine.shipNo}"></td>
+                    <td th:text="${machine.classificationSociety}"></td>
                     <td>
                         <a th:href="@{|/machine?machineId=${machine.id}|}" style="margin-right: 16px">查看</a>
-                        <a th:href="@{|/api/files/export/machine?machineName=${machine.name}|}">导出</a>
+                        <a href="javascript:;" style="margin-right: 16px" data-toggle="modal" data-target="#machineEdit">编辑</a>
+                        <a th:href="@{|/api/files/export/machine?machineName=${machine.name}|}">导出整机BOM</a>
                     </td>
                 </tr>
                 </tbody>
@@ -116,6 +125,54 @@
             <div id="winGDExcelConfirm" style="display: none">
                 <div class="modal-body">
                     <p id="winGDExcelProgress" class="progress-prompt">文件上传中...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="machineEdit" tabindex="-1" role="dialog" aria-labelledby="machineEditLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="machineEditLabel">修改机器信息</h4>
+            </div>
+            <form  id="machineEditForm">
+                <div class="modal-body">
+                    <label for="name" class="control-label col-lg-2 col-md-2">名称</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="name" class="form-control" type="text"/>
+                    </div>
+                    <label for="number" class="control-label col-lg-2 col-md-2">机号</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="number" class="form-control" type="text"/>
+                    </div>
+                    <label for="type" class="control-label col-lg-2 col-md-2">机型</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="type" class="form-control" type="text"/>
+                    </div>
+                    <label for="cylinderAmount" class="control-label col-lg-2 col-md-2">缸数</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="cylinderAmount" class="form-control" type="text"/>
+                    </div>
+                    <label for="shipNo" class="control-label col-lg-2 col-md-2">船号</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="shipNo" class="form-control" type="text"/>
+                    </div>
+                    <label for="classificationSociety" class="control-label col-lg-2 col-md-2">船级社</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="classificationSociety" class="form-control" type="text"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="updateBtn" type="button" class="btn btn-primary">修改</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </form>
+            <div id="machineEditConfirm" style="display: none">
+                <div class="modal-body">
+                    <p id="machineEditProgress" class="progress-prompt">文件上传中...</p>
                 </div>
             </div>
         </div>

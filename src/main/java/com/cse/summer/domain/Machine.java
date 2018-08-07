@@ -11,6 +11,11 @@ import java.util.List;
 @Table(name = "cse_machine")
 public class Machine extends Entity {
     private String name;
+    private String number;
+    private String cylinderAmount;
+    private String shipNo;
+    private String classificationSociety;
+    private String patent;
     private String type;
 
     @Transient
@@ -25,6 +30,46 @@ public class Machine extends Entity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public String getCylinderAmount() {
+        return cylinderAmount;
+    }
+
+    public void setCylinderAmount(String cylinderAmount) {
+        this.cylinderAmount = cylinderAmount;
+    }
+
+    public String getShipNo() {
+        return shipNo;
+    }
+
+    public void setShipNo(String shipNo) {
+        this.shipNo = shipNo;
+    }
+
+    public String getClassificationSociety() {
+        return classificationSociety;
+    }
+
+    public void setClassificationSociety(String classificationSociety) {
+        this.classificationSociety = classificationSociety;
+    }
+
+    public String getPatent() {
+        return patent;
+    }
+
+    public void setPatent(String patent) {
+        this.patent = patent;
     }
 
     public String getType() {

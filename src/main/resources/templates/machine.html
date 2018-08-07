@@ -39,7 +39,9 @@
                         <th class="col-lg-1 col-md-1">部套号</th>
                         <th class="col-lg-2 col-md-2">物料号</th>
                         <th class="col-lg-1 col-md-1">专利方版本</th>
-                        <th class="col-lg-3 col-md-3">名称</th>
+                        <th class="col-lg-1 col-md-1">名称</th>
+                        <th class="col-lg-1 col-md-1">总数量</th>
+                        <th class="col-lg-1 col-md-1">单件数量</th>
                         <th class="col-lg-1 col-md-1">当前版本</th>
                         <th class="col-lg-1 col-md-1">最新版本</th>
                         <th class="col-lg-3 col-md-3">操作</th>
@@ -51,6 +53,8 @@
                         <td th:text="${record.materialNo}"></td>
                         <td th:text="${record.materialVersion}"></td>
                         <td th:text="${record.name}"></td>
+                        <td th:text="${record.amount}"></td>
+                        <td th:text="${record.absoluteAmount}"></td>
                         <td th:text="${record.version}"></td>
                         <td th:text="${record.latestVersion}"></td>
                         <td>
