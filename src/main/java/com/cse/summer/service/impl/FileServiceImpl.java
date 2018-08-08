@@ -63,17 +63,35 @@ public class FileServiceImpl implements FileService {
         List<Structure> structureList = new ArrayList<>(100);
         xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, null, machineName, -1, 1);
 
-        Machine machine = new Machine();
-        machine.setObjectId(Generator.getObjectId());
-        machine.setStatus(1);
-        machine.setName(machineName);
-        machine.setPatent(SummerConst.MachineType.MAN);
-        machineRepository.save(machine);
+        Machine targetMachine = machineRepository.findMachineByName(machineName);
+        if (null == targetMachine) {
+            Machine machine = new Machine();
+            machine.setObjectId(Generator.getObjectId());
+            machine.setStatus(1);
+            machine.setName(machineName);
+            machine.setPatent(SummerConst.MachineType.MAN);
+            machineRepository.save(machine);
+        }
 
         materialRepository.saveAll(materialList);
         structureRepository.saveAll(structureList);
     }
 
+    /**
+     * 层级遍历
+     *
+     * @param element       被遍历的元素
+     * @param materialList  用于储存物料的集合，被遍历的元素统一存放到此处
+     * @param structureList 用于存储部套的集合
+     * @param structureNo   部套号
+     * @param parentId      父节点ID
+     * @param machineName   机器名
+     * @param parentLevel   父节点层级
+     * @param amount        父节点总数量
+     *                      部套判断是否已存在时的比较属性：机器名、物料号、专利方版本、部套号、是否已删除
+     *                      物料判断是否已存在时的比较属性：物料号、专利方版本
+     *                      先判断部套是否存在，如果部套存在那么该物料一定存在，如果部套不存在，才判断物料是否存在
+     */
     @SuppressWarnings("unchecked")
     private void xmlRecursiveTraversal(Element element, List<Material> materialList, List<Structure> structureList, String structureNo, String parentId, String machineName, int parentLevel, int amount) {
         if ("designSpec".equals(element.getName())) {
@@ -86,42 +104,54 @@ public class FileServiceImpl implements FileService {
             }
         } else if ("module".equals(element.getName())) {
             Element revision = element.element("revision");
-            // 如果库中已有当前部套，则不会再次导入
-            List<Material> materials = materialRepository.findMaterialByMaterialNoAndMaterialVersionAndTypeAndLevel(
-                    element.attributeValue("id"), revision.attributeValue("revision"), 1, 0);
-            Structure structure = new Structure();
-            structure.setObjectId(Generator.getObjectId());
-            structure.setStatus(1);
-            structure.setMachineName(machineName);
-            structure.setRevision(revision.attributeValue("revision"));
-            structure.setStructureNo(revision.element("structureNo").getText());
-            if (materials.size() > 0) {
-                structure.setVersion(materials.get(0).getLatestVersion());
-                structureList.add(structure);
-            } else {
-                Material material = new Material(1);
-                int level = parentLevel + 1;
-                material.setLevel(level);
-                material.setObjectId(Generator.getObjectId());
-                material.setStatus(1);
-                material.setVersion(0);
-                material.setLatestVersion(0);
-                material.setMaterialNo(element.attributeValue("id"));
-                material.setName(element.element("name").getText());
-                material.setMaterialVersion(revision.attributeValue("revision"));
-                material.setPage(revision.element("noOfPages").getText());
-                material.setWeight(revision.element("mass").getText());
-                material.setStructureNo(revision.element("structureNo").getText());
-                material.setAmount(revision.element("quantity").getText());
-                material.setAbsoluteAmount(revision.element("quantity").getText());
-                materialList.add(material);
-                Element parts = revision.element("partList");
-                amount = Integer.parseInt(revision.element("quantity").getText());
-                int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getStructureNo(), material.getObjectId(), machineName, level, amount);
-                material.setChildCount(childCount);
+            String structNoM = revision.element("structureNo").getText();
+            String materNoM = element.attributeValue("id");
+            String materVersionM = revision.attributeValue("revision");
+            // 判断部套是否存在，不存在的情况下才需要保存该部套信息
+            Structure targetStruct = structureRepository.findExistStructure(machineName, structNoM, materNoM, materVersionM);
+            // 如果部套不存在，则保存部套，并判断库中是否有部套对应的物料，物料存在则重用库中物料，不存在则新建物料
+            // 如果部套已经存在，那么物料一定也存在了，那么该部套对应的物料所有的子节点都不需要遍历了
+            if (null == targetStruct) {
+                targetStruct = new Structure();
+                targetStruct.setObjectId(Generator.getObjectId());
+                targetStruct.setStatus(1);
+                targetStruct.setMachineName(machineName);
+                targetStruct.setStructureNo(structNoM);
+                targetStruct.setMaterialNo(materNoM);
+                targetStruct.setRevision(materVersionM);
 
-                structure.setVersion(0);
-                structureList.add(structure);
+                // 判断待保存的物料是否存在
+                List<Material> materials = materialRepository.findAllByMaterialNoAndMaterialVersionAndLevel(materNoM, materVersionM, 0);
+                // 集合大于0表示物料存在
+                if (materials.size() > 0) {
+                    // 使用该物料的最新版本作为部套的目标物料版本
+                    targetStruct.setVersion(materials.get(0).getLatestVersion());
+                } else {
+                    // 如果物料不存在，则需要保存物料的数据，并遍历物料的所有子节点
+                    Material material = new Material(1);
+                    int level = parentLevel + 1;
+                    material.setLevel(level);
+                    material.setObjectId(Generator.getObjectId());
+                    material.setStatus(1);
+                    material.setVersion(0);
+                    material.setLatestVersion(0);
+                    material.setMaterialNo(materNoM);
+                    material.setName(element.element("name").getText());
+                    material.setMaterialVersion(materVersionM);
+                    material.setPage(revision.element("noOfPages").getText());
+                    material.setWeight(revision.element("mass").getText());
+                    material.setStructureNo(structNoM);
+                    // 可能存在数量为1.00的形式，所以字符串先转为double再转为int
+                    material.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
+                    material.setAbsoluteAmount((int) Double.parseDouble(revision.element("quantity").getText()));
+                    materialList.add(material);
+                    Element parts = revision.element("partList");
+                    amount = Integer.parseInt(revision.element("quantity").getText());
+                    int childCount = xmlPartsRecursiveTraversal(parts, materialList, structNoM, material.getObjectId(), machineName, level, amount);
+                    material.setChildCount(childCount);
+                    targetStruct.setVersion(0);
+                }
+                structureList.add(targetStruct);
             }
         } else if ("part".equals(element.getName())) {
             Material material = new Material(1);
@@ -142,9 +172,9 @@ public class FileServiceImpl implements FileService {
             }
             if (null != revision.element("quantity")) {
                 int absoluteAmount = (int) Double.parseDouble(revision.element("quantity").getText());
-                material.setAbsoluteAmount(String.valueOf(absoluteAmount));
+                material.setAbsoluteAmount(absoluteAmount);
                 amount = absoluteAmount * amount;
-                material.setAmount(String.valueOf(amount));
+                material.setAmount(amount);
             }
             if (null != revision.element("drawingSize")) {
                 material.setDrawingSize(revision.element("drawingSize").getText());
@@ -183,9 +213,9 @@ public class FileServiceImpl implements FileService {
             }
             if (null != revision.element("quantity")) {
                 int absoluteAmount = (int) Double.parseDouble(revision.element("quantity").getText());
-                material.setAbsoluteAmount(String.valueOf(absoluteAmount));
+                material.setAbsoluteAmount(absoluteAmount);
                 amount = absoluteAmount * amount;
-                material.setAmount(String.valueOf(amount));
+                material.setAmount(amount);
             }
             if (null != revision.element("drawingSize")) {
                 material.setDrawingSize(revision.element("drawingSize").getText());
@@ -204,6 +234,18 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    /**
+     * 查找该层元素是否有子节点并决定继续遍历的方法
+     *
+     * @param parts        该层元素
+     * @param materialList 用于储存物料的集合，被遍历的元素统一存放到此处
+     * @param structureNo  该子节点物料所在顶层物料的部套号
+     * @param parentId     父物料节点ID
+     * @param machineName  机器名，用于部套数据检索，确定该机器是否已有某一部套
+     * @param parentLevel  父节点层级
+     * @param amount       父节点总数量，子节点根据父节点总数量计算总数量
+     * @return 该层元素子节点数
+     */
     @SuppressWarnings("unchecked")
     private int xmlPartsRecursiveTraversal(Element parts, List<Material> materialList, String structureNo, String parentId, String machineName, int parentLevel, int amount) {
         int childCount = 0;
@@ -254,129 +296,141 @@ public class FileServiceImpl implements FileService {
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
         winGDExcelProcess(machineName, workbook, materialList, structureList);
-        Machine machine = new Machine();
-        machine.setObjectId(Generator.getObjectId());
-        machine.setStatus(1);
-        machine.setName(machineName);
-        machine.setPatent(SummerConst.MachineType.WIN_GD);
-        machineRepository.save(machine);
+
+        Machine targetMachine = machineRepository.findMachineByName(machineName);
+        if (null == targetMachine) {
+            Machine machine = new Machine();
+            machine.setObjectId(Generator.getObjectId());
+            machine.setStatus(1);
+            machine.setName(machineName);
+            machine.setPatent(SummerConst.MachineType.WIN_GD);
+            machineRepository.save(machine);
+        }
+
         structureRepository.saveAll(structureList);
         materialRepository.saveAll(materialList);
     }
 
     private void winGDExcelProcess(String machineName, Workbook workbook, List<Material> materialList, List<Structure> structureList) {
         // 建立维护层级关系的数组
-        Material[] levelArray = new Material[10];
+        Material[] levelArray = new Material[12];
         Sheet sheet = workbook.getSheetAt(1);
         int index = 0;
+        String unImportStruct = "";
         for (Row row : sheet) {
             if (index < 1) {
                 index++;
             } else {
-                String unImportStruct = "";
-                if (null != row.getCell(0)) {
-                    // 获取该节点层级，从0开始
-                    int level = row.getCell(0).toString().length() / 3 - 1;
-                    if (0 == level) {
-                        Structure structure = new Structure();
-                        structure.setObjectId(Generator.getObjectId());
-                        structure.setStatus(1);
-                        structure.setMachineName(machineName);
-                        structure.setStructureNo(row.getCell(8).toString());
-                        String materialVersion = "";
-                        if (null != row.getCell(5)) {
-                            materialVersion = row.getCell(5).toString();
-                        }
-                        structure.setRevision(materialVersion);
+                String materNo = row.getCell(4).toString();
+                String materVersion = row.getCell(5).toString();
+                // 获取该节点层级，从0开始
+                int level = row.getCell(0).toString().length() / 3 - 1;
+                if (0 == level) {
+                    // 设为空，防止多个部套，部套名相同但物料号不同的情况
+                    unImportStruct = "";
+                    String structNo = row.getCell(8).toString();
+                    Structure targetStruct = structureRepository.findExistStructure(machineName, structNo, materNo, materVersion);
 
-                        List<Material> materials = materialRepository.findMaterialByMaterialNoAndMaterialVersionAndTypeAndLevel(
-                                row.getCell(4).toString(), materialVersion, 2, 0);
+                    // 当部套不存在的时候就新创建部套
+                    if (null == targetStruct) {
+                        targetStruct = new Structure();
+                        targetStruct.setObjectId(Generator.getObjectId());
+                        targetStruct.setStatus(1);
+                        targetStruct.setMachineName(machineName);
+                        targetStruct.setStructureNo(structNo);
+                        targetStruct.setMaterialNo(materNo);
+                        targetStruct.setRevision(materVersion);
+
+                        // 当物料存在时就为部套设置物料最新的版本
+                        List<Material> materials = materialRepository.findAllByMaterialNoAndMaterialVersionAndLevel(materNo, materVersion, 0);
                         if (materials.size() > 0) {
-                            structure.setVersion(materials.get(0).getLatestVersion());
-                            unImportStruct = structure.getStructureNo();
+                            targetStruct.setVersion(materials.get(0).getLatestVersion());
+                            // 当物料存在时，不需要再导入
+                            unImportStruct = structNo;
                         } else {
-                            structure.setVersion(0);
+                            targetStruct.setVersion(0);
                         }
-                        structureList.add(structure);
-                    }
-
-                    Material material = new Material(2);
-                    material.setObjectId(Generator.getObjectId());
-                    material.setStatus(1);
-                    material.setVersion(0);
-                    material.setLatestVersion(0);
-                    material.setChildCount(0);
-                    if (null != row.getCell(1)) {
-                        material.setDrawingSize(row.getCell(1).toString());
-                    }
-                    if (null != row.getCell(2)) {
-                        material.setDrawingNo(row.getCell(2).toString());
-                    }
-                    if (null != row.getCell(3)) {
-                        material.setDrawingVersion(row.getCell(3).toString());
-                    }
-                    if (null != row.getCell(4)) {
-                        material.setMaterialNo(row.getCell(4).toString());
-                    }
-                    if (null != row.getCell(5)) {
-                        material.setMaterialVersion(row.getCell(5).toString());
+                        structureList.add(targetStruct);
                     } else {
-                        material.setMaterialVersion("");
+                        // 当该部套存在时，该部套存在的物料也已经存在，所以不需要导入
+                        unImportStruct = structNo;
                     }
-                    if (null != row.getCell(7)) {
-                        material.setName(row.getCell(7).toString());
-                    }
-                    if (null != row.getCell(8)) {
-                        material.setStructureNo(row.getCell(8).toString());
-                    }
-                    if (null != row.getCell(9)) {
-                        material.setMaterial(row.getCell(9).toString());
-                    }
-                    if (null != row.getCell(10)) {
-                        material.setMaterialJis(row.getCell(10).toString());
-                    }
-                    if (null != row.getCell(11)) {
-                        material.setMaterialWin(row.getCell(11).toString());
-                    }
-                    if (null != row.getCell(12)) {
-                        material.setWeight(row.getCell(12).toString());
-                    }
-                    if (null != row.getCell(13)) {
-                        material.setPositionNo(row.getCell(13).toString());
-                    }
-                    if (null != row.getCell(14)) {
-                        material.setAmount(row.getCell(14).toString());
-                    }
-                    if (null != row.getCell(16)) {
-                        material.setModifyNote(row.getCell(16).toString());
-                    }
-                    if (null != row.getCell(19)) {
-                        material.setAbsoluteAmount(row.getCell(19).toString());
-                    }
-                    if (null != row.getCell(0)) {
-                        // 维护WinGD原层级格式
-                        material.setSrcLevel(row.getCell(0).toString());
-                        // 获取该节点层级，从0开始
-                        int aLevel = row.getCell(0).toString().length() / 3 - 1;
-                        // 设置层级
-                        material.setLevel(aLevel);
-                        if (0 == aLevel) {
-                            // 最上层节点时不设置父节点
-                            levelArray[0] = material;
-                        } else {
-                            Material parentMat = levelArray[aLevel - 1];
-                            parentMat.setChildCount(parentMat.getChildCount() + 1);
-                            // 根据最上级节点设置部套号
-                            material.setStructureNo(parentMat.getStructureNo());
-                            // 设置该节点所属上级节点的ID
-                            material.setParentId(parentMat.getObjectId());
-                            // 将该节点覆盖数组中相同层级的上一个节点
-                            levelArray[aLevel] = material;
-                        }
-                    }
-                    if (!unImportStruct.equals(material.getStructureNo())) {
-                        materialList.add(material);
-                    }
+                }
+
+                // 此处，即使部套已经存在也还需要遍历表，因为此处不是树级结构
+                Material material = new Material(2);
+                material.setObjectId(Generator.getObjectId());
+                material.setStatus(1);
+                material.setVersion(0);
+                material.setLatestVersion(0);
+                material.setChildCount(0);
+                material.setMaterialNo(materNo);
+                material.setMaterialVersion(materVersion);
+
+                if (null != row.getCell(1)) {
+                    material.setDrawingSize(row.getCell(1).toString());
+                }
+                if (null != row.getCell(2)) {
+                    material.setDrawingNo(row.getCell(2).toString());
+                }
+                if (null != row.getCell(3)) {
+                    material.setDrawingVersion(row.getCell(3).toString());
+                }
+                if (null != row.getCell(7)) {
+                    material.setName(row.getCell(7).toString());
+                }
+                if (null != row.getCell(8)) {
+                    material.setStructureNo(row.getCell(8).toString());
+                }
+                if (null != row.getCell(9) && !"".equals(row.getCell(9).toString())) {
+                    material.setMaterial(row.getCell(9).toString());
+                } else if (null != row.getCell(10) && !"".equals(row.getCell(10).toString())) {
+                    material.setMaterial(row.getCell(10).toString());
+                } else if (null != row.getCell(11) && !"".equals(row.getCell(11).toString())) {
+                    material.setMaterial(row.getCell(11).toString());
+                } else {
+                    material.setMaterial("");
+                }
+                if (null != row.getCell(12)) {
+                    material.setWeight(row.getCell(12).toString());
+                }
+                if (null != row.getCell(13)) {
+                    material.setPositionNo(row.getCell(13).toString());
+                }
+                if (null != row.getCell(14)) {
+                    material.setAmount((int) Double.parseDouble(row.getCell(14).toString()));
+                }
+                if (null != row.getCell(16)) {
+                    material.setModifyNote(row.getCell(16).toString());
+                }
+                if (null != row.getCell(19)) {
+                    material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(19).toString()));
+                }
+
+                // 维护WinGD原层级格式
+                material.setSrcLevel(row.getCell(0).toString());
+                // 设置层级
+                material.setLevel(level);
+                if (0 == level) {
+                    // 最上层节点时不设置父节点
+                    levelArray[0] = material;
+                } else {
+                    Material parentMat = levelArray[level - 1];
+                    parentMat.setChildCount(parentMat.getChildCount() + 1);
+                    // 根据最上级节点设置部套号
+                    material.setStructureNo(parentMat.getStructureNo());
+                    // 设置该节点所属上级节点的ID
+                    material.setParentId(parentMat.getObjectId());
+                    // 将该节点覆盖数组中相同层级的上一个节点
+                    levelArray[level] = material;
+                }
+
+                int amount = (int) Double.parseDouble(row.getCell(14).toString());
+                material.setAmount(amount);
+                material.setAbsoluteAmount(amount);
+
+                if (!unImportStruct.equals(material.getStructureNo())) {
+                    materialList.add(material);
                 }
             }
         }
@@ -461,13 +515,13 @@ public class FileServiceImpl implements FileService {
                     material.setName(row.getCell(6).toString());
                 }
                 if (null != row.getCell(7)) {
-                    material.setAmount(row.getCell(7).toString());
+                    material.setAmount(Integer.valueOf(row.getCell(7).toString()));
                 }
                 if (null != row.getCell(8)) {
                     material.setWeight(row.getCell(8).toString());
                 }
                 if (null != row.getCell(9)) {
-                    material.setAbsoluteAmount(row.getCell(9).toString());
+                    material.setAbsoluteAmount(Integer.valueOf(row.getCell(9).toString()));
                 }
                 recordList.add(material);
             }

@@ -13,10 +13,6 @@ public class Material extends Entity implements Serializable {
      * 物料名称
      */
     private String name;
-//    /**
-//     * 机器名称
-//     */
-//    private String machineName;
     /**
      * 父物料的objectId
      */
@@ -45,10 +41,6 @@ public class Material extends Entity implements Serializable {
      * 排序号
      */
     private String sequenceNo;
-//    /**
-//     * MAN专用版本号
-//     */
-//    private String revision;
     /**
      * 当前版本号
      */
@@ -67,17 +59,9 @@ public class Material extends Entity implements Serializable {
      */
     private String materialVersion;
     /**
-     * 一级材料
+     * 材料名称
      */
     private String material;
-    /**
-     * 二级材料
-     */
-    private String materialJis;
-    /**
-     * 三级材料
-     */
-    private String materialWin;
 
     /**
      * 图纸大小
@@ -99,11 +83,11 @@ public class Material extends Entity implements Serializable {
     /**
      * 总数量
      */
-    private String amount;
+    private Integer amount;
     /**
      * 数量
      */
-    private String absoluteAmount;
+    private Integer absoluteAmount;
 
     /**
      * 更改通知
@@ -117,10 +101,6 @@ public class Material extends Entity implements Serializable {
      * 子节点数量
      */
     private Integer childCount;
-//    /**
-//     * 是否正在使用
-//     */
-//    private Boolean active;
 
     public Material() {
     }
@@ -233,22 +213,6 @@ public class Material extends Entity implements Serializable {
         this.material = material;
     }
 
-    public String getMaterialJis() {
-        return materialJis;
-    }
-
-    public void setMaterialJis(String materialJis) {
-        this.materialJis = materialJis;
-    }
-
-    public String getMaterialWin() {
-        return materialWin;
-    }
-
-    public void setMaterialWin(String materialWin) {
-        this.materialWin = materialWin;
-    }
-
     public String getDrawingSize() {
         return drawingSize;
     }
@@ -281,19 +245,19 @@ public class Material extends Entity implements Serializable {
         this.weight = weight;
     }
 
-    public String getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(Integer amount) {
         this.amount = amount;
     }
 
-    public String getAbsoluteAmount() {
+    public Integer getAbsoluteAmount() {
         return absoluteAmount;
     }
 
-    public void setAbsoluteAmount(String absoluteAmount) {
+    public void setAbsoluteAmount(Integer absoluteAmount) {
         this.absoluteAmount = absoluteAmount;
     }
 

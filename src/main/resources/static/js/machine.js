@@ -66,8 +66,6 @@ $(document).ready(function () {
         $("#materialNo0").text(currentNode.materialNo);
         $("#materialVersion0").text(currentNode.materialVersion);
         $("#material0").text(currentNode.material);
-        $("#materialJis0").text(currentNode.materialJis);
-        $("#materialWin0").text(currentNode.materialWin);
         $("#drawingNo0").text(currentNode.drawingNo);
         $("#drawingVersion0").text(currentNode.drawingVersion);
         $("#drawingSize0").text(currentNode.drawingSize);

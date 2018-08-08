@@ -38,7 +38,7 @@ public class StructureServiceImpl implements StructureService {
             Structure targetStruct = new Structure();
             targetStruct.setObjectId(Generator.getObjectId());
             targetStruct.setStatus(1);
-            targetStruct.setStructureNo(material.getStructureNo());
+            targetStruct.setStructureNo(structure.getStructureNo());
             targetStruct.setMachineName(structure.getMachineName());
             targetStruct.setVersion(material.getVersion());
             targetStruct.setRevision(material.getMaterialVersion());

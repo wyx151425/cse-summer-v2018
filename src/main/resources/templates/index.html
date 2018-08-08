@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>产品列表</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.png}" type="image/x-icon"/>
     <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
     <link rel="stylesheet" th:href="@{/css/summer.css}">
     <script th:src="@{/js/jquery-3.3.1.js}"></script>
@@ -142,10 +143,7 @@
             </div>
             <form  id="machineEditForm">
                 <div class="modal-body">
-                    <label for="id" class="control-label col-lg-2 col-md-2">ID</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="id" class="form-control" type="text" hidden="hidden"/>
-                    </div>
+                    <input id="id" class="form-control" type="hidden"/>
                     <label for="name" class="control-label col-lg-2 col-md-2">名称</label>
                     <div class="form-group col-lg-10 col-md-10">
                         <input id="name" class="form-control" type="text" readonly="readonly"/>

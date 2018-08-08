@@ -72,6 +72,7 @@ $(document).ready(function () {
 
     $("#updateBtn").click(function () {
         $("#machineEditForm").css("display", "none");
+        $("#machineEditConfirm").css("display", "block");
         let machineEditProgress = $("#machineEditProgress");
         machineEditProgress.css("display", "block")
             .text("数据修改中...");
@@ -117,5 +118,5 @@ function toUpdateMachine(machineId, machineName, machineNo, machineType, cylinde
     $("#shipNo").val(shipNo);
     $("#classificationSociety").val(classificationSociety);
     $("#machineEditForm").css("display", "block");
-    $("#machineEditProgress").css("display", "none");
+    $("#machineEditConfirm").css("display", "none");
 }
