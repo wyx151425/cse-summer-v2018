@@ -40,4 +40,16 @@ public class MachineServiceImpl implements MachineService {
     public List<Machine> findMachineList() {
         return machineRepository.findAll();
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateMachine(Machine machine) {
+        Machine targetMac = machineRepository.getOne(machine.getId());
+        targetMac.setType(machine.getType());
+        targetMac.setClassificationSociety(machine.getClassificationSociety());
+        targetMac.setCylinderAmount(machine.getCylinderAmount());
+        targetMac.setNumber(machine.getNumber());
+        targetMac.setShipNo(machine.getShipNo());
+        machineRepository.save(targetMac);
+    }
 }

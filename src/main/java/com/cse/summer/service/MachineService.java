@@ -22,4 +22,11 @@ public interface MachineService {
      * @return 机器数据列表
      */
     List<Machine> findMachineList();
+
+    /**
+     * 更新机器信息
+     *
+     * @param machine 机器数据
+     */
+    void updateMachine(Machine machine);
 }

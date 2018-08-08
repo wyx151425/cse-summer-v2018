@@ -204,8 +204,6 @@ $(document).ready(function () {
             }
         });
     });
-
-
 });
 
 function deleteStructure(machineName, structureNo) {
