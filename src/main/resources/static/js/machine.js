@@ -159,9 +159,10 @@ $(document).ready(function () {
     });
 
     $("#exportStructure").click(function () {
-        let structureNo = $("#structureNo5").val();
+        let materialNo = $("#materialNo5").val();
+        let revision = $("#revision5").val();
         let version = $("#version5").val();
-        let url = "api/files/export/structure?structureNo=" + structureNo + "&version=" + version;
+        let url = "api/files/export/structure?materialNo=" + materialNo + "&materialVersion" + revision +"&version=" + version;
         let link= $('<a href="'+ url +'"></a>');
         link.get(0).click();
     });
@@ -182,7 +183,8 @@ $(document).ready(function () {
             // 发送到服务器的数据。
             data: JSON.stringify({
                 machineName: $("#machineName7").val(),
-                structureNo: $("#structureNo7").val(),
+                materialNo: $("#materialNo7").val(),
+                revision: $("#revision7").val(),
                 version: $("#version7").val()
             }),
             async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
@@ -190,8 +192,10 @@ $(document).ready(function () {
             success: function (data) {
                 if (200 === data.statusCode) {
                     $("#addDbStructureProgress").text("更新成功，请刷新页面查看更新");
-                } else if (9001 === data.statusCode) {
-                    $("#addDbStructureProgress").text("部套不存在");
+                } else if(9001 === data.statusCode) {
+                    $("#addDbStructureProgress").text("该物料已经添加为该机器的部套");
+                } else if (10001 === data.statusCode) {
+                    $("#addDbStructureProgress").text("物料不存在");
                 } else {
                     $("#addDbStructureProgress").text("系统错误");
                 }
@@ -202,9 +206,61 @@ $(document).ready(function () {
             }
         });
     });
+
+    let list;
+
+    $("#search").click(function () {
+        let search = $(this);
+        search.text("查询中...");
+        $.ajax({
+            url: "api/materials/search?materialNo=" + $("#materialNo7").val(),
+            dataType: "json", // 预期服务器返回的数据类型
+            type: "get", // 请求方式GET
+            contentType: "application/json", // 发送信息至服务器时的内容编码类型
+            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
+            // 请求成功后的回调函数。
+            success: function (data) {
+                search.text("查询");
+                list = data.data;
+                let revisionSel = $("#revision7");
+                revisionSel.empty();
+                let versionSel = $("#version7");
+                versionSel.empty();
+                $.each(list, function (index, value) {
+                    revisionSel.append('<option value="' + value.revision + '">' + value.revision + '</option>');
+                });
+                let latestVersion = list[0].latestVersion;
+                for (let index = 0; index <= latestVersion; index++) {
+                    versionSel.append('<option value="' + index + '">' + index + '</option>');
+                }
+            },
+            // 请求出错时调用的函数
+            error: function () {
+                search.text("查询");
+                alert("数据发送失败");
+            }
+        });
+    });
+
+    $("#revision7").change(function () {
+        let revision7 = $(this);
+        let revision = revision7.val();
+        let latestVersion;
+        for (let index = 0; index < list.length; index++) {
+            if (revision == list[index].revision) {
+                latestVersion = list[index].latestVersion;
+                break;
+            }
+        }
+        let versionSel = $("#version7");
+        versionSel.empty();
+        for (let index = 0; index <= latestVersion; index++) {
+            versionSel.append('<option value="' + index + '">' + index + '</option>');
+        }
+    });
 });
 
-function deleteStructure(machineName, structureNo) {
+function deleteStructure(id) {
     $.ajax({
         url: "api/structures",
         dataType: "json", // 预期服务器返回的数据类型
@@ -212,8 +268,7 @@ function deleteStructure(machineName, structureNo) {
         contentType: "application/json", // 发送信息至服务器时的内容编码类型
         // 发送到服务器的数据。
         data: JSON.stringify({
-            machineName: machineName,
-            structureNo: structureNo
+            id: id
         }),
         async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
         // 请求成功后的回调函数。
@@ -242,8 +297,10 @@ function versionList(structureNo, latestVersion) {
     }
 }
 
-function structureExport(structureNo, latestVersion) {
+function structureExport(structureNo, materialNo, revision, latestVersion) {
     $("#structureNo5").attr("value", structureNo);
+    $("#materialNo").attr("value", materialNo);
+    $("#revision5").attr("Value", revision);
     let select = $("#version5");
     select.empty();
     for (let index = 0; index <= latestVersion; index++) {

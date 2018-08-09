@@ -2,6 +2,8 @@ package com.cse.summer.service;
 
 import com.cse.summer.domain.Structure;
 
+import java.util.List;
+
 /**
  * @author 王振琦
  */
@@ -23,7 +25,15 @@ public interface StructureService {
     /**
      * 删除部套
      *
-     * @param structure 部套对象
+     * @param id 待删除部套的ID
      */
-    void deleteStructure(Structure structure);
+    void deleteStructure(Integer id);
+
+    /**
+     * 根据机器的名称获取部套
+     *
+     * @param machineName 机器名称
+     * @return 查询获得的BomRecord列表对象
+     */
+    List<Structure> findStructureListByMachineName(String machineName);
 }

@@ -284,4 +284,14 @@ public class Material extends Entity implements Serializable {
     public void setChildCount(Integer childCount) {
         this.childCount = childCount;
     }
+
+    @Override
+    public String toString() {
+        return "Material{" +
+                "materialNo='" + materialNo  +
+                ", materialVersion='" + materialVersion + '\'' +
+                ", version=" + version + '\'' +
+                ", latestVersion=" + latestVersion + '\'' +
+                '}';
+    }
 }

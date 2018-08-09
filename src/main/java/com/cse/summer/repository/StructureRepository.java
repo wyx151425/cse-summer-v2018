@@ -1,6 +1,7 @@
 package com.cse.summer.repository;
 
 import com.cse.summer.domain.Material;
+import com.cse.summer.domain.StructMater;
 import com.cse.summer.domain.Structure;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -51,4 +52,26 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
      */
     @Query("select m from Structure s left join Material m on s.version = m.version and s.structureNo = m.structureNo where s.status > 0 and s.machineName = :machineName and m.level = 0 order by s.structureNo")
     List<Material> findStructureMaterial(@Param("machineName") String machineName);
+
+    /**
+     * 连接查询机器部套
+     *
+     * @param machineName 机器名
+     * @return 部套对应的物料数据集合
+     */
+    @Query("select new com.cse.summer.domain.StructMater(s, m) from Structure s left join Material m on s.materialNo = m.materialNo and s.revision = m.materialVersion and s.version = m.version where s.status = 1 and s.machineName = :machineName and m.level = 0 order by s.structureNo")
+    List<StructMater> findAllStructureAndMaterial(@Param("machineName") String machineName);
+
+    /**
+     * 保存部套时使用，检查部套是否已经与物料关联
+     * @param machineName 机器名
+     * @param materialNo 物料号
+     * @param revision 专利方版本
+     * @param version 版本号
+     * @param status 状态标识
+     * @return 查询到的部套
+     */
+    Structure findStructureByMachineNameAndMaterialNoAndRevisionAndVersionAndStatus(
+            String machineName, String materialNo, String revision, Integer version, Integer status
+    );
 }

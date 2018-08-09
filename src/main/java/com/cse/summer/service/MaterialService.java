@@ -3,6 +3,7 @@ package com.cse.summer.service;
 import com.cse.summer.domain.Material;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 物料业务逻辑类
@@ -26,4 +27,12 @@ public interface MaterialService {
      * @return 查询获得的BomRecord列表对象
      */
     List<Material> findDirectLevelMaterialListByMachineName(String machineName);
+
+    /**
+     * 根据物料号查询该物料的所有专利方版本和每个专利方版本的最新版本号
+     *
+     * @param materialNo 物料号
+     * @return 数据传输对象
+     */
+    List<Map<String, String>> findRevisionAndLatestVersion(String materialNo);
 }

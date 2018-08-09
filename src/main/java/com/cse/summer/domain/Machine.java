@@ -12,14 +12,14 @@ import java.util.List;
 public class Machine extends Entity {
     private String name;
     private String number;
-    private String cylinderAmount;
+    private Integer cylinderAmount;
     private String shipNo;
     private String classificationSociety;
     private String patent;
     private String type;
 
     @Transient
-    private List<Material> materialList;
+    private List<Structure> structureList;
 
     public Machine() {
     }
@@ -40,11 +40,11 @@ public class Machine extends Entity {
         this.number = number;
     }
 
-    public String getCylinderAmount() {
+    public Integer getCylinderAmount() {
         return cylinderAmount;
     }
 
-    public void setCylinderAmount(String cylinderAmount) {
+    public void setCylinderAmount(Integer cylinderAmount) {
         this.cylinderAmount = cylinderAmount;
     }
 
@@ -80,11 +80,11 @@ public class Machine extends Entity {
         this.type = type;
     }
 
-    public List<Material> getMaterialList() {
-        return materialList;
+    public List<Structure> getStructureList() {
+        return structureList;
     }
 
-    public void setMaterialList(List<Material> materialList) {
-        this.materialList = materialList;
+    public void setStructureList(List<Structure> structureList) {
+        this.structureList = structureList;
     }
 }

@@ -1,7 +1,7 @@
 package com.cse.summer.domain;
 
+import javax.persistence.*;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 /**
  * @author 王振琦
@@ -29,6 +29,9 @@ public class Structure extends com.cse.summer.domain.Entity {
      * 物料版本
      */
     private Integer version;
+
+    @Transient
+    private Material material;
 
     public Structure() {
     }
@@ -73,6 +76,14 @@ public class Structure extends com.cse.summer.domain.Entity {
         this.version = version;
     }
 
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
+
     @Override
     public String toString() {
         return "Structure{" +
@@ -80,7 +91,8 @@ public class Structure extends com.cse.summer.domain.Entity {
                 ", structureNo='" + structureNo + '\'' +
                 ", materialNo='" + materialNo + '\'' +
                 ", revision='" + revision + '\'' +
-                ", version=" + version +
+                ", version=" + version + '\'' +
+                ", material=" + material + '\'' +
                 '}';
     }
 }

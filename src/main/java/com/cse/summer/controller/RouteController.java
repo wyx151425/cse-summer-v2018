@@ -2,7 +2,9 @@ package com.cse.summer.controller;
 
 import com.cse.summer.domain.Machine;
 import com.cse.summer.domain.Material;
+import com.cse.summer.domain.Structure;
 import com.cse.summer.service.MachineService;
+import com.cse.summer.service.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,10 +41,10 @@ public class RouteController {
     ) {
         ModelAndView mv = new ModelAndView();
         Machine machine = machineService.findMachine(machineId);
-        List<Material> materialList = machine.getMaterialList();
-        machine.setMaterialList(null);
+        List<Structure> structureList = machine.getStructureList();
+        machine.setStructureList(null);
         mv.addObject("machine", machine);
-        mv.addObject("materialList", materialList);
+        mv.addObject("structureList", structureList);
         mv.setViewName("machine");
         return mv;
     }

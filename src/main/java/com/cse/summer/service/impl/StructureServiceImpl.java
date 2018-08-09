@@ -2,6 +2,7 @@ package com.cse.summer.service.impl;
 
 import com.cse.summer.context.exception.SummerException;
 import com.cse.summer.domain.Material;
+import com.cse.summer.domain.StructMater;
 import com.cse.summer.domain.Structure;
 import com.cse.summer.repository.MaterialRepository;
 import com.cse.summer.repository.StructureRepository;
@@ -11,6 +12,9 @@ import com.cse.summer.util.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author 王振琦
@@ -30,19 +34,23 @@ public class StructureServiceImpl implements StructureService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addDbStructure(Structure structure) {
-        Material material = materialRepository.findMaterialByStructureNoAndVersionAndLevel(
-                structure.getStructureNo(), structure.getVersion(), 0);
+        Material material = materialRepository.findMaterialByMaterialNoAndMaterialVersionAndVersionAndLevel(
+                structure.getMaterialNo(), structure.getRevision(), structure.getVersion(), 0);
         if (null == material) {
-            throw new SummerException(StatusCode.STRUCTURE_NO_EXIST);
+            // 检查库中是否有该物料
+            throw new SummerException(StatusCode.MATERIAL_NO_EXIST);
         } else {
-            Structure targetStruct = new Structure();
-            targetStruct.setObjectId(Generator.getObjectId());
-            targetStruct.setStatus(1);
-            targetStruct.setStructureNo(structure.getStructureNo());
-            targetStruct.setMachineName(structure.getMachineName());
-            targetStruct.setVersion(material.getVersion());
-            targetStruct.setRevision(material.getMaterialVersion());
-            structureRepository.save(targetStruct);
+            // 检查该部套是否已经与该物料关联
+            Structure target = structureRepository.findStructureByMachineNameAndMaterialNoAndRevisionAndVersionAndStatus(
+                    structure.getMachineName(), structure.getMaterialNo(), structure.getRevision(), structure.getVersion(), 1);
+            if (null == target) {
+                structure.setObjectId(Generator.getObjectId());
+                structure.setStatus(1);
+                structure.setStructureNo(material.getStructureNo());
+                structureRepository.save(structure);
+            } else {
+                throw new SummerException(StatusCode.STRUCTURE_EXIST);
+            }
         }
     }
 
@@ -57,10 +65,22 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteStructure(Structure structure) {
-        Structure targetStructure = structureRepository.findStructureByMachineNameAndStructureNoAndStatusGreaterThanEqual(
-                structure.getMachineName(), structure.getStructureNo(), 1);
+    public void deleteStructure(Integer id) {
+        Structure targetStructure = structureRepository.getOne(id);
         targetStructure.setStatus(0);
         structureRepository.save(targetStructure);
+    }
+
+    @Override
+    @Transactional(readOnly = true, rollbackFor = Exception.class)
+    public List<Structure> findStructureListByMachineName(String machineName) {
+        List<StructMater> list = structureRepository.findAllStructureAndMaterial(machineName);
+        List<Structure> structures = new ArrayList<>();
+        for (StructMater structMater : list) {
+            Structure structure = structMater.getStructure();
+            structure.setMaterial(structMater.getMaterial());
+            structures.add(structure);
+        }
+        return structures;
     }
 }

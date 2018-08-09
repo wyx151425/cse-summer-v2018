@@ -70,6 +70,11 @@ public class FileServiceImpl implements FileService {
             machine.setStatus(1);
             machine.setName(machineName);
             machine.setPatent(SummerConst.MachineType.MAN);
+            machine.setNumber("");
+            machine.setType("");
+            machine.setCylinderAmount(0);
+            machine.setShipNo("");
+            machine.setClassificationSociety("");
             machineRepository.save(machine);
         }
 
@@ -304,6 +309,11 @@ public class FileServiceImpl implements FileService {
             machine.setStatus(1);
             machine.setName(machineName);
             machine.setPatent(SummerConst.MachineType.WIN_GD);
+            machine.setNumber("");
+            machine.setType("");
+            machine.setCylinderAmount(0);
+            machine.setShipNo("");
+            machine.setClassificationSociety("");
             machineRepository.save(machine);
         }
 

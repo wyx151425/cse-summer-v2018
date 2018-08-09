@@ -31,7 +31,7 @@ public class StructureController extends BaseFacade {
 
     @DeleteMapping(value = "structures")
     public Response<Structure> actionDeleteStructure(@RequestBody Structure structure) {
-        structureService.deleteStructure(structure);
+        structureService.deleteStructure(structure.getId());
         return new Response<>();
     }
 }

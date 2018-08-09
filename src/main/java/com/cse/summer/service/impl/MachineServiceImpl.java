@@ -2,6 +2,8 @@ package com.cse.summer.service.impl;
 
 import com.cse.summer.domain.Machine;
 import com.cse.summer.domain.Material;
+import com.cse.summer.domain.StructMater;
+import com.cse.summer.domain.Structure;
 import com.cse.summer.repository.MachineRepository;
 import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.MachineService;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,8 +33,16 @@ public class MachineServiceImpl implements MachineService {
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public Machine findMachine(Integer id) {
         Machine machine = machineRepository.getOne(id);
-        List<Material> materialList = structureRepository.findStructureMaterial(machine.getName());
-        machine.setMaterialList(materialList);
+
+        List<StructMater> list = structureRepository.findAllStructureAndMaterial(machine.getName());
+        List<Structure> structures = new ArrayList<>();
+        for (StructMater structMater : list) {
+            Structure structure = structMater.getStructure();
+            structure.setMaterial(structMater.getMaterial());
+            structures.add(structure);
+        }
+
+        machine.setStructureList(structures);
         return machine;
     }
 

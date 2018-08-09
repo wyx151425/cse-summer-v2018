@@ -3,6 +3,8 @@ package com.cse.summer.repository;
 import com.cse.summer.domain.Material;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -57,4 +59,24 @@ public interface MaterialRepository extends JpaRepository<Material, Integer> {
      * @return 部套数据
      */
     Material findMaterialByStructureNoAndVersionAndLevel(String structureNo, Integer version, Integer level);
+
+    /**
+     * 根据物料号，专利方版本，版本号，层级精准查询物料
+     *
+     * @param materialNo      物料号
+     * @param materialVersion 物料号版本
+     * @param version         版本号
+     * @param level           层级
+     * @return 物料
+     */
+    Material findMaterialByMaterialNoAndMaterialVersionAndVersionAndLevel(String materialNo, String materialVersion, Integer version, Integer level);
+
+    /**
+     * 根据物料号查询物料
+     *
+     * @param materialNo 物料号
+     * @return 物料号数据集合
+     */
+    @Query("select m from Material m where m.materialNo = :materialNo group by m.materialVersion")
+    List<Material> findAllByMaterialNo(@Param("materialNo") String materialNo);
 }

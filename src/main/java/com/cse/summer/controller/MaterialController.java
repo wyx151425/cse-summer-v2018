@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author 王振琦
@@ -34,5 +35,11 @@ public class MaterialController {
     public Response<List<Material>> actionQueryBomRecordListByProductName(@PathVariable(value = "machineName") String machineName) {
         List<Material> materialList = materialService.findDirectLevelMaterialListByMachineName(machineName);
         return new Response<>(materialList);
+    }
+
+    @GetMapping(value = "materials/search")
+    public Response<List<Map<String, String>>> actionSearchStructureMaterialVersion(@RequestParam("materialNo") String materialNo) {
+        List<Map<String, String>> list = materialService.findRevisionAndLatestVersion(materialNo);
+        return new Response<>(list);
     }
 }
