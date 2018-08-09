@@ -1,8 +1,8 @@
 package com.cse.summer.service;
 
 import com.cse.summer.domain.Excel;
+import com.cse.summer.domain.Structure;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dom4j.DocumentException;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +35,16 @@ public interface FileService {
     void importWinGDExcel(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
+     * 导入新版本部套的BOM文件
+     *
+     * @param structure 封装了必要数据的部套对象
+     * @param file      Excel文件
+     * @throws InvalidFormatException 格式错误异常
+     * @throws IOException            输入输出异常
+     */
+    void importNewVersionStructureExcel(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
+
+    /**
      * 导出机器的完整BOM文件
      *
      * @param machineName 机器名
@@ -43,21 +53,10 @@ public interface FileService {
     Excel exportMachineExcel(String machineName);
 
     /**
-     * 导入新版本部套的BOM文件
-     *
-     * @param structureNo 部套号
-     * @param file        Excel文件
-     * @throws InvalidFormatException 格式错误异常
-     * @throws IOException            输入输出异常
-     */
-    void importNewVersionStructureExcel(String structureNo, MultipartFile file) throws InvalidFormatException, IOException;
-
-    /**
      * 导出机器指定版本的部套的BOM文件
      *
-     * @param structureNo 部套号
-     * @param version     版本号
+     * @param structure 部套对象
      * @return Excel文件
      */
-    Excel exportStructureExcel(String structureNo, Integer version);
+    Excel exportStructureExcel(Structure structure);
 }

@@ -4,7 +4,7 @@ CREATE TABLE `cse_machine` (
   `status` INT(1),
   `name` VARCHAR(255),
   `patent` varchar(255),
-  `number` varchar(255),
+  `structureNo` varchar(255),
   `type` varchar(255),
   `cylinder_amount` varchar(255),
   `classification_society` varchar(255),

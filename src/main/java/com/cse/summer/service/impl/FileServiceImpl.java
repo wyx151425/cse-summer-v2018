@@ -61,7 +61,7 @@ public class FileServiceImpl implements FileService {
         Element root = doc.getRootElement();
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
-        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, null, machineName, -1, 1);
+        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, 1, null, null);
 
         Machine targetMachine = machineRepository.findMachineByName(machineName);
         if (null == targetMachine) {
@@ -88,7 +88,6 @@ public class FileServiceImpl implements FileService {
      * @param element       被遍历的元素
      * @param materialList  用于储存物料的集合，被遍历的元素统一存放到此处
      * @param structureList 用于存储部套的集合
-     * @param structureNo   部套号
      * @param parentId      父节点ID
      * @param machineName   机器名
      * @param parentLevel   父节点层级
@@ -98,22 +97,24 @@ public class FileServiceImpl implements FileService {
      *                      先判断部套是否存在，如果部套存在那么该物料一定存在，如果部套不存在，才判断物料是否存在
      */
     @SuppressWarnings("unchecked")
-    private void xmlRecursiveTraversal(Element element, List<Material> materialList, List<Structure> structureList, String structureNo, String parentId, String machineName, int parentLevel, int amount) {
+    private void xmlRecursiveTraversal(
+            Element element, List<Material> materialList, List<Structure> structureList, String parentId,
+            String machineName, int parentLevel, int amount, String atNo, String atRevision) {
         if ("designSpec".equals(element.getName())) {
             logger.info("装置号id: " + element.attributeValue("id"));
             Element revision = element.element("revision");
             Element modules = revision.element("moduleList");
             List<Element> moduleList = modules.elements("module");
             for (Element module : moduleList) {
-                xmlRecursiveTraversal(module, materialList, structureList, null, null, machineName, parentLevel, amount);
+                xmlRecursiveTraversal(module, materialList, structureList, null, machineName, parentLevel, amount, null, null);
             }
         } else if ("module".equals(element.getName())) {
             Element revision = element.element("revision");
             String structNoM = revision.element("structureNo").getText();
             String materNoM = element.attributeValue("id");
-            String materVersionM = revision.attributeValue("revision");
+            String revisionM = revision.attributeValue("revision");
             // 判断部套是否存在，不存在的情况下才需要保存该部套信息
-            Structure targetStruct = structureRepository.findExistStructure(machineName, structNoM, materNoM, materVersionM);
+            Structure targetStruct = structureRepository.findExistStructure(machineName, structNoM, materNoM, revisionM);
             // 如果部套不存在，则保存部套，并判断库中是否有部套对应的物料，物料存在则重用库中物料，不存在则新建物料
             // 如果部套已经存在，那么物料一定也存在了，那么该部套对应的物料所有的子节点都不需要遍历了
             if (null == targetStruct) {
@@ -123,17 +124,18 @@ public class FileServiceImpl implements FileService {
                 targetStruct.setMachineName(machineName);
                 targetStruct.setStructureNo(structNoM);
                 targetStruct.setMaterialNo(materNoM);
-                targetStruct.setRevision(materVersionM);
+                targetStruct.setRevision(revisionM);
+                targetStruct.setVersion(0);
 
                 // 判断待保存的物料是否存在
-                List<Material> materials = materialRepository.findAllByMaterialNoAndMaterialVersionAndLevel(materNoM, materVersionM, 0);
+                List<Material> materials = materialRepository.findAllByMaterialNoAndRevisionAndLevel(materNoM, revisionM, 0);
                 // 集合大于0表示物料存在
                 if (materials.size() > 0) {
-                    // 使用该物料的最新版本作为部套的目标物料版本
-                    targetStruct.setVersion(materials.get(0).getLatestVersion());
                 } else {
                     // 如果物料不存在，则需要保存物料的数据，并遍历物料的所有子节点
                     Material material = new Material(1);
+                    material.setAtNo(materNoM);
+                    material.setAtRevision(revisionM);
                     int level = parentLevel + 1;
                     material.setLevel(level);
                     material.setObjectId(Generator.getObjectId());
@@ -142,24 +144,24 @@ public class FileServiceImpl implements FileService {
                     material.setLatestVersion(0);
                     material.setMaterialNo(materNoM);
                     material.setName(element.element("name").getText());
-                    material.setMaterialVersion(materVersionM);
+                    material.setRevision(revisionM);
                     material.setPage(revision.element("noOfPages").getText());
                     material.setWeight(revision.element("mass").getText());
-                    material.setStructureNo(structNoM);
                     // 可能存在数量为1.00的形式，所以字符串先转为double再转为int
                     material.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
                     material.setAbsoluteAmount((int) Double.parseDouble(revision.element("quantity").getText()));
                     materialList.add(material);
                     Element parts = revision.element("partList");
                     amount = Integer.parseInt(revision.element("quantity").getText());
-                    int childCount = xmlPartsRecursiveTraversal(parts, materialList, structNoM, material.getObjectId(), machineName, level, amount);
+                    int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, amount, materNoM, revisionM);
                     material.setChildCount(childCount);
-                    targetStruct.setVersion(0);
                 }
                 structureList.add(targetStruct);
             }
         } else if ("part".equals(element.getName())) {
             Material material = new Material(1);
+            material.setAtNo(atNo);
+            material.setAtRevision(atRevision);
             int level = parentLevel + 1;
             material.setLevel(level);
             material.setObjectId(Generator.getObjectId());
@@ -167,11 +169,10 @@ public class FileServiceImpl implements FileService {
             material.setVersion(0);
             material.setLatestVersion(0);
             material.setParentId(parentId);
-            material.setStructureNo(structureNo);
             material.setMaterialNo(element.attributeValue("id"));
             material.setName(element.element("name").getText());
             Element revision = element.element("revision");
-            material.setMaterialVersion(revision.attributeValue("revision"));
+            material.setRevision(revision.attributeValue("revision"));
             if (null != revision.element("mass")) {
                 material.setWeight(revision.element("mass").getText());
             }
@@ -195,12 +196,14 @@ public class FileServiceImpl implements FileService {
             }
             materialList.add(material);
             Element parts = revision.element("partList");
-            int childCount = xmlPartsRecursiveTraversal(parts, materialList, structureNo, material.getObjectId(), machineName, level, amount);
+            int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, amount, atNo, atRevision);
 
             material.setChildCount(childCount);
         } else if ("standardPart".equals(element.getName()) || "document".equals(element.getName())
                 || "supDrawing".equals(element.getName()) || "licData".equals(element.getName())) {
             Material material = new Material(1);
+            material.setAtNo(atNo);
+            material.setAtRevision(atRevision);
             int level = parentLevel + 1;
             material.setLevel(level);
             material.setObjectId(Generator.getObjectId());
@@ -208,11 +211,10 @@ public class FileServiceImpl implements FileService {
             material.setVersion(0);
             material.setLatestVersion(0);
             material.setParentId(parentId);
-            material.setStructureNo(structureNo);
             material.setMaterialNo(element.attributeValue("id"));
             material.setName(element.element("name").getText());
             Element revision = element.element("revision");
-            material.setMaterialVersion(revision.attributeValue("revision"));
+            material.setRevision(revision.attributeValue("revision"));
             if (null != revision.element("mass")) {
                 material.setWeight(revision.element("mass").getText());
             }
@@ -244,7 +246,6 @@ public class FileServiceImpl implements FileService {
      *
      * @param parts        该层元素
      * @param materialList 用于储存物料的集合，被遍历的元素统一存放到此处
-     * @param structureNo  该子节点物料所在顶层物料的部套号
      * @param parentId     父物料节点ID
      * @param machineName  机器名，用于部套数据检索，确定该机器是否已有某一部套
      * @param parentLevel  父节点层级
@@ -252,42 +253,42 @@ public class FileServiceImpl implements FileService {
      * @return 该层元素子节点数
      */
     @SuppressWarnings("unchecked")
-    private int xmlPartsRecursiveTraversal(Element parts, List<Material> materialList, String structureNo, String parentId, String machineName, int parentLevel, int amount) {
+    private int xmlPartsRecursiveTraversal(Element parts, List<Material> materialList, String parentId, String machineName, int parentLevel, int amount, String atNo, String atRevision) {
         int childCount = 0;
         if (null != parts) {
             List<Element> partList = parts.elements("part");
             if (partList.size() > 0) {
                 childCount += partList.size();
                 for (Element part : partList) {
-                    xmlRecursiveTraversal(part, materialList, null, structureNo, parentId, machineName, parentLevel, amount);
+                    xmlRecursiveTraversal(part, materialList, null, parentId, machineName, parentLevel, amount, atNo, atRevision);
                 }
             }
             List<Element> standardParts = parts.elements("standardPart");
             if (standardParts.size() > 0) {
                 childCount += standardParts.size();
                 for (Element standardPart : standardParts) {
-                    xmlRecursiveTraversal(standardPart, materialList, null, structureNo, parentId, machineName, parentLevel, amount);
+                    xmlRecursiveTraversal(standardPart, materialList, null, parentId, machineName, parentLevel, amount, atNo, atRevision);
                 }
             }
             List<Element> documents = parts.elements("document");
             if (documents.size() > 0) {
                 childCount += documents.size();
                 for (Element document : documents) {
-                    xmlRecursiveTraversal(document, materialList, null, structureNo, parentId, machineName, parentLevel, amount);
+                    xmlRecursiveTraversal(document, materialList, null, parentId, machineName, parentLevel, amount, atNo, atRevision);
                 }
             }
             List<Element> supDrawings = parts.elements("supDrawing");
             if (supDrawings.size() > 0) {
                 childCount += supDrawings.size();
                 for (Element supDrawing : supDrawings) {
-                    xmlRecursiveTraversal(supDrawing, materialList, null, structureNo, parentId, machineName, parentLevel, amount);
+                    xmlRecursiveTraversal(supDrawing, materialList, null, parentId, machineName, parentLevel, amount, atNo, atRevision);
                 }
             }
             List<Element> licData = parts.elements("licData");
             if (licData.size() > 0) {
                 childCount += licData.size();
                 for (Element aLicData : licData) {
-                    xmlRecursiveTraversal(aLicData, materialList, null, structureNo, parentId, machineName, parentLevel, amount);
+                    xmlRecursiveTraversal(aLicData, materialList, null, parentId, machineName, parentLevel, amount, atNo, atRevision);
                 }
             }
         }
@@ -326,7 +327,7 @@ public class FileServiceImpl implements FileService {
         Material[] levelArray = new Material[12];
         Sheet sheet = workbook.getSheetAt(1);
         int index = 0;
-        String unImportStruct = "";
+        String unImportMater = "";
         for (Row row : sheet) {
             if (index < 1) {
                 index++;
@@ -337,7 +338,7 @@ public class FileServiceImpl implements FileService {
                 int level = row.getCell(0).toString().length() / 3 - 1;
                 if (0 == level) {
                     // 设为空，防止多个部套，部套名相同但物料号不同的情况
-                    unImportStruct = "";
+                    unImportMater = "";
                     String structNo = row.getCell(8).toString();
                     Structure targetStruct = structureRepository.findExistStructure(machineName, structNo, materNo, materVersion);
 
@@ -352,18 +353,16 @@ public class FileServiceImpl implements FileService {
                         targetStruct.setRevision(materVersion);
 
                         // 当物料存在时就为部套设置物料最新的版本
-                        List<Material> materials = materialRepository.findAllByMaterialNoAndMaterialVersionAndLevel(materNo, materVersion, 0);
+                        List<Material> materials = materialRepository.findAllByMaterialNoAndRevisionAndLevel(materNo, materVersion, 0);
                         if (materials.size() > 0) {
-                            targetStruct.setVersion(materials.get(0).getLatestVersion());
                             // 当物料存在时，不需要再导入
-                            unImportStruct = structNo;
-                        } else {
-                            targetStruct.setVersion(0);
+                            unImportMater = materNo;
                         }
+                        targetStruct.setVersion(0);
                         structureList.add(targetStruct);
                     } else {
                         // 当该部套存在时，该部套存在的物料也已经存在，所以不需要导入
-                        unImportStruct = structNo;
+                        unImportMater = materNo;
                     }
                 }
 
@@ -375,7 +374,7 @@ public class FileServiceImpl implements FileService {
                 material.setLatestVersion(0);
                 material.setChildCount(0);
                 material.setMaterialNo(materNo);
-                material.setMaterialVersion(materVersion);
+                material.setRevision(materVersion);
 
                 if (null != row.getCell(1)) {
                     material.setDrawingSize(row.getCell(1).toString());
@@ -388,9 +387,6 @@ public class FileServiceImpl implements FileService {
                 }
                 if (null != row.getCell(7)) {
                     material.setName(row.getCell(7).toString());
-                }
-                if (null != row.getCell(8)) {
-                    material.setStructureNo(row.getCell(8).toString());
                 }
                 if (null != row.getCell(9) && !"".equals(row.getCell(9).toString())) {
                     material.setMaterial(row.getCell(9).toString());
@@ -424,11 +420,14 @@ public class FileServiceImpl implements FileService {
                 if (0 == level) {
                     // 最上层节点时不设置父节点
                     levelArray[0] = material;
+                    material.setAtNo(material.getMaterialNo());
+                    material.setAtRevision(material.getRevision());
                 } else {
                     Material parentMat = levelArray[level - 1];
                     parentMat.setChildCount(parentMat.getChildCount() + 1);
-                    // 根据最上级节点设置部套号
-                    material.setStructureNo(parentMat.getStructureNo());
+                    // 根据最上级节点设置所属
+                    material.setAtNo(levelArray[0].getMaterialNo());
+                    material.setAtRevision(levelArray[0].getRevision());
                     // 设置该节点所属上级节点的ID
                     material.setParentId(parentMat.getObjectId());
                     // 将该节点覆盖数组中相同层级的上一个节点
@@ -439,7 +438,7 @@ public class FileServiceImpl implements FileService {
                 material.setAmount(amount);
                 material.setAbsoluteAmount(amount);
 
-                if (!unImportStruct.equals(material.getStructureNo())) {
+                if (!unImportMater.equals(material.getAtNo())) {
                     materialList.add(material);
                 }
             }
@@ -447,31 +446,18 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public Excel exportMachineExcel(String machineName) {
-        List<Structure> structureList = structureRepository.findAllByMachineNameAndStatusOrderByStructureNo(machineName, 1);
-        List<Material> materialList = new ArrayList<>();
-        for (Structure structure : structureList) {
-            List<Material> materials = materialRepository.findAllByStructureNoAndVersion(structure.getStructureNo(), structure.getVersion());
-            materialList.addAll(materials);
-        }
-        XSSFWorkbook workbook = buildExcelWorkbook(materialList);
-        return new Excel(machineName + ".xlsx", workbook);
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importNewVersionStructureExcel(String structureNo, MultipartFile file) throws IOException, InvalidFormatException {
-
+    public void importNewVersionStructureExcel(Structure structure, MultipartFile file) throws IOException, InvalidFormatException {
         // 更新旧部套的最新版本号
-        List<Material> oldRecordList = materialRepository.findAllByStructureNo(structureNo);
-        int oldVersion = oldRecordList.get(0).getLatestVersion();
+        List<Material> oldMaterialList = materialRepository.findAllByMaterialNoAndRevisionAndLevel(
+                structure.getMaterialNo(), structure.getRevision(), 0);
+        int oldVersion = oldMaterialList.get(0).getLatestVersion();
         int latestVersion = oldVersion + 1;
         // 不可以使用foreach 因为foreach循环是拷贝而不是引用同一个对象
-        for (int index = 0; index < oldRecordList.size(); index++) {
-            oldRecordList.get(index).setLatestVersion(latestVersion);
+        for (int index = 0; index < oldMaterialList.size(); index++) {
+            oldMaterialList.get(index).setLatestVersion(latestVersion);
         }
-        materialRepository.saveAll(oldRecordList);
+        materialRepository.saveAll(oldMaterialList);
 
         // 开始解析新版本数据
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
@@ -484,20 +470,17 @@ public class FileServiceImpl implements FileService {
             if (index < 1) {
                 index++;
             } else {
-                Material material = new Material(2);
+                Material material = new Material();
                 material.setObjectId(Generator.getObjectId());
                 material.setStatus(1);
-                material.setVersion(latestVersion);
-                material.setLatestVersion(latestVersion);
                 material.setChildCount(0);
-                if (null != row.getCell(0)) {
-                    material.setStructureNo(row.getCell(0).toString());
-                }
                 if (null != row.getCell(1)) {
                     /*不知道为什么表格中有层次为0的数据会自动被替换为0.0*/
                     int level = Integer.parseInt(row.getCell(1).toString().replace(".0", ""));
                     material.setLevel(level);
                     if (0 == level) {
+                        material.setVersion(latestVersion);
+                        material.setLatestVersion(latestVersion);
                         // 最上层节点时不设置父节点
                         levelArray[0] = material;
                     } else {
@@ -513,7 +496,7 @@ public class FileServiceImpl implements FileService {
                     material.setMaterialNo(row.getCell(2).toString());
                 }
                 if (null != row.getCell(3)) {
-                    material.setMaterialVersion(row.getCell(3).toString());
+                    material.setRevision(row.getCell(3).toString());
                 }
                 if (null != row.getCell(4)) {
                     material.setDrawingNo(row.getCell(4).toString());
@@ -541,16 +524,37 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public Excel exportStructureExcel(String structureNo, Integer version) {
-        List<Material> materialList = materialRepository.findAllByStructureNoAndVersion(structureNo, version);
+    public Excel exportMachineExcel(String machineName) {
+        List<Structure> structureList = structureRepository.findAllByMachineNameAndStatusOrderByStructureNo(machineName, 1);
+        List<Material> materialList = new ArrayList<>();
+        for (Structure structure : structureList) {
+            List<Material> materials = materialRepository.findAllByAtNoAndAtRevisionAndVersion(
+                    structure.getMaterialNo(), structure.getRevision(), structure.getVersion());
+            for (Material material : materials) {
+                material.setStructureNo(structure.getStructureNo());
+            }
+            materialList.addAll(materials);
+        }
         XSSFWorkbook workbook = buildExcelWorkbook(materialList);
-        Material structure = materialList.get(0);
-        String revision = structure.getMaterialVersion();
-        String name = structure.getStructureNo() + "_" + structure.getMaterialNo() + "." + revision + "_" + structure.getVersion() + ".xlsx";
+        return new Excel(machineName + ".xlsx", workbook);
+    }
+
+    @Override
+    @Transactional(readOnly = true, rollbackFor = Exception.class)
+    public Excel exportStructureExcel(Structure structure) {
+        List<Material> materialList = materialRepository.findAllByAtNoAndAtRevisionAndVersion(
+                structure.getMaterialNo(), structure.getRevision(), structure.getVersion()
+        );
+        for (Material material : materialList) {
+            material.setStructureNo(structure.getStructureNo());
+        }
+
+        XSSFWorkbook workbook = buildExcelWorkbook(materialList);
+        String name = structure.getStructureNo() + "_" + structure.getMaterialNo() + "." + structure.getRevision() + "_" + structure.getVersion() + ".xlsx";
         return new Excel(name, workbook);
     }
 
-    private XSSFWorkbook buildExcelWorkbook(List<Material> recordList) {
+    private XSSFWorkbook buildExcelWorkbook(List<Material> materialList) {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet();
         XSSFRow row = sheet.createRow(0);
@@ -575,14 +579,12 @@ public class FileServiceImpl implements FileService {
         XSSFCell cell9 = row.createCell(9);
         cell9.setCellValue("数量");
 
-        int size = recordList.size();
+        int size = materialList.size();
         for (int index = 0; index < size; index++) {
-            Material material = recordList.get(index);
+            Material material = materialList.get(index);
             XSSFRow tempRow = sheet.createRow(index + 1);
             XSSFCell tempCell0 = tempRow.createCell(0);
-            if (null != material.getStructureNo()) {
-                tempCell0.setCellValue(material.getStructureNo());
-            }
+            tempCell0.setCellValue(material.getStructureNo());
             XSSFCell tempCell1 = tempRow.createCell(1);
             if (null != material.getLevel()) {
                 tempCell1.setCellValue(material.getLevel());
@@ -592,8 +594,8 @@ public class FileServiceImpl implements FileService {
                 tempCell2.setCellValue(material.getMaterialNo());
             }
             XSSFCell tempCell3 = tempRow.createCell(3);
-            if (null != material.getMaterialVersion()) {
-                tempCell3.setCellValue(material.getMaterialVersion());
+            if (null != material.getRevision()) {
+                tempCell3.setCellValue(material.getRevision());
             }
             XSSFCell tempCell4 = tempRow.createCell(4);
             if (null != material.getDrawingNo()) {

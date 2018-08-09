@@ -3,6 +3,7 @@ package com.cse.summer.controller;
 import com.cse.summer.context.exception.SummerException;
 import com.cse.summer.domain.Excel;
 import com.cse.summer.domain.Response;
+import com.cse.summer.domain.Structure;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.StatusCode;
 import com.cse.summer.util.SummerConst;
@@ -79,14 +80,14 @@ public class FileController extends BaseFacade {
 
     @PostMapping(value = "files/import/structure/newVersion")
     public Response<Object> actionImportNewVersionStructureExcel(
-            @RequestParam("structureNo") String structureNo,
+            @RequestBody Structure structure,
             @RequestParam("structureExcel") MultipartFile structureExcel
     ) {
         if (!SummerConst.DocType.XLSX.equals(structureExcel.getContentType())) {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
-            fileService.importNewVersionStructureExcel(structureNo, structureExcel);
+            fileService.importNewVersionStructureExcel(structure, structureExcel);
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
@@ -95,10 +96,9 @@ public class FileController extends BaseFacade {
 
     @GetMapping(value = "files/export/structure")
     public void actionExportStructureExcel(
-            @RequestParam("structureNo") String structureNo,
-            @RequestParam("version") Integer version
+            @RequestBody Structure structure
     ) throws IOException {
-        Excel excel = fileService.exportStructureExcel(structureNo, version);
+        Excel excel = fileService.exportStructureExcel(structure);
         getHttpServletResponse().reset();
         getHttpServletResponse().setHeader("content-disposition", "attachment;filename="
                 + URLEncoder.encode(excel.getName(), "UTF-8"));

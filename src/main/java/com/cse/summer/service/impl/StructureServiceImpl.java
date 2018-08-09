@@ -34,7 +34,7 @@ public class StructureServiceImpl implements StructureService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addDbStructure(Structure structure) {
-        Material material = materialRepository.findMaterialByMaterialNoAndMaterialVersionAndVersionAndLevel(
+        Material material = materialRepository.findMaterialByMaterialNoAndRevisionAndVersionAndLevel(
                 structure.getMaterialNo(), structure.getRevision(), structure.getVersion(), 0);
         if (null == material) {
             // 检查库中是否有该物料

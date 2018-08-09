@@ -47,7 +47,7 @@ public class MaterialServiceImpl implements MaterialService {
         List<Map<String, String>> list = new ArrayList<>();
         for (Material material : materialList) {
             Map<String, String> map = new HashMap<>();
-            map.put("revision", material.getMaterialVersion());
+            map.put("revision", material.getRevision());
             map.put("latestVersion", String.valueOf(material.getLatestVersion()));
             list.add(map);
         }

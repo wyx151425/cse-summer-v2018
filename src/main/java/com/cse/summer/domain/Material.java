@@ -1,6 +1,7 @@
 package com.cse.summer.domain;
 
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 
 /**
@@ -9,6 +10,13 @@ import java.io.Serializable;
 @javax.persistence.Entity
 @Table(name = "cse_material")
 public class Material extends Entity implements Serializable {
+    /**
+     * 部套号
+     */
+    @Transient
+    private String structureNo;
+    private String atNo;
+    private String atRevision;
     /**
      * 物料名称
      */
@@ -30,10 +38,6 @@ public class Material extends Entity implements Serializable {
      */
     private String srcLevel;
     /**
-     * 部套号
-     */
-    private String structureNo;
-    /**
      * 部件号
      */
     private String positionNo;
@@ -41,6 +45,10 @@ public class Material extends Entity implements Serializable {
      * 排序号
      */
     private String sequenceNo;
+    /**
+     * 专利方版本
+     */
+    private String revision;
     /**
      * 当前版本号
      */
@@ -54,10 +62,6 @@ public class Material extends Entity implements Serializable {
      * 物料号
      */
     private String materialNo;
-    /**
-     * 物料号版本
-     */
-    private String materialVersion;
     /**
      * 材料名称
      */
@@ -109,6 +113,30 @@ public class Material extends Entity implements Serializable {
         this.type = type;
     }
 
+    public String getStructureNo() {
+        return structureNo;
+    }
+
+    public void setStructureNo(String structureNo) {
+        this.structureNo = structureNo;
+    }
+
+    public String getAtNo() {
+        return atNo;
+    }
+
+    public void setAtNo(String atNo) {
+        this.atNo = atNo;
+    }
+
+    public String getAtRevision() {
+        return atRevision;
+    }
+
+    public void setAtRevision(String atRevision) {
+        this.atRevision = atRevision;
+    }
+
     public String getName() {
         return name;
     }
@@ -147,14 +175,6 @@ public class Material extends Entity implements Serializable {
 
     public void setSrcLevel(String srcLevel) {
         this.srcLevel = srcLevel;
-    }
-
-    public String getStructureNo() {
-        return structureNo;
-    }
-
-    public void setStructureNo(String structureNo) {
-        this.structureNo = structureNo;
     }
 
     public String getPositionNo() {
@@ -197,12 +217,12 @@ public class Material extends Entity implements Serializable {
         this.materialNo = materialNo;
     }
 
-    public String getMaterialVersion() {
-        return materialVersion;
+    public String getRevision() {
+        return revision;
     }
 
-    public void setMaterialVersion(String materialVersion) {
-        this.materialVersion = materialVersion;
+    public void setRevision(String revision) {
+        this.revision = revision;
     }
 
     public String getMaterial() {
@@ -289,7 +309,7 @@ public class Material extends Entity implements Serializable {
     public String toString() {
         return "Material{" +
                 "materialNo='" + materialNo  +
-                ", materialVersion='" + materialVersion + '\'' +
+                ", revision='" + revision + '\'' +
                 ", version=" + version + '\'' +
                 ", latestVersion=" + latestVersion + '\'' +
                 '}';
