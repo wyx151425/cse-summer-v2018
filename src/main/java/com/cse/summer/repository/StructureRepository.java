@@ -24,7 +24,7 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
     Structure findStructureByMachineNameAndStructureNoAndStatus(String machineName, String structureNo, Integer status);
 
     /**
-     * 精准查询部套是否存在
+     * 添加库中部套时使用，精准查询部套是否存在
      *
      * @param machineName 机器名
      * @param structureNo 部套号
