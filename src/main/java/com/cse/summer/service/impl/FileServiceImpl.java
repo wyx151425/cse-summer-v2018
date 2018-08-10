@@ -63,7 +63,7 @@ public class FileServiceImpl implements FileService {
         Element root = doc.getRootElement();
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
-        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, 1, null, null);
+        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, null, null);
 
         Machine targetMachine = machineRepository.findMachineByName(machineName);
         if (null == targetMachine) {
@@ -93,22 +93,20 @@ public class FileServiceImpl implements FileService {
      * @param parentId      父节点ID
      * @param machineName   机器名
      * @param parentLevel   父节点层级
-     * @param amount        父节点总数量
      *                      部套判断是否已存在时的比较属性：机器名、物料号、专利方版本、部套号、是否已删除
      *                      物料判断是否已存在时的比较属性：物料号、专利方版本
      *                      先判断部套是否存在，如果部套存在那么该物料一定存在，如果部套不存在，才判断物料是否存在
      */
     @SuppressWarnings("unchecked")
-    private void xmlRecursiveTraversal(
-            Element element, List<Material> materialList, List<Structure> structureList, String parentId,
-            String machineName, int parentLevel, int amount, String atNo, String atRevision) {
+    private void xmlRecursiveTraversal(Element element, List<Material> materialList, List<Structure> structureList,
+        String parentId, String machineName, int parentLevel, String atNo, String atRevision) {
         if ("designSpec".equals(element.getName())) {
             logger.info("装置号id: " + element.attributeValue("id"));
             Element revision = element.element("revision");
             Element modules = revision.element("moduleList");
             List<Element> moduleList = modules.elements("module");
             for (Element module : moduleList) {
-                xmlRecursiveTraversal(module, materialList, structureList, null, machineName, parentLevel, amount, null, null);
+                xmlRecursiveTraversal(module, materialList, structureList, null, machineName, parentLevel, null, null);
             }
         } else if ("module".equals(element.getName())) {
             Element revision = element.element("revision");
@@ -149,12 +147,11 @@ public class FileServiceImpl implements FileService {
                     material.setPage(revision.element("noOfPages").getText());
                     material.setWeight(revision.element("mass").getText());
                     // 可能存在数量为1.00的形式，所以字符串先转为double再转为int
-                    material.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
-                    material.setAbsoluteAmount((int) Double.parseDouble(revision.element("quantity").getText()));
+                    material.setAbsoluteAmount(1);
+                    targetStruct.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
                     materialList.add(material);
                     Element parts = revision.element("partList");
-                    amount = Integer.parseInt(revision.element("quantity").getText());
-                    int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, amount, materNoM, revisionM);
+                    int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, materNoM, revisionM);
                     material.setChildCount(childCount);
                 }
                 structureList.add(targetStruct);
@@ -178,10 +175,7 @@ public class FileServiceImpl implements FileService {
                 material.setWeight(revision.element("mass").getText());
             }
             if (null != revision.element("quantity")) {
-                int absoluteAmount = (int) Double.parseDouble(revision.element("quantity").getText());
-                material.setAbsoluteAmount(absoluteAmount);
-                amount = absoluteAmount * amount;
-                material.setAmount(amount);
+                material.setAbsoluteAmount((int) Double.parseDouble(revision.element("quantity").getText()));
             }
             if (null != revision.element("drawingSize")) {
                 material.setDrawingSize(revision.element("drawingSize").getText());
@@ -197,7 +191,7 @@ public class FileServiceImpl implements FileService {
             }
             materialList.add(material);
             Element parts = revision.element("partList");
-            int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, amount, atNo, atRevision);
+            int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, atNo, atRevision);
 
             material.setChildCount(childCount);
         } else if ("standardPart".equals(element.getName()) || "document".equals(element.getName())
@@ -220,10 +214,7 @@ public class FileServiceImpl implements FileService {
                 material.setWeight(revision.element("mass").getText());
             }
             if (null != revision.element("quantity")) {
-                int absoluteAmount = (int) Double.parseDouble(revision.element("quantity").getText());
-                material.setAbsoluteAmount(absoluteAmount);
-                amount = absoluteAmount * amount;
-                material.setAmount(amount);
+                material.setAbsoluteAmount((int) Double.parseDouble(revision.element("quantity").getText()));
             }
             if (null != revision.element("drawingSize")) {
                 material.setDrawingSize(revision.element("drawingSize").getText());
@@ -250,46 +241,45 @@ public class FileServiceImpl implements FileService {
      * @param parentId     父物料节点ID
      * @param machineName  机器名，用于部套数据检索，确定该机器是否已有某一部套
      * @param parentLevel  父节点层级
-     * @param amount       父节点总数量，子节点根据父节点总数量计算总数量
      * @return 该层元素子节点数
      */
     @SuppressWarnings("unchecked")
-    private int xmlPartsRecursiveTraversal(Element parts, List<Material> materialList, String parentId, String machineName, int parentLevel, int amount, String atNo, String atRevision) {
+    private int xmlPartsRecursiveTraversal(Element parts, List<Material> materialList, String parentId, String machineName, int parentLevel, String atNo, String atRevision) {
         int childCount = 0;
         if (null != parts) {
             List<Element> partList = parts.elements("part");
             if (partList.size() > 0) {
                 childCount += partList.size();
                 for (Element part : partList) {
-                    xmlRecursiveTraversal(part, materialList, null, parentId, machineName, parentLevel, amount, atNo, atRevision);
+                    xmlRecursiveTraversal(part, materialList, null, parentId, machineName, parentLevel, atNo, atRevision);
                 }
             }
             List<Element> standardParts = parts.elements("standardPart");
             if (standardParts.size() > 0) {
                 childCount += standardParts.size();
                 for (Element standardPart : standardParts) {
-                    xmlRecursiveTraversal(standardPart, materialList, null, parentId, machineName, parentLevel, amount, atNo, atRevision);
+                    xmlRecursiveTraversal(standardPart, materialList, null, parentId, machineName, parentLevel, atNo, atRevision);
                 }
             }
             List<Element> documents = parts.elements("document");
             if (documents.size() > 0) {
                 childCount += documents.size();
                 for (Element document : documents) {
-                    xmlRecursiveTraversal(document, materialList, null, parentId, machineName, parentLevel, amount, atNo, atRevision);
+                    xmlRecursiveTraversal(document, materialList, null, parentId, machineName, parentLevel, atNo, atRevision);
                 }
             }
             List<Element> supDrawings = parts.elements("supDrawing");
             if (supDrawings.size() > 0) {
                 childCount += supDrawings.size();
                 for (Element supDrawing : supDrawings) {
-                    xmlRecursiveTraversal(supDrawing, materialList, null, parentId, machineName, parentLevel, amount, atNo, atRevision);
+                    xmlRecursiveTraversal(supDrawing, materialList, null, parentId, machineName, parentLevel, atNo, atRevision);
                 }
             }
             List<Element> licData = parts.elements("licData");
             if (licData.size() > 0) {
                 childCount += licData.size();
                 for (Element aLicData : licData) {
-                    xmlRecursiveTraversal(aLicData, materialList, null, parentId, machineName, parentLevel, amount, atNo, atRevision);
+                    xmlRecursiveTraversal(aLicData, materialList, null, parentId, machineName, parentLevel, atNo, atRevision);
                 }
             }
         }
@@ -404,9 +394,6 @@ public class FileServiceImpl implements FileService {
                 if (null != row.getCell(13)) {
                     material.setPositionNo(row.getCell(13).toString());
                 }
-                if (null != row.getCell(14)) {
-                    material.setAmount((int) Double.parseDouble(row.getCell(14).toString()));
-                }
                 if (null != row.getCell(16)) {
                     material.setModifyNote(row.getCell(16).toString());
                 }
@@ -436,7 +423,6 @@ public class FileServiceImpl implements FileService {
                 }
 
                 int amount = (int) Double.parseDouble(row.getCell(14).toString());
-                material.setAmount(amount);
                 material.setAbsoluteAmount(amount);
 
                 if (!unImportMater.equals(material.getAtNo())) {
@@ -524,9 +510,6 @@ public class FileServiceImpl implements FileService {
                 }
                 if (null != row.getCell(8)) {
                     material.setMaterial(row.getCell(8).toString());
-                }
-                if (null != row.getCell(10)) {
-                    material.setAmount((int) Double.parseDouble(row.getCell(10).toString()));
                 }
                 if (null != row.getCell(11)) {
                     material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(11).toString()));
@@ -694,10 +677,6 @@ public class FileServiceImpl implements FileService {
             }
             XSSFCell tempCell9 = tempRow.createCell(9);
             tempCell9.setCellValue("*");
-            XSSFCell tempCell10 = tempRow.createCell(10);
-            if (null != material.getAmount()) {
-                tempCell10.setCellValue(material.getAmount());
-            }
             XSSFCell tempCell11 = tempRow.createCell(11);
             if (null != material.getAbsoluteAmount()) {
                 tempCell11.setCellValue(material.getAbsoluteAmount());

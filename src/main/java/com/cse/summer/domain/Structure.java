@@ -29,6 +29,10 @@ public class Structure extends com.cse.summer.domain.Entity {
      * 物料版本
      */
     private Integer version;
+    /**
+     * 总数量
+     */
+    private Integer amount;
 
     @Transient
     private Material material;
@@ -74,6 +78,14 @@ public class Structure extends com.cse.summer.domain.Entity {
 
     public void setVersion(Integer version) {
         this.version = version;
+    }
+
+    public Integer getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
     }
 
     public Material getMaterial() {

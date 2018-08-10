@@ -89,10 +89,6 @@ public class Material extends Entity implements Serializable {
      */
     private String weight;
     /**
-     * 总数量
-     */
-    private Integer amount;
-    /**
      * 数量
      */
     private Integer absoluteAmount;
@@ -275,14 +271,6 @@ public class Material extends Entity implements Serializable {
 
     public void setWeight(String weight) {
         this.weight = weight;
-    }
-
-    public Integer getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Integer amount) {
-        this.amount = amount;
     }
 
     public Integer getAbsoluteAmount() {
