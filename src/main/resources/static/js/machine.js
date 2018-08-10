@@ -288,10 +288,12 @@ function deleteStructure(id) {
     });
 }
 
-function versionList(structureNo, latestVersion) {
+function versionList(structureNo, materialNo, revision, latestVersion) {
     $("#versionChooseForm").css("display", "block");
     $("#versionChooseConfirm").css("display", "none");
     $("#structureNo4").attr("value", structureNo);
+    $("#materialNo4").attr("value", materialNo);
+    $("#revision4").attr("value", revision);
     let select = $("#version4");
     select.empty();
     for (let index = 0; index <= latestVersion; index++) {

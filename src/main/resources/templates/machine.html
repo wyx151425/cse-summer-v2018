@@ -39,11 +39,11 @@
                         <th class="col-lg-1 col-md-1">部套号</th>
                         <th class="col-lg-2 col-md-2">物料号</th>
                         <th class="col-lg-1 col-md-1">专利方版本</th>
+                        <th class="col-lg-1 col-md-1">当前版本</th>
+                        <th class="col-lg-1 col-md-1">最新版本</th>
                         <th class="col-lg-2 col-md-2">名称</th>
                         <th class="col-lg-1 col-md-1">总数量</th>
                         <th class="col-lg-1 col-md-1">单件数量</th>
-                        <th class="col-lg-1 col-md-1">当前版本</th>
-                        <th class="col-lg-1 col-md-1">最新版本</th>
                         <th class="col-lg-2 col-md-2">操作</th>
                     </tr>
                     </thead>
@@ -52,11 +52,11 @@
                         <td th:text="${structure.structureNo}"></td>
                         <td th:text="${structure.materialNo}"></td>
                         <td th:text="${structure.revision}"></td>
+                        <td th:text="${structure.version}"></td>
+                        <td th:text="${structure.material.latestVersion}"></td>
                         <td th:text="${structure.material.name}"></td>
                         <td th:text="${structure.material.amount}"></td>
                         <td th:text="${structure.material.absoluteAmount}"></td>
-                        <td th:text="${structure.version}"></td>
-                        <td th:text="${structure.material.latestVersion}"></td>
                         <td>
                             <a href="javascript:;" style="margin-right: 16px"
                                th:onclick="|javascript:structureExport('${structure.structureNo}', '${structure.materialNo}', '${structure.revision}', '${structure.material.latestVersion}');|">
@@ -65,7 +65,7 @@
                             <a href="javascript:;" style="margin-right: 16px"
                                th:onclick="|javascript:deleteStructure('${structure.id}');|">删除</a>
                             <a href="javascript:;"
-                               th:onclick="|javascript:versionList('${structure.structureNo}', '${structure.material.latestVersion}');|"
+                               th:onclick="|javascript:versionList('${structure.structureNo}', '${structure.materialNo}', '${structure.revision}', '${structure.material.latestVersion}');|"
                                th:if="${structure.material.latestVersion > 0}">
                                 <span data-target="#versionChoose" data-toggle="modal">修改版本</span>
                             </a>
@@ -164,7 +164,8 @@
                 <div class="modal-body">
                     <label for="machineName7" class="control-label col-lg-2 col-md-2">机器名</label>
                     <div class="form-group col-lg-10 col-md-10">
-                        <input id="machineName7" type="text" class="form-control" th:value="${machine.name}" readonly="readonly"/>
+                        <input id="machineName7" type="text" class="form-control" th:value="${machine.name}"
+                               readonly="readonly"/>
                     </div>
                     <label for="materialNo7" class="control-label col-lg-2 col-md-2">物料号</label>
                     <div class="form-group col-lg-10 col-md-10">
@@ -220,7 +221,8 @@
                     <label for="structureNo3" class="control-label col-lg-2 col-md-2">部套号</label>
                     <div class="form-group col-lg-10 col-md-10">
                         <select id="structureNo3" class="form-control" name="structureNo">
-                            <option th:value="${structure.structureNo}" th:each="structure, structureStat : ${structureList}"
+                            <option th:value="${structure.structureNo}"
+                                    th:each="structure, structureStat : ${structureList}"
                                     th:text="${structure.structureNo}"></option>
                         </select>
                     </div>
@@ -261,6 +263,14 @@
                     <div class="form-group col-lg-10 col-md-10">
                         <input id="structureNo4" type="text" class="form-control" readonly="readonly"/>
                     </div>
+                    <label for="materialNo4" class="control-label col-lg-2 col-md-2">物料号</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="materialNo4" type="text" class="form-control" readonly="readonly"/>
+                    </div>
+                    <label for="revision4" class="control-label col-lg-2 col-md-2">专利版本</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="revision4" type="text" class="form-control" readonly="readonly"/>
+                    </div>
                     <label for="version4" class="control-label col-lg-2 col-md-2">版本号</label>
                     <div class="form-group col-lg-10 col-md-10">
                         <select id="version4" class="form-control">
@@ -292,7 +302,8 @@
                 <div class="modal-body">
                     <label for="machineName5" class="control-label col-lg-2 col-md-2">机器名</label>
                     <div class="form-group col-lg-10 col-md-10">
-                        <input id="machineName5" type="text" class="form-control" th:value="${machine.name}" readonly="readonly"/>
+                        <input id="machineName5" type="text" class="form-control" th:value="${machine.name}"
+                               readonly="readonly"/>
                     </div>
                     <label for="structureNo5" class="control-label col-lg-2 col-md-2">部套号</label>
                     <div class="form-group col-lg-10 col-md-10">

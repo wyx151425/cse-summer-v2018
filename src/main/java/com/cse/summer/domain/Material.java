@@ -22,6 +22,10 @@ public class Material extends Entity implements Serializable {
      */
     private String name;
     /**
+     * 中文名
+     */
+    private String chinese;
+    /**
      * 父物料的objectId
      */
     private String parentId;
@@ -143,6 +147,14 @@ public class Material extends Entity implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getChinese() {
+        return chinese;
+    }
+
+    public void setChinese(String chinese) {
+        this.chinese = chinese;
     }
 
     public String getParentId() {
