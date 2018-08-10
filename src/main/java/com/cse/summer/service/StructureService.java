@@ -28,12 +28,4 @@ public interface StructureService {
      * @param id 待删除部套的ID
      */
     void deleteStructure(Integer id);
-
-    /**
-     * 根据机器的名称获取部套
-     *
-     * @param machineName 机器名称
-     * @return 查询获得的BomRecord列表对象
-     */
-    List<Structure> findStructureListByMachineName(String machineName);
 }

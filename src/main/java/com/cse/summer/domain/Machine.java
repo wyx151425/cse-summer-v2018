@@ -11,7 +11,7 @@ import java.util.List;
 @Table(name = "cse_machine")
 public class Machine extends Entity {
     private String name;
-    private String number;
+    private String machineNo;
     private Integer cylinderAmount;
     private String shipNo;
     private String classificationSociety;
@@ -32,12 +32,12 @@ public class Machine extends Entity {
         this.name = name;
     }
 
-    public String getNumber() {
-        return number;
+    public String getMachineNo() {
+        return machineNo;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void setMachineNo(String machineNo) {
+        this.machineNo = machineNo;
     }
 
     public Integer getCylinderAmount() {

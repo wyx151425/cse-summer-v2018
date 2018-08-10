@@ -102,3 +102,11 @@ main.container {
 .hidden {
     display: none;
 }
+
+.form-group {
+    overflow: hidden;
+}
+
+#search {
+    float: right;
+}

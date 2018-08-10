@@ -64,6 +64,22 @@ public class FileController extends BaseFacade {
         return new Response<>();
     }
 
+    @PostMapping(value = "files/import/structure/newVersion")
+    public Response<Object> actionImportNewVersionStructureExcel(
+            @RequestParam String structureNo,
+            @RequestParam("structureExcel") MultipartFile structureExcel
+    ) {
+        if (!SummerConst.DocType.XLSX.equals(structureExcel.getContentType())) {
+            throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
+        }
+        try {
+            fileService.importNewVersionStructureExcel(structureNo, structureExcel);
+        } catch (InvalidFormatException | IOException e) {
+            throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
+        }
+        return new Response<>();
+    }
+
     @GetMapping(value = "files/export/machine")
     public void actionExportMachineExcel(@RequestParam("machineName") String machineName) throws IOException {
         Excel excel = fileService.exportMachineExcel(machineName);
@@ -78,25 +94,9 @@ public class FileController extends BaseFacade {
         buffer.close();
     }
 
-    @PostMapping(value = "files/import/structure/newVersion")
-    public Response<Object> actionImportNewVersionStructureExcel(
-            @RequestBody Structure structure,
-            @RequestParam("structureExcel") MultipartFile structureExcel
-    ) {
-        if (!SummerConst.DocType.XLSX.equals(structureExcel.getContentType())) {
-            throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
-        }
-        try {
-            fileService.importNewVersionStructureExcel(structure, structureExcel);
-        } catch (InvalidFormatException | IOException e) {
-            throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
-        }
-        return new Response<>();
-    }
-
     @GetMapping(value = "files/export/structure")
     public void actionExportStructureExcel(
-            @RequestBody Structure structure
+            @ModelAttribute Structure structure
     ) throws IOException {
         Excel excel = fileService.exportStructureExcel(structure);
         getHttpServletResponse().reset();

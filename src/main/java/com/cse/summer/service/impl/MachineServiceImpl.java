@@ -1,7 +1,6 @@
 package com.cse.summer.service.impl;
 
 import com.cse.summer.domain.Machine;
-import com.cse.summer.domain.Material;
 import com.cse.summer.domain.StructMater;
 import com.cse.summer.domain.Structure;
 import com.cse.summer.repository.MachineRepository;
@@ -59,7 +58,7 @@ public class MachineServiceImpl implements MachineService {
         targetMac.setType(machine.getType());
         targetMac.setClassificationSociety(machine.getClassificationSociety());
         targetMac.setCylinderAmount(machine.getCylinderAmount());
-        targetMac.setNumber(machine.getNumber());
+        targetMac.setMachineNo(machine.getMachineNo());
         targetMac.setShipNo(machine.getShipNo());
         machineRepository.save(targetMac);
     }

@@ -1,5 +1,6 @@
 package com.cse.summer.service.impl;
 
+import com.cse.summer.context.exception.SummerException;
 import com.cse.summer.domain.Excel;
 import com.cse.summer.domain.Machine;
 import com.cse.summer.domain.Material;
@@ -9,6 +10,7 @@ import com.cse.summer.repository.MaterialRepository;
 import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.Generator;
+import com.cse.summer.util.StatusCode;
 import com.cse.summer.util.SummerConst;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
@@ -70,7 +72,7 @@ public class FileServiceImpl implements FileService {
             machine.setStatus(1);
             machine.setName(machineName);
             machine.setPatent(SummerConst.MachineType.MAN);
-            machine.setNumber("");
+            machine.setMachineNo("");
             machine.setType("");
             machine.setCylinderAmount(0);
             machine.setShipNo("");
@@ -130,8 +132,7 @@ public class FileServiceImpl implements FileService {
                 // 判断待保存的物料是否存在
                 List<Material> materials = materialRepository.findAllByMaterialNoAndRevisionAndLevel(materNoM, revisionM, 0);
                 // 集合大于0表示物料存在
-                if (materials.size() > 0) {
-                } else {
+                if (0 == materials.size()) {
                     // 如果物料不存在，则需要保存物料的数据，并遍历物料的所有子节点
                     Material material = new Material(1);
                     material.setAtNo(materNoM);
@@ -310,7 +311,7 @@ public class FileServiceImpl implements FileService {
             machine.setStatus(1);
             machine.setName(machineName);
             machine.setPatent(SummerConst.MachineType.WIN_GD);
-            machine.setNumber("");
+            machine.setMachineNo("");
             machine.setType("");
             machine.setCylinderAmount(0);
             machine.setShipNo("");
@@ -447,10 +448,16 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importNewVersionStructureExcel(Structure structure, MultipartFile file) throws IOException, InvalidFormatException {
+    public void importNewVersionStructureExcel(String structureNo, MultipartFile file) throws IOException, InvalidFormatException {
+
+        // 开始解析新版本数据
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        Row structRow = workbook.getSheetAt(0).getRow(1);
+        String materNo = structRow.getCell(2).toString();
+        String materV = structRow.getCell(3).toString();
+
         // 更新旧部套的最新版本号
-        List<Material> oldMaterialList = materialRepository.findAllByMaterialNoAndRevisionAndLevel(
-                structure.getMaterialNo(), structure.getRevision(), 0);
+        List<Material> oldMaterialList = materialRepository.findAllByAtNoAndAtRevision(materNo, materV);
         int oldVersion = oldMaterialList.get(0).getLatestVersion();
         int latestVersion = oldVersion + 1;
         // 不可以使用foreach 因为foreach循环是拷贝而不是引用同一个对象
@@ -459,8 +466,6 @@ public class FileServiceImpl implements FileService {
         }
         materialRepository.saveAll(oldMaterialList);
 
-        // 开始解析新版本数据
-        Workbook workbook = WorkbookFactory.create(file.getInputStream());
         List<Material> recordList = new ArrayList<>(500);
         // 建立维护层级关系的数组
         Material[] levelArray = new Material[10];
@@ -473,30 +478,34 @@ public class FileServiceImpl implements FileService {
                 Material material = new Material();
                 material.setObjectId(Generator.getObjectId());
                 material.setStatus(1);
+                material.setVersion(latestVersion);
+                material.setLatestVersion(latestVersion);
+                material.setMaterialNo(row.getCell(2).toString());
+                material.setRevision(row.getCell(3).toString());
                 material.setChildCount(0);
                 if (null != row.getCell(1)) {
-                    /*不知道为什么表格中有层次为0的数据会自动被替换为0.0*/
-                    int level = Integer.parseInt(row.getCell(1).toString().replace(".0", ""));
+                    int level = (int) Double.parseDouble(row.getCell(1).toString());
                     material.setLevel(level);
                     if (0 == level) {
-                        material.setVersion(latestVersion);
-                        material.setLatestVersion(latestVersion);
                         // 最上层节点时不设置父节点
                         levelArray[0] = material;
+                        material.setAtNo(material.getMaterialNo());
+                        material.setAtRevision(material.getRevision());
+
+                        String structNo = row.getCell(0).toString();
+                        if (!structureNo.equals(structNo)) {
+                            throw new SummerException(StatusCode.STRUCTURE_NO_ERROR);
+                        }
                     } else {
                         Material parentMat = levelArray[level - 1];
                         parentMat.setChildCount(parentMat.getChildCount() + 1);
                         // 设置该节点所属上级节点的ID
                         material.setParentId(parentMat.getObjectId());
+                        material.setAtNo(parentMat.getAtNo());
+                        material.setAtRevision(parentMat.getAtRevision());
                         // 将该节点覆盖数组中相同层级的上一个节点
                         levelArray[level] = material;
                     }
-                }
-                if (null != row.getCell(2)) {
-                    material.setMaterialNo(row.getCell(2).toString());
-                }
-                if (null != row.getCell(3)) {
-                    material.setRevision(row.getCell(3).toString());
                 }
                 if (null != row.getCell(4)) {
                     material.setDrawingNo(row.getCell(4).toString());
@@ -508,13 +517,13 @@ public class FileServiceImpl implements FileService {
                     material.setName(row.getCell(6).toString());
                 }
                 if (null != row.getCell(7)) {
-                    material.setAmount(Integer.valueOf(row.getCell(7).toString()));
+                    material.setAmount((int) Double.parseDouble(row.getCell(7).toString()));
                 }
                 if (null != row.getCell(8)) {
                     material.setWeight(row.getCell(8).toString());
                 }
                 if (null != row.getCell(9)) {
-                    material.setAbsoluteAmount(Integer.valueOf(row.getCell(9).toString()));
+                    material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(9).toString()));
                 }
                 recordList.add(material);
             }

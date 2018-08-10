@@ -46,7 +46,6 @@ public class StructureServiceImpl implements StructureService {
             if (null == target) {
                 structure.setObjectId(Generator.getObjectId());
                 structure.setStatus(1);
-                structure.setStructureNo(material.getStructureNo());
                 structureRepository.save(structure);
             } else {
                 throw new SummerException(StatusCode.STRUCTURE_EXIST);
@@ -57,8 +56,7 @@ public class StructureServiceImpl implements StructureService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStructureVersion(Structure structure) {
-        Structure targetStructure = structureRepository.findStructureByMachineNameAndStructureNoAndStatusGreaterThanEqual(
-                structure.getMachineName(), structure.getStructureNo(), 1);
+        Structure targetStructure = structureRepository.findStructureByMachineNameAndStructureNoAndStatus(structure.getMachineName(), structure.getStructureNo(), 1);
         targetStructure.setVersion(structure.getVersion());
         structureRepository.save(targetStructure);
     }
@@ -69,18 +67,5 @@ public class StructureServiceImpl implements StructureService {
         Structure targetStructure = structureRepository.getOne(id);
         targetStructure.setStatus(0);
         structureRepository.save(targetStructure);
-    }
-
-    @Override
-    @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public List<Structure> findStructureListByMachineName(String machineName) {
-        List<StructMater> list = structureRepository.findAllStructureAndMaterial(machineName);
-        List<Structure> structures = new ArrayList<>();
-        for (StructMater structMater : list) {
-            Structure structure = structMater.getStructure();
-            structure.setMaterial(structMater.getMaterial());
-            structures.add(structure);
-        }
-        return structures;
     }
 }

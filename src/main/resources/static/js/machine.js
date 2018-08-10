@@ -159,10 +159,11 @@ $(document).ready(function () {
     });
 
     $("#exportStructure").click(function () {
+        let structureNo = $("#structureNo5").val();
         let materialNo = $("#materialNo5").val();
         let revision = $("#revision5").val();
         let version = $("#version5").val();
-        let url = "api/files/export/structure?materialNo=" + materialNo + "&materialVersion" + revision +"&version=" + version;
+        let url = "api/files/export/structure?structureNo=" + structureNo + "&materialNo=" + materialNo + "&revision=" + revision +"&version=" + version;
         let link= $('<a href="'+ url +'"></a>');
         link.get(0).click();
     });
@@ -183,6 +184,7 @@ $(document).ready(function () {
             // 发送到服务器的数据。
             data: JSON.stringify({
                 machineName: $("#machineName7").val(),
+                structureNo: $("#structureNo7").val(),
                 materialNo: $("#materialNo7").val(),
                 revision: $("#revision7").val(),
                 version: $("#version7").val()
@@ -299,8 +301,8 @@ function versionList(structureNo, latestVersion) {
 
 function structureExport(structureNo, materialNo, revision, latestVersion) {
     $("#structureNo5").attr("value", structureNo);
-    $("#materialNo").attr("value", materialNo);
-    $("#revision5").attr("Value", revision);
+    $("#materialNo5").attr("value", materialNo);
+    $("#revision5").attr("value", revision);
     let select = $("#version5");
     select.empty();
     for (let index = 0; index <= latestVersion; index++) {

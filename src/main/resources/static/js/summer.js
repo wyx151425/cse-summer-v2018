@@ -48,7 +48,9 @@ $(document).ready(function () {
             secureuri: false,  // 是否需要安全协议，一般设置为false
             fileElementId: 'structureExcel',  // 文件上传域的ID
             dataType: 'json',  // 返回值类型 一般设置为json
-            data: {machineName: $("#machineName3").val(), structureNo: $("#structureNo3").val()},
+            data: {
+                structureNo: $("#structureNo3").val()
+            },
             success: function (data) {
                 successCallback(data);
             },
@@ -84,7 +86,7 @@ $(document).ready(function () {
             // 发送到服务器的数据。
             data: JSON.stringify({
                 id: $("#id").val(),
-                number: $("#number").val(),
+                machineNo: $("#machineNo").val(),
                 type: $("#type").val(),
                 cylinderAmount: $("#cylinderAmount").val(),
                 shipNo: $("#shipNo").val(),
@@ -112,7 +114,7 @@ $(document).ready(function () {
 function toUpdateMachine(machineId, machineName, machineNo, machineType, cylinderAmount, shipNo, classificationSociety) {
     $("#id").val(machineId);
     $("#name").val(machineName);
-    $("#number").val(machineNo);
+    $("#machineNo").val(machineNo);
     $("#type").val(machineType);
     $("#cylinderAmount").val(cylinderAmount);
     $("#shipNo").val(shipNo);

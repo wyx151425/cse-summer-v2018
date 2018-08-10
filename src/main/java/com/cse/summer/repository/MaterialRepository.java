@@ -50,6 +50,15 @@ public interface MaterialRepository extends JpaRepository<Material, Integer> {
      *
      * @param atNo       所属物料号
      * @param atRevision 所属专利方版本
+     * @return 物料数据集合
+     */
+    List<Material> findAllByAtNoAndAtRevision(String atNo, String atRevision);
+
+    /**
+     * 根据所属物料号，所属专利方版本和版本号
+     *
+     * @param atNo       所属物料号
+     * @param atRevision 所属专利方版本
      * @param version    版本
      * @return 物料数据集合
      */

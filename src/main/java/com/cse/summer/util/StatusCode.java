@@ -17,5 +17,6 @@ public class StatusCode {
     public static final int FILE_FORMAT_ERROR = 8001;
     public static final int FILE_RESOLVE_ERROR = 8002;
     public static final int STRUCTURE_EXIST = 9001;
+    public static final int STRUCTURE_NO_ERROR = 9002;
     public static final int MATERIAL_NO_EXIST = 10001;
 }
