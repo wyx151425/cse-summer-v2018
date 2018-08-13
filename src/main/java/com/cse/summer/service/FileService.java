@@ -37,12 +37,12 @@ public interface FileService {
     /**
      * 导入新版本部套的BOM文件
      *
-     * @param structureNo 部套号
-     * @param file        Excel文件
+     * @param structure 部套
+     * @param file      Excel文件
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    void importNewVersionStructureExcel(String structureNo, MultipartFile file) throws InvalidFormatException, IOException;
+    void importNewVersionStructureExcel(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导出机器的完整BOM文件

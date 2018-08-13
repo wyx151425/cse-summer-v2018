@@ -49,6 +49,7 @@ $(document).ready(function () {
             fileElementId: 'structureExcel',  // 文件上传域的ID
             dataType: 'json',  // 返回值类型 一般设置为json
             data: {
+                machineName: $("#machineName3").val(),
                 structureNo: $("#structureNo3").val()
             },
             success: function (data) {

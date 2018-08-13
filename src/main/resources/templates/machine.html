@@ -37,13 +37,14 @@
                     <thead>
                     <tr>
                         <th class="col-lg-1 col-md-1">部套号</th>
-                        <th class="col-lg-2 col-md-2">物料号</th>
+                        <th class="col-lg-1 col-md-2">物料号</th>
+                        <th class="col-lg-1 col-md-1">英文名</th>
+                        <th class="col-lg-2 col-md-2">中文名</th>
+                        <th class="col-lg-1 col-md-1">总数量</th>
+                        <th class="col-lg-1 col-md-1">单件数量</th>
                         <th class="col-lg-1 col-md-1">专利方版本</th>
                         <th class="col-lg-1 col-md-1">当前版本</th>
                         <th class="col-lg-1 col-md-1">最新版本</th>
-                        <th class="col-lg-2 col-md-2">名称</th>
-                        <th class="col-lg-1 col-md-1">总数量</th>
-                        <th class="col-lg-1 col-md-1">单件数量</th>
                         <th class="col-lg-2 col-md-2">操作</th>
                     </tr>
                     </thead>
@@ -51,12 +52,13 @@
                     <tr class="structure" th:each="structure, structureStat : ${structureList}">
                         <td th:text="${structure.structureNo}"></td>
                         <td th:text="${structure.materialNo}"></td>
+                        <td th:text="${structure.material.name}"></td>
+                        <td th:text="${structure.material.chinese}"></td>
+                        <td th:text="${structure.amount}"></td>
+                        <td th:text="${structure.amount}"></td>
                         <td th:text="${structure.revision}"></td>
                         <td th:text="${structure.version}"></td>
                         <td th:text="${structure.material.latestVersion}"></td>
-                        <td th:text="${structure.material.name}"></td>
-                        <td th:text="${structure.material.amount}"></td>
-                        <td th:text="${structure.material.absoluteAmount}"></td>
                         <td>
                             <a href="javascript:;" style="margin-right: 16px"
                                th:onclick="|javascript:structureExport('${structure.structureNo}', '${structure.materialNo}', '${structure.revision}', '${structure.material.latestVersion}');|">

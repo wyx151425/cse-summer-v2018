@@ -1,12 +1,10 @@
 package com.cse.summer.service.impl;
 
 import com.cse.summer.context.exception.SummerException;
-import com.cse.summer.domain.Excel;
-import com.cse.summer.domain.Machine;
-import com.cse.summer.domain.Material;
-import com.cse.summer.domain.Structure;
+import com.cse.summer.domain.*;
 import com.cse.summer.repository.MachineRepository;
 import com.cse.summer.repository.MaterialRepository;
+import com.cse.summer.repository.NameRepository;
 import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.Generator;
@@ -47,12 +45,14 @@ public class FileServiceImpl implements FileService {
     private final MachineRepository machineRepository;
     private final MaterialRepository materialRepository;
     private final StructureRepository structureRepository;
+    private final NameRepository nameRepository;
 
     @Autowired
-    public FileServiceImpl(MachineRepository machineRepository, MaterialRepository materialRepository, StructureRepository structureRepository) {
+    public FileServiceImpl(MachineRepository machineRepository, MaterialRepository materialRepository, StructureRepository structureRepository, NameRepository nameRepository) {
         this.machineRepository = machineRepository;
         this.materialRepository = materialRepository;
         this.structureRepository = structureRepository;
+        this.nameRepository = nameRepository;
     }
 
     @Override
@@ -99,7 +99,7 @@ public class FileServiceImpl implements FileService {
      */
     @SuppressWarnings("unchecked")
     private void xmlRecursiveTraversal(Element element, List<Material> materialList, List<Structure> structureList,
-        String parentId, String machineName, int parentLevel, String atNo, String atRevision) {
+                                       String parentId, String machineName, int parentLevel, String atNo, String atRevision) {
         if ("designSpec".equals(element.getName())) {
             logger.info("装置号id: " + element.attributeValue("id"));
             Element revision = element.element("revision");
@@ -143,6 +143,10 @@ public class FileServiceImpl implements FileService {
                     material.setLatestVersion(0);
                     material.setMaterialNo(materNoM);
                     material.setName(element.element("name").getText());
+                    List<Name> names = nameRepository.findByEnglish(element.element("name").getText());
+                    if (names.size() > 0) {
+                        material.setChinese(names.get(0).getChinese());
+                    }
                     material.setRevision(revisionM);
                     material.setPage(revision.element("noOfPages").getText());
                     material.setWeight(revision.element("mass").getText());
@@ -169,6 +173,10 @@ public class FileServiceImpl implements FileService {
             material.setParentId(parentId);
             material.setMaterialNo(element.attributeValue("id"));
             material.setName(element.element("name").getText());
+            List<Name> names = nameRepository.findByEnglish(element.element("name").getText());
+            if (names.size() > 0) {
+                material.setChinese(names.get(0).getChinese());
+            }
             Element revision = element.element("revision");
             material.setRevision(revision.attributeValue("revision"));
             if (null != revision.element("mass")) {
@@ -208,6 +216,10 @@ public class FileServiceImpl implements FileService {
             material.setParentId(parentId);
             material.setMaterialNo(element.attributeValue("id"));
             material.setName(element.element("name").getText());
+            List<Name> names = nameRepository.findByEnglish(element.element("name").getText());
+            if (names.size() > 0) {
+                material.setChinese(names.get(0).getChinese());
+            }
             Element revision = element.element("revision");
             material.setRevision(revision.attributeValue("revision"));
             if (null != revision.element("mass")) {
@@ -378,6 +390,10 @@ public class FileServiceImpl implements FileService {
                 }
                 if (null != row.getCell(7)) {
                     material.setName(row.getCell(7).toString());
+                    List<Name> names = nameRepository.findByEnglish(row.getCell(7).toString());
+                    if (names.size() > 0) {
+                        material.setChinese(names.get(0).getChinese());
+                    }
                 }
                 if (null != row.getCell(9) && !"".equals(row.getCell(9).toString())) {
                     material.setMaterial(row.getCell(9).toString());
@@ -434,7 +450,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importNewVersionStructureExcel(String structureNo, MultipartFile file) throws IOException, InvalidFormatException {
+    public void importNewVersionStructureExcel(Structure structure, MultipartFile file) throws IOException, InvalidFormatException {
 
         // 开始解析新版本数据
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
@@ -479,7 +495,7 @@ public class FileServiceImpl implements FileService {
                         material.setAtRevision(material.getRevision());
 
                         String structNo = row.getCell(0).toString();
-                        if (!structureNo.equals(structNo)) {
+                        if (!structure.getStructureNo().equals(structNo)) {
                             throw new SummerException(StatusCode.STRUCTURE_NO_ERROR);
                         }
                     } else {
@@ -520,6 +536,12 @@ public class FileServiceImpl implements FileService {
                 if (null != row.getCell(13)) {
                     material.setModifyNote(row.getCell(13).toString());
                 }
+                if (null != row.getCell(14)) {
+                    material.setRevision(row.getCell(14).toString());
+                }
+                if (null != row.getCell(15) || !"".equals(row.getCell(15).toString())) {
+                    material.setSpareExp(row.getCell(15).toString().replace(".0", ""));
+                }
                 recordList.add(material);
             }
         }
@@ -529,19 +551,39 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public Excel exportMachineExcel(String machineName) {
+        Machine machine = machineRepository.findMachineByName(machineName);
         List<Structure> structureList = structureRepository.findAllByMachineNameAndStatusOrderByStructureNo(machineName, 1);
         List<Material> materialList = new ArrayList<>();
         for (Structure structure : structureList) {
             List<Material> materials = materialRepository.findAllByAtNoAndAtRevisionAndVersion(
                     structure.getMaterialNo(), structure.getRevision(), structure.getVersion());
-            for (Material material : materials) {
-                material.setStructureNo(structure.getStructureNo());
-            }
+            dataHandler(materials, machine.getCylinderAmount(), structure);
             materialList.addAll(materials);
         }
-        Machine machine = machineRepository.findMachineByName(machineName);
         XSSFWorkbook workbook = buildExcelWorkbook(materialList, machine);
         return new Excel(machineName + ".xlsx", workbook);
+    }
+
+    private void dataHandler(List<Material> materialList, int cylinderAmount, Structure structure) {
+        Material[] materArray = new Material[12];
+        for (int index = 0; index < materialList.size(); index++) {
+            Material material = materialList.get(index);
+            material.setStructureNo(structure.getStructureNo());
+            materArray[material.getLevel()] = material;
+            if (0 == material.getLevel()) {
+                material.setAmount(structure.getAmount());
+                material.setAbsoluteAmount(structure.getAmount());
+            } else {
+                Integer parentAmount = materArray[material.getLevel() - 1].getAmount();
+                if (null != material.getAbsoluteAmount()) {
+                    material.setAmount(parentAmount * material.getAbsoluteAmount());
+                }
+            }
+            if (null != material.getSpareExp() && !"".equals(material.getSpareExp())) {
+                int spare = spareAnalysis(cylinderAmount, material.getSpareExp());
+                material.setSpare(spare);
+            }
+        }
     }
 
     @Override
@@ -595,6 +637,8 @@ public class FileServiceImpl implements FileService {
             cell110.setCellValue("装机件");
             XSSFCell cell113 = row1.createCell(13);
             cell113.setCellValue("设计工艺信息");
+            XSSFCell cell114 = row1.createCell(14);
+            cell114.setCellValue("备件");
             i++;
         }
 
@@ -630,6 +674,11 @@ public class FileServiceImpl implements FileService {
         if (null == machine) {
             XSSFCell cell14 = row.createCell(14);
             cell14.setCellValue("专利方版本");
+            XSSFCell cell15 = row.createCell(15);
+            cell15.setCellValue("备件");
+        } else {
+            XSSFCell cell15 = row.createCell(14);
+            cell15.setCellValue("数量");
         }
         i++;
 
@@ -695,8 +744,47 @@ public class FileServiceImpl implements FileService {
                     tempCell14.setCellValue(material.getRevision());
                 }
             }
+            if (null == machine) {
+                XSSFCell tempCell14 = tempRow.createCell(14);
+                if (null != material.getRevision()) {
+                    tempCell14.setCellValue(material.getRevision());
+                }
+                XSSFCell tempCell15 = tempRow.createCell(15);
+                if (null != material.getSpareExp()) {
+                    tempCell15.setCellValue(material.getSpareExp());
+                }
+            } else {
+                XSSFCell tempCell14 = tempRow.createCell(14);
+                if (null != material.getSpare()) {
+                    tempCell14.setCellValue(material.getSpare());
+                }
+                if (null != material.getAmount()) {
+                    XSSFCell tempCell10 = tempRow.createCell(10);
+                    tempCell10.setCellValue(material.getAmount());
+                }
+            }
         }
 
         return workbook;
+    }
+
+    private int spareAnalysis(int cylinderAmount, String exp) {
+        int mantissa = 0;
+        int multiplier = 0;
+        int plusIndex = -1;
+        int nIndex = -1;
+        if (exp.contains("n")) {
+            nIndex = exp.indexOf("n");
+            if (nIndex != 0) {
+                multiplier = Integer.parseInt(exp.substring(0, nIndex));
+            } else {
+                multiplier = 1;
+            }
+        }
+        if (exp.contains("+")) {
+            plusIndex = exp.indexOf("+");
+            mantissa = Integer.parseInt(exp.substring(plusIndex + 1, exp.length()));
+        }
+        return multiplier * cylinderAmount + mantissa;
     }
 }

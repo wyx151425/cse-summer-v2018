@@ -89,6 +89,11 @@ public class Material extends Entity implements Serializable {
      */
     private String weight;
     /**
+     * 总数量
+     */
+    @Transient
+    private Integer amount;
+    /**
      * 数量
      */
     private Integer absoluteAmount;
@@ -105,6 +110,15 @@ public class Material extends Entity implements Serializable {
      * 子节点数量
      */
     private Integer childCount;
+    /**
+     * 备件数
+     */
+    @Transient
+    private Integer spare;
+    /**
+     * 备件表达式
+     */
+    private String spareExp;
 
     public Material() {
     }
@@ -273,6 +287,14 @@ public class Material extends Entity implements Serializable {
         this.weight = weight;
     }
 
+    public Integer getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
+    }
+
     public Integer getAbsoluteAmount() {
         return absoluteAmount;
     }
@@ -303,6 +325,22 @@ public class Material extends Entity implements Serializable {
 
     public void setChildCount(Integer childCount) {
         this.childCount = childCount;
+    }
+
+    public Integer getSpare() {
+        return spare;
+    }
+
+    public void setSpare(Integer spare) {
+        this.spare = spare;
+    }
+
+    public String getSpareExp() {
+        return spareExp;
+    }
+
+    public void setSpareExp(String spareExp) {
+        this.spareExp = spareExp;
     }
 
     @Override

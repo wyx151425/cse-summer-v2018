@@ -53,3 +53,11 @@ CREATE TABLE `cse_material` (
   `child_count` int(11),
   PRIMARY KEY (`id`)
 )  ENGINE=INNODB DEFAULT CHARSET=UTF8;
+
+CREATE TABLE `cse_name` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `object_id` CHAR(32),
+  `english` VARCHAR(255),
+  `chinese` varchar(255),
+  PRIMARY KEY (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=UTF8;

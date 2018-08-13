@@ -66,14 +66,14 @@ public class FileController extends BaseFacade {
 
     @PostMapping(value = "files/import/structure/newVersion")
     public Response<Object> actionImportNewVersionStructureExcel(
-            @RequestParam String structureNo,
+            Structure structure,
             @RequestParam("structureExcel") MultipartFile structureExcel
     ) {
         if (!SummerConst.DocType.XLSX.equals(structureExcel.getContentType())) {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
-            fileService.importNewVersionStructureExcel(structureNo, structureExcel);
+            fileService.importNewVersionStructureExcel(structure, structureExcel);
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
