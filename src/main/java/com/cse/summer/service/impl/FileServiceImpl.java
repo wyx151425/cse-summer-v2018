@@ -390,10 +390,6 @@ public class FileServiceImpl implements FileService {
                 }
                 if (null != row.getCell(7)) {
                     material.setName(row.getCell(7).toString());
-                    List<Name> names = nameRepository.findByEnglish(row.getCell(7).toString());
-                    if (names.size() > 0) {
-                        material.setChinese(names.get(0).getChinese());
-                    }
                 }
                 if (null != row.getCell(9) && !"".equals(row.getCell(9).toString())) {
                     material.setMaterial(row.getCell(9).toString());
@@ -442,6 +438,10 @@ public class FileServiceImpl implements FileService {
                 material.setAbsoluteAmount(amount);
 
                 if (!unImportMater.equals(material.getAtNo())) {
+                    List<Name> names = nameRepository.findByEnglish(row.getCell(7).toString());
+                    if (names.size() > 0) {
+                        material.setChinese(names.get(0).getChinese());
+                    }
                     materialList.add(material);
                 }
             }
@@ -451,7 +451,6 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void importNewVersionStructureExcel(Structure structure, MultipartFile file) throws IOException, InvalidFormatException {
-
         // 开始解析新版本数据
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Row structRow = workbook.getSheetAt(0).getRow(1);

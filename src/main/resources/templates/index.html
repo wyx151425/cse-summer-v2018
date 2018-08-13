@@ -96,7 +96,13 @@
             </form>
             <div id="manXmlConfirm" style="display: none">
                 <div class="modal-body">
-                    <p id="manXmlProgress" class="progress-prompt">文件上传中...</p>
+                    <div id="manXmlProgress" class="progress-prompt">
+                        <div class="loader loader-1">
+                            <div class="loader-outter"></div>
+                            <div class="loader-inner"></div>
+                        </div>
+                        文件上传中...
+                    </div>
                 </div>
             </div>
         </div>
@@ -110,7 +116,7 @@
                 </button>
                 <h4 class="modal-title" id="WinGDExcelLabel">导入WinGD Excel文件</h4>
             </div>
-            <form  id="winGDExcelForm">
+            <form id="winGDExcelForm">
                 <div class="modal-body">
                     <label for="machineName2" class="control-label col-lg-2 col-md-2">机器</label>
                     <div class="form-group col-lg-10 col-md-10">
@@ -128,7 +134,13 @@
             </form>
             <div id="winGDExcelConfirm" style="display: none">
                 <div class="modal-body">
-                    <p id="winGDExcelProgress" class="progress-prompt">文件上传中...</p>
+                    <div id="winGDExcelProgress" class="progress-prompt">
+                        <div class="loader loader-1">
+                            <div class="loader-outter"></div>
+                            <div class="loader-inner"></div>
+                        </div>
+                        文件上传中...
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,7 +154,7 @@
                 </button>
                 <h4 class="modal-title" id="machineEditLabel">修改机器信息</h4>
             </div>
-            <form  id="machineEditForm">
+            <form id="machineEditForm">
                 <div class="modal-body">
                     <input id="id" class="form-control" type="hidden"/>
                     <label for="name" class="control-label col-lg-2 col-md-2">名称</label>
