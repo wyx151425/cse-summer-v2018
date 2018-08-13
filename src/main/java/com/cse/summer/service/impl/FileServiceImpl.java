@@ -743,24 +743,18 @@ public class FileServiceImpl implements FileService {
                 if (null != material.getRevision()) {
                     tempCell14.setCellValue(material.getRevision());
                 }
-            }
-            if (null == machine) {
-                XSSFCell tempCell14 = tempRow.createCell(14);
-                if (null != material.getRevision()) {
-                    tempCell14.setCellValue(material.getRevision());
-                }
                 XSSFCell tempCell15 = tempRow.createCell(15);
                 if (null != material.getSpareExp()) {
                     tempCell15.setCellValue(material.getSpareExp());
                 }
             } else {
-                XSSFCell tempCell14 = tempRow.createCell(14);
-                if (null != material.getSpare()) {
-                    tempCell14.setCellValue(material.getSpare());
-                }
                 if (null != material.getAmount()) {
                     XSSFCell tempCell10 = tempRow.createCell(10);
                     tempCell10.setCellValue(material.getAmount());
+                }
+                XSSFCell tempCell14 = tempRow.createCell(14);
+                if (null != material.getSpare()) {
+                    tempCell14.setCellValue(material.getSpare());
                 }
             }
         }
