@@ -61,7 +61,8 @@
                         <a href="javascript:;" style="margin-right: 16px" data-toggle="modal" data-target="#machineEdit"
                            th:onclick="|javascript:toUpdateMachine('${machine.id}', '${machine.name}', '${machine.machineNo}',
                            '${machine.type}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}');|">编辑</a>
-                        <a th:href="@{|/api/files/export/machine?machineName=${machine.name}|}">导出整机BOM</a>
+                        <a href="javascript:;" th:onclick="|javascript:toExportMachineBom('${machine.name}', '${machine.machineNo}',
+                           '${machine.type}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}')|">导出整机BOM</a>
                     </td>
                 </tr>
                 </tbody>

@@ -123,3 +123,14 @@ function toUpdateMachine(machineId, machineName, machineNo, machineType, cylinde
     $("#machineEditForm").css("display", "block");
     $("#machineEditConfirm").css("display", "none");
 }
+
+function toExportMachineBom(machineName, machineNo, machineType, machineCylinder, shipNo, cs) {
+    if (null == machineNo || null == machineType || null == machineCylinder || null == shipNo || null == cs
+        || "" === machineNo || "" === machineType ||  "" === machineCylinder ||  "" === shipNo ||  "" === cs ) {
+        alert("请完善机器信息");
+    } else {
+        let url = "api/files/export/machine?machineName=" + machineName;
+        let link = $('<a href="' + url + '"></a>');
+        link.get(0).click();
+    }
+}
