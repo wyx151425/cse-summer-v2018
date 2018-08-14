@@ -354,6 +354,7 @@ public class FileServiceImpl implements FileService {
                         targetStruct.setStructureNo(structNo);
                         targetStruct.setMaterialNo(materNo);
                         targetStruct.setRevision(materVersion);
+                        targetStruct.setAmount((int) Double.parseDouble(row.getCell(14).toString()));
 
                         // 当物料存在时就为部套设置物料最新的版本
                         List<Material> materials = materialRepository.findAllByMaterialNoAndRevisionAndLevel(materNo, materVersion, 0);
@@ -403,9 +404,10 @@ public class FileServiceImpl implements FileService {
                 if (null != row.getCell(12)) {
                     material.setWeight(row.getCell(12).toString());
                 }
-                if (null != row.getCell(13)) {
-                    material.setPositionNo(row.getCell(13).toString());
-                }
+
+                int levelLength = row.getCell(0).toString().length();
+                material.setPositionNo(row.getCell(0).toString().substring(levelLength - 3, levelLength));
+
                 if (null != row.getCell(16)) {
                     material.setModifyNote(row.getCell(16).toString());
                 }

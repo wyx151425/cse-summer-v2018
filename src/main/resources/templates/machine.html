@@ -37,11 +37,10 @@
                     <thead>
                     <tr>
                         <th class="col-lg-1 col-md-1">部套号</th>
-                        <th class="col-lg-1 col-md-2">物料号</th>
-                        <th class="col-lg-1 col-md-1">英文名</th>
+                        <th class="col-lg-1 col-md-1">物料号</th>
+                        <th class="col-lg-2 col-md-2">英文名</th>
                         <th class="col-lg-2 col-md-2">中文名</th>
                         <th class="col-lg-1 col-md-1">总数量</th>
-                        <th class="col-lg-1 col-md-1">单件数量</th>
                         <th class="col-lg-1 col-md-1">专利方版本</th>
                         <th class="col-lg-1 col-md-1">当前版本</th>
                         <th class="col-lg-1 col-md-1">最新版本</th>
@@ -54,7 +53,6 @@
                         <td th:text="${structure.materialNo}"></td>
                         <td th:text="${structure.material.name}"></td>
                         <td th:text="${structure.material.chinese}"></td>
-                        <td th:text="${structure.amount}"></td>
                         <td th:text="${structure.amount}"></td>
                         <td th:text="${structure.revision}"></td>
                         <td th:text="${structure.version}"></td>
