@@ -187,7 +187,8 @@ $(document).ready(function () {
                 structureNo: $("#structureNo7").val(),
                 materialNo: $("#materialNo7").val(),
                 revision: $("#revision7").val(),
-                version: $("#version7").val()
+                version: $("#version7").val(),
+                amount: $("#amount7").val()
             }),
             async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
             // 请求成功后的回调函数。

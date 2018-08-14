@@ -547,7 +547,7 @@ public class FileServiceImpl implements FileService {
                 if (null != row.getCell(14)) {
                     material.setRevision(row.getCell(14).toString());
                 }
-                if (null != row.getCell(15) || !"".equals(row.getCell(15).toString())) {
+                if (null != row.getCell(15)) {
                     material.setSpareExp(row.getCell(15).toString().replace(".0", ""));
                 }
                 recordList.add(material);
