@@ -5,11 +5,11 @@
 
     <groupId>com.cse</groupId>
     <artifactId>summer</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <version>1.0.0-RELEASE</version>
+    <packaging>war</packaging>
 
     <name>summer</name>
-    <description>Machine management system of CSE</description>
+    <description>Design BOM management system of CSE</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -40,6 +40,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -77,6 +89,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
+        <finalName>csedms</finalName>
     </build>
 
 

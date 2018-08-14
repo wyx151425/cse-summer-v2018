@@ -35,14 +35,16 @@ $(document).ready(function () {
         });
     });
 
-    $("#addNewVersion").click(function () {
-        $("#structureExcelForm").css("display", "block");
-        $("#structureExcelConfirm").css("display", "none");
-    });
-
     $("#importFile").click(function () {
         $("#structureExcelForm").css("display", "none");
         $("#structureExcelConfirm").css("display", "block");
+
+        let password = $("#password").val();
+        if (password !== "Ab*DTpod^Wn%x9or") {
+            $(".progress-prompt").text("秘钥错误");
+            return;
+        }
+
         $.ajaxFileUpload({
             url: 'api/files/import/structure/newVersion',  // 用于文件上传的服务器端请求地址
             secureuri: false,  // 是否需要安全协议，一般设置为false
