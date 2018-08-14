@@ -162,12 +162,12 @@ public class FileServiceImpl implements FileService {
                     material.setWeight(revision.element("mass").getText());
                     // 可能存在数量为1.00的形式，所以字符串先转为double再转为int
                     material.setAbsoluteAmount(1);
-                    targetStruct.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
                     materialList.add(material);
                     Element parts = revision.element("partList");
                     int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, materNoM, revisionM, names);
                     material.setChildCount(childCount);
                 }
+                targetStruct.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
                 structureList.add(targetStruct);
             }
         } else if ("part".equals(element.getName())) {
