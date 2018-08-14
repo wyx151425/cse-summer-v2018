@@ -55,6 +55,15 @@ public class FileServiceImpl implements FileService {
         this.nameRepository = nameRepository;
     }
 
+    private String findChineseName(String englishName, List<Name> names) {
+        for (Name name : names) {
+            if (name.getEnglish().equals(englishName)) {
+                return name.getChinese();
+            }
+        }
+        return "";
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void importMANXml(String machineName, MultipartFile file) throws DocumentException, IOException {
@@ -63,7 +72,10 @@ public class FileServiceImpl implements FileService {
         Element root = doc.getRootElement();
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
-        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, null, null);
+
+        List<Name> names = nameRepository.findAll();
+
+        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, null, null, names);
 
         Machine targetMachine = machineRepository.findMachineByName(machineName);
         if (null == targetMachine) {
@@ -99,14 +111,14 @@ public class FileServiceImpl implements FileService {
      */
     @SuppressWarnings("unchecked")
     private void xmlRecursiveTraversal(Element element, List<Material> materialList, List<Structure> structureList,
-                                       String parentId, String machineName, int parentLevel, String atNo, String atRevision) {
+                                       String parentId, String machineName, int parentLevel, String atNo, String atRevision, List<Name> names) {
         if ("designSpec".equals(element.getName())) {
             logger.info("装置号id: " + element.attributeValue("id"));
             Element revision = element.element("revision");
             Element modules = revision.element("moduleList");
             List<Element> moduleList = modules.elements("module");
             for (Element module : moduleList) {
-                xmlRecursiveTraversal(module, materialList, structureList, null, machineName, parentLevel, null, null);
+                xmlRecursiveTraversal(module, materialList, structureList, null, machineName, parentLevel, null, null, names);
             }
         } else if ("module".equals(element.getName())) {
             Element revision = element.element("revision");
@@ -143,10 +155,8 @@ public class FileServiceImpl implements FileService {
                     material.setLatestVersion(0);
                     material.setMaterialNo(materNoM);
                     material.setName(element.element("name").getText());
-                    List<Name> names = nameRepository.findByEnglish(element.element("name").getText());
-                    if (names.size() > 0) {
-                        material.setChinese(names.get(0).getChinese());
-                    }
+                    String chineseName = findChineseName(element.element("name").getText(), names);
+                    material.setChinese(chineseName);
                     material.setRevision(revisionM);
                     material.setPage(revision.element("noOfPages").getText());
                     material.setWeight(revision.element("mass").getText());
@@ -155,7 +165,7 @@ public class FileServiceImpl implements FileService {
                     targetStruct.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
                     materialList.add(material);
                     Element parts = revision.element("partList");
-                    int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, materNoM, revisionM);
+                    int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, materNoM, revisionM, names);
                     material.setChildCount(childCount);
                 }
                 structureList.add(targetStruct);
@@ -173,10 +183,8 @@ public class FileServiceImpl implements FileService {
             material.setParentId(parentId);
             material.setMaterialNo(element.attributeValue("id"));
             material.setName(element.element("name").getText());
-            List<Name> names = nameRepository.findByEnglish(element.element("name").getText());
-            if (names.size() > 0) {
-                material.setChinese(names.get(0).getChinese());
-            }
+            String chineseName = findChineseName(element.element("name").getText(), names);
+            material.setChinese(chineseName);
             Element revision = element.element("revision");
             material.setRevision(revision.attributeValue("revision"));
             if (null != revision.element("mass")) {
@@ -199,7 +207,7 @@ public class FileServiceImpl implements FileService {
             }
             materialList.add(material);
             Element parts = revision.element("partList");
-            int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, atNo, atRevision);
+            int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, atNo, atRevision, names);
 
             material.setChildCount(childCount);
         } else if ("standardPart".equals(element.getName()) || "document".equals(element.getName())
@@ -216,10 +224,8 @@ public class FileServiceImpl implements FileService {
             material.setParentId(parentId);
             material.setMaterialNo(element.attributeValue("id"));
             material.setName(element.element("name").getText());
-            List<Name> names = nameRepository.findByEnglish(element.element("name").getText());
-            if (names.size() > 0) {
-                material.setChinese(names.get(0).getChinese());
-            }
+            String chineseName = findChineseName(element.element("name").getText(), names);
+            material.setChinese(chineseName);
             Element revision = element.element("revision");
             material.setRevision(revision.attributeValue("revision"));
             if (null != revision.element("mass")) {
@@ -256,42 +262,42 @@ public class FileServiceImpl implements FileService {
      * @return 该层元素子节点数
      */
     @SuppressWarnings("unchecked")
-    private int xmlPartsRecursiveTraversal(Element parts, List<Material> materialList, String parentId, String machineName, int parentLevel, String atNo, String atRevision) {
+    private int xmlPartsRecursiveTraversal(Element parts, List<Material> materialList, String parentId, String machineName, int parentLevel, String atNo, String atRevision, List<Name> names) {
         int childCount = 0;
         if (null != parts) {
             List<Element> partList = parts.elements("part");
             if (partList.size() > 0) {
                 childCount += partList.size();
                 for (Element part : partList) {
-                    xmlRecursiveTraversal(part, materialList, null, parentId, machineName, parentLevel, atNo, atRevision);
+                    xmlRecursiveTraversal(part, materialList, null, parentId, machineName, parentLevel, atNo, atRevision, names);
                 }
             }
             List<Element> standardParts = parts.elements("standardPart");
             if (standardParts.size() > 0) {
                 childCount += standardParts.size();
                 for (Element standardPart : standardParts) {
-                    xmlRecursiveTraversal(standardPart, materialList, null, parentId, machineName, parentLevel, atNo, atRevision);
+                    xmlRecursiveTraversal(standardPart, materialList, null, parentId, machineName, parentLevel, atNo, atRevision, names);
                 }
             }
             List<Element> documents = parts.elements("document");
             if (documents.size() > 0) {
                 childCount += documents.size();
                 for (Element document : documents) {
-                    xmlRecursiveTraversal(document, materialList, null, parentId, machineName, parentLevel, atNo, atRevision);
+                    xmlRecursiveTraversal(document, materialList, null, parentId, machineName, parentLevel, atNo, atRevision, names);
                 }
             }
             List<Element> supDrawings = parts.elements("supDrawing");
             if (supDrawings.size() > 0) {
                 childCount += supDrawings.size();
                 for (Element supDrawing : supDrawings) {
-                    xmlRecursiveTraversal(supDrawing, materialList, null, parentId, machineName, parentLevel, atNo, atRevision);
+                    xmlRecursiveTraversal(supDrawing, materialList, null, parentId, machineName, parentLevel, atNo, atRevision, names);
                 }
             }
             List<Element> licData = parts.elements("licData");
             if (licData.size() > 0) {
                 childCount += licData.size();
                 for (Element aLicData : licData) {
-                    xmlRecursiveTraversal(aLicData, materialList, null, parentId, machineName, parentLevel, atNo, atRevision);
+                    xmlRecursiveTraversal(aLicData, materialList, null, parentId, machineName, parentLevel, atNo, atRevision, names);
                 }
             }
         }
@@ -304,7 +310,10 @@ public class FileServiceImpl implements FileService {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
-        winGDExcelProcess(machineName, workbook, materialList, structureList);
+
+        List<Name> names = nameRepository.findAll();
+
+        winGDExcelProcess(machineName, workbook, materialList, structureList, names);
 
         Machine targetMachine = machineRepository.findMachineByName(machineName);
         if (null == targetMachine) {
@@ -325,7 +334,7 @@ public class FileServiceImpl implements FileService {
         materialRepository.saveAll(materialList);
     }
 
-    private void winGDExcelProcess(String machineName, Workbook workbook, List<Material> materialList, List<Structure> structureList) {
+    private void winGDExcelProcess(String machineName, Workbook workbook, List<Material> materialList, List<Structure> structureList, List<Name> names) {
         // 建立维护层级关系的数组
         Material[] levelArray = new Material[12];
         Sheet sheet = workbook.getSheetAt(1);
@@ -440,10 +449,8 @@ public class FileServiceImpl implements FileService {
                 material.setAbsoluteAmount(amount);
 
                 if (!unImportMater.equals(material.getAtNo())) {
-                    List<Name> names = nameRepository.findByEnglish(row.getCell(7).toString());
-                    if (names.size() > 0) {
-                        material.setChinese(names.get(0).getChinese());
-                    }
+                    String chineseName = findChineseName(row.getCell(7).toString(), names);
+                    material.setChinese(chineseName);
                     materialList.add(material);
                 }
             }
