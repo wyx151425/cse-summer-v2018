@@ -6,7 +6,7 @@ import com.cse.summer.domain.Response;
 import com.cse.summer.domain.Structure;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.StatusCode;
-import com.cse.summer.util.SummerConst;
+import com.cse.summer.util.Constant;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class FileController extends BaseFacade {
             @RequestParam("machineName") String machineName,
             @RequestParam("manXml") MultipartFile manXml
     ) {
-        if (!SummerConst.DocType.XML.equals(manXml.getContentType())) {
+        if (!Constant.DocType.XML.equals(manXml.getContentType())) {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
@@ -53,7 +53,7 @@ public class FileController extends BaseFacade {
             @RequestParam("machineName") String machineName,
             @RequestParam("winGDExcel") MultipartFile winGDExcel
     ) {
-        if (!SummerConst.DocType.XLSX.equals(winGDExcel.getContentType())) {
+        if (!Constant.DocType.XLSX.equals(winGDExcel.getContentType())) {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
@@ -69,7 +69,7 @@ public class FileController extends BaseFacade {
             Structure structure,
             @RequestParam("structureExcel") MultipartFile structureExcel
     ) {
-        if (!SummerConst.DocType.XLSX.equals(structureExcel.getContentType())) {
+        if (!Constant.DocType.XLSX.equals(structureExcel.getContentType())) {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
@@ -83,11 +83,11 @@ public class FileController extends BaseFacade {
     @GetMapping(value = "files/export/machine")
     public void actionExportMachineExcel(@RequestParam("machineName") String machineName) throws IOException {
         Excel excel = fileService.exportMachineExcel(machineName);
-        getHttpServletResponse().reset();
-        getHttpServletResponse().setHeader("content-disposition", "attachment;filename="
+        getResponse().reset();
+        getResponse().setHeader("content-disposition", "attachment;filename="
                 + URLEncoder.encode(excel.getName(), "UTF-8"));
-        getHttpServletResponse().setContentType(SummerConst.DocType.XLSX_UTF8);
-        OutputStream out = getHttpServletResponse().getOutputStream();
+        getResponse().setContentType(Constant.DocType.XLSX_UTF8);
+        OutputStream out = getResponse().getOutputStream();
         BufferedOutputStream buffer = new BufferedOutputStream(out);
         buffer.flush();
         excel.getWorkbook().write(buffer);
@@ -99,11 +99,11 @@ public class FileController extends BaseFacade {
             @ModelAttribute Structure structure
     ) throws IOException {
         Excel excel = fileService.exportStructureExcel(structure);
-        getHttpServletResponse().reset();
-        getHttpServletResponse().setHeader("content-disposition", "attachment;filename="
+        getResponse().reset();
+        getResponse().setHeader("content-disposition", "attachment;filename="
                 + URLEncoder.encode(excel.getName(), "UTF-8"));
-        getHttpServletResponse().setContentType(SummerConst.DocType.XLSX_UTF8);
-        OutputStream out = getHttpServletResponse().getOutputStream();
+        getResponse().setContentType(Constant.DocType.XLSX_UTF8);
+        OutputStream out = getResponse().getOutputStream();
         BufferedOutputStream buffer = new BufferedOutputStream(out);
         buffer.flush();
         excel.getWorkbook().write(buffer);

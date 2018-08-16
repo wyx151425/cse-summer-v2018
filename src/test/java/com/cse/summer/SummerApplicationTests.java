@@ -1,11 +1,27 @@
 package com.cse.summer;
 
+import com.cse.summer.domain.Name;
+import com.cse.summer.domain.User;
 import com.cse.summer.repository.NameRepository;
+import com.cse.summer.repository.UserRepository;
+import com.cse.summer.util.Generator;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -14,9 +30,22 @@ public class SummerApplicationTests {
     @Autowired
     private NameRepository nameRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Test
     public void contextLoads() {
     }
+
+//    @Test
+//    public void addUser() {
+//        User user = new User();
+//        user.setObjectId(Generator.getObjectId());
+//        user.setStatus(1);
+//        user.setName("wangzhenqi");
+//        user.setPassword("151425");
+//        userRepository.save(user);
+//    }
 
 //    @Test
 //    public void addNameRelation() {

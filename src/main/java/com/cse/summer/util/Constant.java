@@ -1,6 +1,6 @@
 package com.cse.summer.util;
 
-public class SummerConst {
+public class Constant {
     public static final String USER = "user";
 
     public static final class DocType {

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CSE DMS</title>
+    <link rel="shortcut icon" th:href="@{images/CSE.png}" type="image/x-icon"/>
+    <link rel="stylesheet" th:href="@{css/nemo.css}">
+    <link rel="stylesheet" th:href="@{css/login.css}">
+    <script th:src="@{js/jquery-3.3.1.min.js}"></script>
+    <script th:src="@{js/login.js}"></script>
+</head>
+<body>
+<main class="container">
+    <div class="title">
+        <a th:href="@{/login}">
+            <img class="favicon" th:src="@{images/CSE.png}" alt="">
+            <div class="purpose">
+                <p class="app-name">中国船舶重工集团柴油机有限公司</p>
+                <p class="app-url">设计BOM管理系统</p>
+            </div>
+        </a>
+    </div>
+    <div class="login-form">
+        <div class="form-group">
+            <label for="name" class="form-label">
+                <span id="icon-user" class="icon icon-user"></span>
+            </label>
+            <input id="name" class="form-control" type="text" placeholder="DMS-用户名"/>
+            <label for="name" class="form-prompt">
+                <span id="remove-text" class="icon icon-remove-sign"></span>
+            </label>
+        </div>
+        <div class="form-group">
+            <label for="password" class="form-label">
+                <span id="icon-lock" class="icon icon-lock"></span>
+            </label>
+            <input id="password" class="form-control" type="password" placeholder="6-32个字符，区分大小写"/>
+            <label for="password" class="form-prompt">
+                <span id="decode-pwd" class="icon icon-eye-open"></span>
+            </label>
+        </div>
+        <p id="response" class="response"></p>
+        <div class="form-group">
+            <button id="loginBtn" class="login-btn" type="button">登录</button>
+        </div>
+    </div>
+</main>
+</body>
+</html>

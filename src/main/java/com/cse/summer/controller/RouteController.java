@@ -26,6 +26,11 @@ public class RouteController {
         this.machineService = machineService;
     }
 
+    @RequestMapping(value = "login")
+    public String routeLoginPage() {
+        return "login";
+    }
+
     @RequestMapping(value = {"", "/", "index"})
     public ModelAndView routeIndexPage() {
         ModelAndView mv = new ModelAndView();

@@ -1,0 +1,116 @@
+main.container {
+    width: 450px;
+    min-height: 400px;
+}
+
+.title {
+    width: 450px;
+    height: 40px;
+    padding: 26px 0;
+    margin-top: 50px;
+}
+
+.favicon {
+    float: left;
+    margin-top: -3px;
+    display: block;
+    width: 46px;
+    height: 46px;
+}
+
+.purpose {
+    float: left;
+    margin-left: 12px;
+}
+
+.app-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.app-url {
+    font-size: 8px;
+}
+
+.login-form {
+    width: 450px;
+    height: auto;
+    padding: 32px;
+    border: solid 1px #dedfe0;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05), 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    width: 384px;
+    height: 54px;
+    line-height: 54px;
+    padding: 0 52px;
+    color: #999;
+    font-size: 14px;
+    box-sizing: border-box;
+    border: solid 1px #b2b2b2;
+}
+
+.form-control:focus {
+    color: #444;
+    border: solid 1px #337ab7;
+}
+
+.form-control:focus ~ span.icon {
+    color: #337ab7;
+}
+
+.form-label {
+    position: absolute;
+    top: 15px;
+    left: 17px;
+}
+
+.form-label span.icon {
+    color: #999;
+    font-size: 21px;
+}
+
+.form-prompt {
+    position: absolute;
+    top: 19px;
+    right: 20px;
+}
+
+.form-prompt span.icon {
+    cursor: pointer;
+    color: #999;
+    font-size: 15px;
+}
+
+.response {
+    font-size: 14px;
+    line-height: 20px;
+    padding: 4px 0;
+    color: #ff4e43;
+}
+
+.login-btn {
+    width: 384px;
+    height: 54px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 8px;
+    background-color: #337ab7;
+}
+
+.login-btn:hover, .login-btn:active {
+    background-color: #204d74;
+}
+
+.bottom {
+    margin-top: 16px;
+}

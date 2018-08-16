@@ -1,5 +1,6 @@
 package com.cse.summer.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.io.Serializable;
@@ -32,6 +33,7 @@ public class Material extends Entity implements Serializable {
     /**
      * 所在层级
      */
+    @Column(name = "position")
     private Integer level;
     /**
      * 源类型（1=MAN/2=WinGD）

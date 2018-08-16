@@ -1,5 +1,7 @@
 package com.cse.summer.controller;
 
+import com.cse.summer.domain.User;
+import com.cse.summer.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,15 +24,27 @@ public class BaseFacade {
     @Autowired
     private HttpSession session;
 
-    HttpServletRequest getHttpServletRequest() {
+    HttpServletRequest getRequest() {
         return request;
     }
 
-    HttpServletResponse getHttpServletResponse() {
+    HttpServletResponse getResponse() {
         return response;
     }
 
-    HttpSession getHttpSession() {
+    HttpSession getSession() {
         return session;
+    }
+
+    void addHttpSessionUser(User user) {
+        session.setAttribute(Constant.USER, user);
+    }
+
+    User getHttpSessionUser() {
+        return (User) session.getAttribute(Constant.USER);
+    }
+
+    void removeHttpSessionUser() {
+        session.setAttribute(Constant.USER, null);
     }
 }

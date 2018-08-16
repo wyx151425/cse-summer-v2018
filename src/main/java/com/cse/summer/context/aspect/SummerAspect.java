@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author 王振琦
  */
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class SummerAspect {
 
     private Logger logger = LoggerFactory.getLogger(SummerAspect.class);

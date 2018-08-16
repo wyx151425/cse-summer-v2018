@@ -9,7 +9,7 @@ import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.Generator;
 import com.cse.summer.util.StatusCode;
-import com.cse.summer.util.SummerConst;
+import com.cse.summer.util.Constant;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -83,7 +83,7 @@ public class FileServiceImpl implements FileService {
             machine.setObjectId(Generator.getObjectId());
             machine.setStatus(1);
             machine.setName(machineName);
-            machine.setPatent(SummerConst.MachineType.MAN);
+            machine.setPatent(Constant.MachineType.MAN);
             machine.setMachineNo("");
             machine.setType("");
             machine.setCylinderAmount(0);
@@ -321,7 +321,7 @@ public class FileServiceImpl implements FileService {
             machine.setObjectId(Generator.getObjectId());
             machine.setStatus(1);
             machine.setName(machineName);
-            machine.setPatent(SummerConst.MachineType.WIN_GD);
+            machine.setPatent(Constant.MachineType.WIN_GD);
             machine.setMachineNo("");
             machine.setType("");
             machine.setCylinderAmount(0);
@@ -770,22 +770,24 @@ public class FileServiceImpl implements FileService {
         return workbook;
     }
 
-    private int spareAnalysis(int cylinderAmount, String exp) {
+    private static int spareAnalysis(int cylinderAmount, String exp) {
         int mantissa = 0;
         int multiplier = 0;
         int plusIndex = -1;
         int nIndex = -1;
         if (exp.contains("n")) {
             nIndex = exp.indexOf("n");
-            if (nIndex != 0) {
+            if (nIndex > 0) {
                 multiplier = Integer.parseInt(exp.substring(0, nIndex));
-            } else {
+            } else if (0 == nIndex) {
                 multiplier = 1;
             }
-        }
-        if (exp.contains("+")) {
-            plusIndex = exp.indexOf("+");
-            mantissa = Integer.parseInt(exp.substring(plusIndex + 1, exp.length()));
+            if (exp.contains("+")) {
+                plusIndex = exp.indexOf("+");
+                mantissa = Integer.parseInt(exp.substring(plusIndex + 1, exp.length()));
+            }
+        } else {
+            mantissa = Integer.parseInt(exp);
         }
         return multiplier * cylinderAmount + mantissa;
     }

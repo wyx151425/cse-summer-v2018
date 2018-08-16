@@ -3,8 +3,10 @@ CREATE TABLE `cse_machine` (
   `object_id` CHAR(32),
   `status` INT(1),
   `name` VARCHAR(255),
+  `machine_no` varchar(255),
   `patent` varchar(255),
-  `structureNo` varchar(255),
+  `ship_no` varchar(255), 
+  `structure_no` varchar(255),
   `type` varchar(255),
   `cylinder_amount` varchar(255),
   `classification_society` varchar(255),
@@ -17,8 +19,10 @@ CREATE TABLE `cse_structure` (
   `status` INT(1),
   `machine_name` VARCHAR(255),
   `structure_no` varchar(255),
+  `material_no` VARCHAR(255),
   `revision` varchar(255),
   `version` int(11),
+  `amount` int(11),
   PRIMARY KEY (`id`)
 )  ENGINE=INNODB DEFAULT CHARSET=UTF8;
 
@@ -51,6 +55,11 @@ CREATE TABLE `cse_material` (
   `modify_note` varchar(255),
   `page` varchar(255),
   `child_count` int(11),
+  `at_no` VARCHAR(255),
+  `at_revision` VARCHAR(255),
+  `chinese` VARCHAR(255),
+  `spare_exp` VARCHAR(255),
+  `type` int(1),
   PRIMARY KEY (`id`)
 )  ENGINE=INNODB DEFAULT CHARSET=UTF8;
 
@@ -59,5 +68,14 @@ CREATE TABLE `cse_name` (
   `object_id` CHAR(32),
   `english` VARCHAR(255),
   `chinese` varchar(255),
+  PRIMARY KEY (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=UTF8;
+
+CREATE TABLE `cse_user` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `object_id` CHAR(32),
+  `status` INT(1),
+  `name` VARCHAR(32),
+  `password` varchar(32),
   PRIMARY KEY (`id`)
 )  ENGINE=INNODB DEFAULT CHARSET=UTF8;
