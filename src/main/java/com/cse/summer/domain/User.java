@@ -8,8 +8,20 @@ import javax.persistence.Table;
 @javax.persistence.Entity
 @Table(name = "cse_user")
 public class User extends Entity {
+    private String username;
     private String name;
     private String password;
+
+    public User() {
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public String getName() {
         return name;

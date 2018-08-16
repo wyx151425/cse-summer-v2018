@@ -35,15 +35,32 @@ $(document).ready(function () {
         });
     });
 
+    $("#importNewStructureFile").click(function () {
+        $("#newStructureExcelForm").css("display", "none");
+        $("#newStructureExcelConfirm").css("display", "block");
+
+        $.ajaxFileUpload({
+            url: 'api/files/import/structure/new',  // 用于文件上传的服务器端请求地址
+            secureuri: false,  // 是否需要安全协议，一般设置为false
+            fileElementId: 'newStructureExcel',  // 文件上传域的ID
+            dataType: 'json',  // 返回值类型 一般设置为json
+            data: {
+                machineName: $("#machineName8").val(),
+                structureNo: $("#structureNo8").val(),
+                amount: $("#amount8").val()
+            },
+            success: function (data) {
+                successCallback(data);
+            },
+            error: function () {
+                $(".progress-prompt").text("系统错误");
+            }
+        });
+    });
+
     $("#importFile").click(function () {
         $("#structureExcelForm").css("display", "none");
         $("#structureExcelConfirm").css("display", "block");
-
-        let password = $("#password").val();
-        if (password !== "Ab*DTpod^Wn%x9or") {
-            $(".progress-prompt").text("秘钥错误");
-            return;
-        }
 
         $.ajaxFileUpload({
             url: 'api/files/import/structure/newVersion',  // 用于文件上传的服务器端请求地址
@@ -70,6 +87,8 @@ $(document).ready(function () {
             $(".progress-prompt").text("文件格式错误");
         } else if (8002 === data.statusCode) {
             $(".progress-prompt").text("文件解析错误");
+        } else if (9002 === data.statusCode) {
+            $(".progress-prompt").text("输入部套号与文件内部套号不相同");
         } else {
             $(".progress-prompt").text("系统错误");
         }
@@ -128,7 +147,7 @@ function toUpdateMachine(machineId, machineName, machineNo, machineType, cylinde
 
 function toExportMachineBom(machineName, machineNo, machineType, machineCylinder, shipNo, cs) {
     if (null == machineNo || null == machineType || null == machineCylinder || null == shipNo || null == cs
-        || "" === machineNo || "" === machineType ||  "" === machineCylinder ||  "" === shipNo ||  "" === cs ) {
+        || "" === machineNo || "" === machineType || "" === machineCylinder || "" === shipNo || "" === cs) {
         alert("请完善机器信息");
     } else {
         let url = "api/files/export/machine?machineName=" + machineName;

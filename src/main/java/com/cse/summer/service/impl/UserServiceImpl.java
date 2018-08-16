@@ -4,7 +4,6 @@ import com.cse.summer.context.exception.SummerException;
 import com.cse.summer.domain.User;
 import com.cse.summer.repository.UserRepository;
 import com.cse.summer.service.UserService;
-import com.cse.summer.util.Constant;
 import com.cse.summer.util.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User login(User user) {
-        User targetUser = userRepository.findUserByName(user.getName());
+        User targetUser = userRepository.findUserByUsername(user.getName());
         if (null == targetUser) {
             throw new SummerException(StatusCode.USER_UNREGISTER);
         } else {

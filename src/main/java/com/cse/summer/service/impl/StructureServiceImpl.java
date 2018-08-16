@@ -2,7 +2,6 @@ package com.cse.summer.service.impl;
 
 import com.cse.summer.context.exception.SummerException;
 import com.cse.summer.domain.Material;
-import com.cse.summer.domain.StructMater;
 import com.cse.summer.domain.Structure;
 import com.cse.summer.repository.MaterialRepository;
 import com.cse.summer.repository.StructureRepository;
@@ -12,9 +11,6 @@ import com.cse.summer.util.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author 王振琦
@@ -41,7 +37,7 @@ public class StructureServiceImpl implements StructureService {
             throw new SummerException(StatusCode.MATERIAL_NO_EXIST);
         } else {
             // 检查该部套是否已经与该物料关联
-            Structure target = structureRepository.findStructureByMachineNameAndMaterialNoAndRevisionAndVersionAndStatus(
+            Structure target = structureRepository.findStructureByMachineNameAndMaterialNoAndRevisionAndVersionAndStatusGreaterThanEqual(
                     structure.getMachineName(), structure.getMaterialNo(), structure.getRevision(), structure.getVersion(), 1);
             if (null == target) {
                 structure.setObjectId(Generator.getObjectId());
@@ -56,7 +52,8 @@ public class StructureServiceImpl implements StructureService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStructureVersion(Structure structure) {
-        Structure targetStructure = structureRepository.findStructureByMachineNameAndStructureNoAndStatus(structure.getMachineName(), structure.getStructureNo(), 1);
+        Structure targetStructure = structureRepository.findStructureByMachineNameAndStructureNoAndStatusGreaterThanEqual(structure.getMachineName(), structure.getStructureNo(), 1);
+        targetStructure.setStatus(1);
         targetStructure.setVersion(structure.getVersion());
         structureRepository.save(targetStructure);
     }
@@ -64,8 +61,16 @@ public class StructureServiceImpl implements StructureService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteStructure(Integer id) {
-        Structure targetStructure = structureRepository.getOne(id);
-        targetStructure.setStatus(0);
-        structureRepository.save(targetStructure);
+        Structure structure = structureRepository.getOne(id);
+        structure.setStatus(0);
+        structureRepository.save(structure);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void confirmStructure(Integer id) {
+        Structure structure = structureRepository.getOne(id);
+        structure.setStatus(2);
+        structureRepository.save(structure);
     }
 }

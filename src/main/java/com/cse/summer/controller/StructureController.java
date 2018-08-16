@@ -6,6 +6,9 @@ import com.cse.summer.service.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * @author 王振琦
+ */
 @RestController
 @RequestMapping(value = "api")
 public class StructureController extends BaseFacade {
@@ -32,6 +35,12 @@ public class StructureController extends BaseFacade {
     @DeleteMapping(value = "structures")
     public Response<Structure> actionDeleteStructure(@RequestBody Structure structure) {
         structureService.deleteStructure(structure.getId());
+        return new Response<>();
+    }
+
+    @PutMapping(value = "structures/{id}/confirm")
+    public Response<Structure> actionConfirmStructure(@PathVariable("id") Integer id) {
+        structureService.confirmStructure(id);
         return new Response<>();
     }
 }

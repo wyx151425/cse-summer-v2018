@@ -7,8 +7,7 @@ public class AuditorEntity extends Entity {
     private String createBy;
     private String updateBy;
 
-    public AuditorEntity(String createBy) {
-        this.createBy = createBy;
+    public AuditorEntity() {
     }
 
     public String getCreateBy() {

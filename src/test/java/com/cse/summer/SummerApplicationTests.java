@@ -37,15 +37,16 @@ public class SummerApplicationTests {
     public void contextLoads() {
     }
 
-//    @Test
-//    public void addUser() {
-//        User user = new User();
-//        user.setObjectId(Generator.getObjectId());
-//        user.setStatus(1);
-//        user.setName("wangzhenqi");
-//        user.setPassword("151425");
-//        userRepository.save(user);
-//    }
+    @Test
+    public void addUser() {
+        User user = new User();
+        user.setObjectId(Generator.getObjectId());
+        user.setStatus(1);
+        user.setUsername("wangzhenqi");
+        user.setName("王振琦");
+        user.setPassword("151425");
+        userRepository.save(user);
+    }
 
 //    @Test
 //    public void addNameRelation() {

@@ -163,8 +163,8 @@ $(document).ready(function () {
         let materialNo = $("#materialNo5").val();
         let revision = $("#revision5").val();
         let version = $("#version5").val();
-        let url = "api/files/export/structure?structureNo=" + structureNo + "&materialNo=" + materialNo + "&revision=" + revision +"&version=" + version;
-        let link= $('<a href="'+ url +'"></a>');
+        let url = "api/files/export/structure?structureNo=" + structureNo + "&materialNo=" + materialNo + "&revision=" + revision + "&version=" + version;
+        let link = $('<a href="' + url + '"></a>');
         link.get(0).click();
     });
 
@@ -195,7 +195,7 @@ $(document).ready(function () {
             success: function (data) {
                 if (200 === data.statusCode) {
                     $("#addDbStructureProgress").text("更新成功，请刷新页面查看更新");
-                } else if(9001 === data.statusCode) {
+                } else if (9001 === data.statusCode) {
                     $("#addDbStructureProgress").text("该物料已经添加为该机器的部套");
                 } else if (10001 === data.statusCode) {
                     $("#addDbStructureProgress").text("物料不存在");
@@ -261,6 +261,40 @@ $(document).ready(function () {
             versionSel.append('<option value="' + index + '">' + index + '</option>');
         }
     });
+
+    $("#publishBtn").click(function () {
+        let publishBtn = $(this);
+        let publishCancel = $("#publishCancel");
+        let structurePublishProgress = $("#structurePublishProgress");
+        publishBtn.text("发布中...");
+        publishBtn.attr("disabled", "disabled");
+        $.ajax({
+            url: "api/structures/" + $("#structureId9").val() + "/confirm",
+            dataType: "json", // 预期服务器返回的数据类型
+            type: "put", // 请求方式GET
+            contentType: "application/json", // 发送信息至服务器时的内容编码类型
+            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
+            // 请求成功后的回调函数。
+            success: function (data) {
+                if (200 === data.statusCode) {
+                    // structurePublishProgress.text("发布成功，刷新界面查看更新");
+                    // publishBtn.css("display", "none");
+                    // publishCancel.text("确定");
+                    location.reload();
+                } else {
+                    structurePublishProgress.text("系统错误");
+                    publishBtn.css("display", "none");
+                    publishCancel.text("确定");
+                }
+            },
+            // 请求出错时调用的函数
+            error: function () {
+                structurePublishProgress.text("系统错误");
+                publishBtn.css("display", "none");
+                publishCancel.text("确定");
+            }
+        });
+    });
 });
 
 function deleteStructure(id) {
@@ -298,7 +332,7 @@ function versionList(structureNo, materialNo, revision, latestVersion) {
     let select = $("#version4");
     select.empty();
     for (let index = 0; index <= latestVersion; index++) {
-        select.append('<option value="' + index + '">' + index +'</option>');
+        select.append('<option value="' + index + '">' + index + '</option>');
     }
 }
 
@@ -309,7 +343,14 @@ function structureExport(structureNo, materialNo, revision, latestVersion) {
     let select = $("#version5");
     select.empty();
     for (let index = 0; index <= latestVersion; index++) {
-        select.append('<option value="' + index + '">' + index +'</option>');
+        select.append('<option value="' + index + '">' + index + '</option>');
     }
 }
 
+function publishStructure(structId, structNo) {
+    $("#structurePublishProgress").text("您确定要发布" + structNo + "部套吗？");
+    $("#structureId9").attr("value", structId);
+
+    $("#publishBtn").removeAttr("disabled").text("发布");
+    $("#publishCancel").text("取消");
+}

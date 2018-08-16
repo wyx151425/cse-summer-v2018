@@ -44,6 +44,10 @@
                         class="btn btn-primary pull-right"
                         style="margin-bottom: 20px">导入新版本部套
                 </button>
+                <button id="addNewStructure" type="button" data-target="#importNewStructure" data-toggle="modal"
+                        class="btn btn-primary pull-right"
+                        style="margin-bottom: 20px; margin-right: 16px">导入新部套
+                </button>
                 <button id="addDbButton" type="button" data-target="#addDbStructure" data-toggle="modal"
                         class="btn btn-primary pull-right"
                         style="margin-bottom: 20px; margin-right: 16px">添加库中部套
@@ -53,12 +57,13 @@
                     <tr>
                         <th class="col-lg-1 col-md-1">部套号</th>
                         <th class="col-lg-1 col-md-1">物料号</th>
-                        <th class="col-lg-2 col-md-2">英文名</th>
-                        <th class="col-lg-2 col-md-2">中文名</th>
+                        <th class="col-lg-1 col-md-1">英文名</th>
+                        <th class="col-lg-1 col-md-1">中文名</th>
                         <th class="col-lg-1 col-md-1">总数量</th>
                         <th class="col-lg-1 col-md-1">专利方版本</th>
                         <th class="col-lg-1 col-md-1">当前版本</th>
                         <th class="col-lg-1 col-md-1">最新版本</th>
+                        <th class="col-lg-1 col-md-1">状态</th>
                         <th class="col-lg-2 col-md-2">操作</th>
                     </tr>
                     </thead>
@@ -72,6 +77,11 @@
                         <td th:text="${structure.revision}"></td>
                         <td th:text="${structure.version}"></td>
                         <td th:text="${structure.material.latestVersion}"></td>
+                        <td>
+                            <a href="javascript:;" th:onclick="|javascript:publishStructure('${structure.id}', '${structure.structureNo}');|">
+                                <span th:if="${structure.status == 1}" data-target="#structurePublish" data-toggle="modal">设计</span></a>
+                            <span th:if="${structure.status == 2}">发布</span>
+                        </td>
                         <td>
                             <a href="javascript:;" style="margin-right: 16px"
                                th:onclick="|javascript:structureExport('${structure.structureNo}', '${structure.materialNo}', '${structure.revision}', '${structure.material.latestVersion}');|">
@@ -222,6 +232,46 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="importNewStructure" tabindex="-1" role="dialog" aria-labelledby="newStructureLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="newStructureLabel">导入新部套</h4>
+            </div>
+            <form id="newStructureExcelForm">
+                <div class="modal-body">
+                    <label for="machineName8" class="control-label col-lg-2 col-md-2">机器名</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="machineName8" type="text" class="form-control" th:value="${machine.name}" readonly="readonly"/>
+                    </div>
+                    <label for="structureNo8" class="control-label col-lg-2 col-md-2">部套号</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="structureNo8" type="text" class="form-control"/>
+                    </div>
+                    <label for="amount8" class="control-label col-lg-2 col-md-2">数量</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="amount8" type="text" class="form-control"/>
+                    </div>
+                    <label for="newStructureExcel" class="control-label col-lg-2 col-md-2">文件</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="newStructureExcel" class="form-control" name="newStructureExcel" type="file"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="importNewStructureFile" type="button" class="btn btn-primary">导入</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </form>
+            <div id="newStructureExcelConfirm" style="display: none">
+                <div class="modal-body">
+                    <p id="newStructureExcelProgress" class="progress-prompt">文件上传中...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="importNewVersionStructure" tabindex="-1" role="dialog" aria-labelledby="StructureLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -248,10 +298,6 @@
                     <label for="structureExcel" class="control-label col-lg-2 col-md-2">文件</label>
                     <div class="form-group col-lg-10 col-md-10">
                         <input id="structureExcel" class="form-control" name="structureExcel" type="file"/>
-                    </div>
-                    <label for="password" class="control-label col-lg-2 col-md-2">秘钥</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="password" class="form-control" type="password"/>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -356,6 +402,31 @@
                     <p id="structureExportProgress" class="progress-prompt">部套导出中...</p>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="structurePublish" tabindex="-1" role="dialog" aria-labelledby="structurePublishLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="structurePublishLabel">发布部套</h4>
+            </div>
+            <form id="structurePublishForm">
+                <div class="modal-body">
+                    <input id="structureId9" type="text" class="form-control" style="display: none"/>
+                    <div id="structurePublishConfirm">
+                        <div class="modal-body">
+                            <p id="structurePublishProgress" class="progress-prompt"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="publishBtn" type="button" class="btn btn-primary">发布</button>
+                    <button id="publishCancel" type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

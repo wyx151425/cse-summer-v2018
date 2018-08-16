@@ -445,9 +445,6 @@ public class FileServiceImpl implements FileService {
                     levelArray[level] = material;
                 }
 
-                int amount = (int) Double.parseDouble(row.getCell(14).toString());
-                material.setAbsoluteAmount(amount);
-
                 if (!unImportMater.equals(material.getAtNo())) {
                     String chineseName = findChineseName(row.getCell(7).toString(), names);
                     material.setChinese(chineseName);
@@ -459,27 +456,33 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importNewVersionStructureExcel(Structure structure, MultipartFile file) throws IOException, InvalidFormatException {
-        // 开始解析新版本数据
+    public void importNewStructureExcel(User user, Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Row structRow = workbook.getSheetAt(0).getRow(1);
         String materNo = structRow.getCell(3).toString();
         String materV = structRow.getCell(14).toString();
+        // 根据物料号和专利方版本检查
+        List<Material> materials = materialRepository.findAllByMaterialNoAndRevisionAndLevel(materNo, materV, 0);
+        if (materials.size() > 0) {
+            throw new SummerException(StatusCode.STRUCTURE_EXIST);
+        } else {
+            List<Material> materialList = new ArrayList<>(500);
+            newStructureAnalysis(workbook.getSheetAt(0), user, structure, materialList, 0);
+            materialRepository.saveAll(materialList);
 
-        // 更新旧部套的最新版本号
-        List<Material> oldMaterialList = materialRepository.findAllByAtNoAndAtRevision(materNo, materV);
-        int oldVersion = oldMaterialList.get(0).getLatestVersion();
-        int latestVersion = oldVersion + 1;
-        // 不可以使用foreach 因为foreach循环是拷贝而不是引用同一个对象
-        for (int index = 0; index < oldMaterialList.size(); index++) {
-            oldMaterialList.get(index).setLatestVersion(latestVersion);
+            structure.setObjectId(Generator.getObjectId());
+            structure.setStatus(1);
+            structure.setCreateBy(user.getName());
+            structure.setUpdateBy(user.getName());
+            structure.setMaterialNo(materNo);
+            structure.setRevision(materV);
+            structure.setVersion(0);
+            structureRepository.save(structure);
         }
-        materialRepository.saveAll(oldMaterialList);
+    }
 
-        List<Material> recordList = new ArrayList<>(500);
-        // 建立维护层级关系的数组
-        Material[] levelArray = new Material[10];
-        Sheet sheet = workbook.getSheetAt(0);
+    private void newStructureAnalysis(Sheet sheet, User user, Structure structure, List<Material> materialList, int version) {
+        Material[] levelArray = new Material[12];
         int index = 0;
         for (Row row : sheet) {
             if (index < 1) {
@@ -488,11 +491,13 @@ public class FileServiceImpl implements FileService {
                 Material material = new Material();
                 material.setObjectId(Generator.getObjectId());
                 material.setStatus(1);
-                material.setVersion(latestVersion);
-                material.setLatestVersion(latestVersion);
+                material.setVersion(version);
+                material.setLatestVersion(version);
                 material.setMaterialNo(row.getCell(3).toString());
                 material.setRevision(row.getCell(14).toString());
                 material.setChildCount(0);
+                material.setCreateBy(user.getName());
+                material.setUpdateBy(user.getName());
                 if (null != row.getCell(1)) {
                     int level = (int) Double.parseDouble(row.getCell(1).toString());
                     material.setLevel(level);
@@ -550,17 +555,41 @@ public class FileServiceImpl implements FileService {
                 if (null != row.getCell(15)) {
                     material.setSpareExp(row.getCell(15).toString().replace(".0", ""));
                 }
-                recordList.add(material);
+                materialList.add(material);
             }
         }
-        materialRepository.saveAll(recordList);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void importNewVersionStructureExcel(User user, Structure structure, MultipartFile file) throws IOException, InvalidFormatException {
+        // 开始解析新版本数据
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        Row structRow = workbook.getSheetAt(0).getRow(1);
+        String materNo = structRow.getCell(3).toString();
+        String materV = structRow.getCell(14).toString();
+
+        // 更新旧部套的最新版本号
+        List<Material> oldMaterialList = materialRepository.findAllByAtNoAndAtRevision(materNo, materV);
+        int oldVersion = oldMaterialList.get(0).getLatestVersion();
+        int latestVersion = oldVersion + 1;
+        // 不可以使用foreach 因为foreach循环是拷贝而不是引用同一个对象
+        for (int index = 0; index < oldMaterialList.size(); index++) {
+            oldMaterialList.get(index).setLatestVersion(latestVersion);
+        }
+        materialRepository.saveAll(oldMaterialList);
+
+        List<Material> materialList = new ArrayList<>(500);
+        Sheet sheet = workbook.getSheetAt(0);
+        newStructureAnalysis(sheet, user, structure, materialList, latestVersion);
+        materialRepository.saveAll(materialList);
     }
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public Excel exportMachineExcel(String machineName) {
         Machine machine = machineRepository.findMachineByName(machineName);
-        List<Structure> structureList = structureRepository.findAllByMachineNameAndStatusOrderByStructureNo(machineName, 1);
+        List<Structure> structureList = structureRepository.findAllByMachineNameAndStatusGreaterThanEqualOrderByStructureNo(machineName, 1);
         List<Material> materialList = new ArrayList<>();
         for (Structure structure : structureList) {
             List<Material> materials = materialRepository.findAllByAtNoAndAtRevisionAndVersion(

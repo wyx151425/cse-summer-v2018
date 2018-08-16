@@ -12,8 +12,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     /**
      * 根据用户名查询用户对象
      *
-     * @param name 用户名
+     * @param username 用户名
      * @return 用户对象
      */
-    User findUserByName(String name);
+    User findUserByUsername(String username);
 }

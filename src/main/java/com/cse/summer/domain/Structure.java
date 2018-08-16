@@ -8,7 +8,11 @@ import javax.persistence.Entity;
  */
 @Entity
 @Table(name = "cse_structure")
-public class Structure extends com.cse.summer.domain.Entity {
+public class Structure extends AuditorEntity {
+    /**
+     * 0-删除/1-设计/2-发布
+     * private Integer status;
+     */
     /**
      * 机器名
      */

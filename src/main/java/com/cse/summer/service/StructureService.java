@@ -28,4 +28,11 @@ public interface StructureService {
      * @param id 待删除部套的ID
      */
     void deleteStructure(Integer id);
+
+    /**
+     * 确认部套发布
+     *
+     * @param id 部套ID
+     */
+    void confirmStructure(Integer id);
 }

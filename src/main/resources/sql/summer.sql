@@ -76,6 +76,7 @@ CREATE TABLE `cse_user` (
   `object_id` CHAR(32),
   `status` INT(1),
   `name` VARCHAR(32),
+  `username` varchar(32),
   `password` varchar(32),
   PRIMARY KEY (`id`)
 )  ENGINE=INNODB DEFAULT CHARSET=UTF8;

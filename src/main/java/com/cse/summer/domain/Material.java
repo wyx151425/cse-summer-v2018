@@ -1,6 +1,7 @@
 package com.cse.summer.domain;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.io.Serializable;
@@ -8,9 +9,9 @@ import java.io.Serializable;
 /**
  * @author 王振琦
  */
-@javax.persistence.Entity
+@Entity
 @Table(name = "cse_material")
-public class Material extends Entity implements Serializable {
+public class Material extends AuditorEntity implements Serializable {
     /**
      * 部套号
      */
@@ -33,7 +34,6 @@ public class Material extends Entity implements Serializable {
     /**
      * 所在层级
      */
-    @Column(name = "position")
     private Integer level;
     /**
      * 源类型（1=MAN/2=WinGD）

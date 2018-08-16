@@ -1,5 +1,6 @@
 package com.cse.summer.domain;
 
+import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.util.List;
@@ -7,9 +8,9 @@ import java.util.List;
 /**
  * @author 王振琦
  */
-@javax.persistence.Entity
+@Entity
 @Table(name = "cse_machine")
-public class Machine extends Entity {
+public class Machine extends AuditorEntity {
     private String name;
     private String machineNo;
     private Integer cylinderAmount;

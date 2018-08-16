@@ -66,12 +66,14 @@ $(document).ready(function () {
             success: function (data) {
                 if (200 === data.statusCode) {
                     window.location.href = "index";
-                } else if(7000 === data.statusCode) {
+                } else if (7000 === data.statusCode) {
                     response.text("用户不存在");
-                } else if(7002 === data.statusCode) {
+                } else if (7002 === data.statusCode) {
                     response.text("该用户被禁用");
-                } else if(7003 === data.statusCode) {
+                } else if (7003 === data.statusCode) {
                     response.text("密码错误");
+                } else {
+                    response.text("系统错误");
                 }
                 loginBtn.text("登录");
                 loginBtn.removeAttr("disabled");
