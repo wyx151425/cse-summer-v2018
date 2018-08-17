@@ -569,17 +569,20 @@ public class FileServiceImpl implements FileService {
         String materNo = structRow.getCell(3).toString();
         String materV = structRow.getCell(14).toString();
 
-        // 更新旧部套的最新版本号
+        // 若能查询到旧部套则更新旧部套的最新版本号
+        int latestVersion = 0;
         List<Material> oldMaterialList = materialRepository.findAllByAtNoAndAtRevision(materNo, materV);
-        int oldVersion = oldMaterialList.get(0).getLatestVersion();
-        int latestVersion = oldVersion + 1;
-        // 不可以使用foreach 因为foreach循环是拷贝而不是引用同一个对象
-        for (int index = 0; index < oldMaterialList.size(); index++) {
-            oldMaterialList.get(index).setLatestVersion(latestVersion);
+        if (oldMaterialList.size() > 0) {
+            int oldVersion = oldMaterialList.get(0).getLatestVersion();
+            latestVersion = oldVersion + 1;
+            // 不可以使用foreach 因为foreach循环是拷贝而不是引用同一个对象
+            for (int index = 0; index < oldMaterialList.size(); index++) {
+                oldMaterialList.get(index).setLatestVersion(latestVersion);
+            }
+            materialRepository.saveAll(oldMaterialList);
         }
-        materialRepository.saveAll(oldMaterialList);
 
-        List<Material> materialList = new ArrayList<>(500);
+        List<Material> materialList = new ArrayList<>(100);
         Sheet sheet = workbook.getSheetAt(0);
         newStructureAnalysis(sheet, user, structure, materialList, latestVersion);
         materialRepository.saveAll(materialList);
