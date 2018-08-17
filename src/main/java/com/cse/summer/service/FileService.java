@@ -74,7 +74,7 @@ public interface FileService {
      * @param machineName 机器名
      * @return Excel文件
      */
-    Excel exportMachineExcel(String machineName);
+    Excel exportMachineExcel(String machineName, Integer status);
 
     /**
      * 导出机器指定版本的部套的BOM文件

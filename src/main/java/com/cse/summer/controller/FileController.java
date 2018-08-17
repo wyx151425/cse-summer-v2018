@@ -113,8 +113,11 @@ public class FileController extends BaseFacade {
     }
 
     @GetMapping(value = "files/export/machine")
-    public void actionExportMachineExcel(@RequestParam("machineName") String machineName) throws IOException {
-        Excel excel = fileService.exportMachineExcel(machineName);
+    public void actionExportMachineExcel(
+            @RequestParam("machineName") String machineName,
+            @RequestParam("status") Integer status
+    ) throws IOException {
+        Excel excel = fileService.exportMachineExcel(machineName, status);
         getResponse().reset();
         getResponse().setHeader("content-disposition", "attachment;filename="
                 + URLEncoder.encode(excel.getName(), "UTF-8"));

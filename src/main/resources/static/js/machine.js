@@ -62,6 +62,7 @@ $(document).ready(function () {
         let currentNode = JSON.parse(idStr);
         $("#id0").text(currentNode.id);
         $("#name0").text(currentNode.name);
+        $("#chinese0").text(currentNode.chinese);
         $("#structureNo0").text(currentNode.structureNo);
         $("#materialNo0").text(currentNode.materialNo);
         $("#materialVersion0").text(currentNode.revision);
@@ -145,7 +146,7 @@ $(document).ready(function () {
             // 请求成功后的回调函数。
             success: function (data) {
                 if (200 === data.statusCode) {
-                    $("#versionChooseProgress").text("更新成功，请刷新界面查看更新");
+                    location.reload();
                 } else {
                     $("#versionChooseProgress").text("系统错误");
                 }
@@ -193,7 +194,7 @@ $(document).ready(function () {
             // 请求成功后的回调函数。
             success: function (data) {
                 if (200 === data.statusCode) {
-                    $("#addDbStructureProgress").text("更新成功，请刷新页面查看更新");
+                    location.reload();
                 } else if (9001 === data.statusCode) {
                     $("#addDbStructureProgress").text("该物料已经添加为该机器的部套");
                 } else if (10001 === data.statusCode) {
@@ -310,7 +311,7 @@ function deleteStructure(id) {
         // 请求成功后的回调函数。
         success: function (data) {
             if (200 === data.statusCode) {
-                alert("删除成功，请刷新界面");
+                location.reload();
             } else {
                 alert("系统错误");
             }

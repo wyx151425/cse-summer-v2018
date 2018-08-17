@@ -137,7 +137,7 @@ $(document).ready(function () {
             // 请求成功后的回调函数。
             success: function (data) {
                 if (200 === data.statusCode) {
-                    $("#machineEditProgress").text("更新成功，请刷新页面查看更新");
+                    location.reload();
                 } else if (9001 === data.statusCode) {
                     $("#machineEditProgress").text("部套不存在");
                 } else {
@@ -164,12 +164,12 @@ function toUpdateMachine(machineId, machineName, machineNo, machineType, cylinde
     $("#machineEditConfirm").css("display", "none");
 }
 
-function toExportMachineBom(machineName, machineNo, machineType, machineCylinder, shipNo, cs) {
+function toExportMachineBom(machineName, machineNo, machineType, machineCylinder, shipNo, cs, status) {
     if (null == machineNo || null == machineType || null == machineCylinder || null == shipNo || null == cs
         || "" === machineNo || "" === machineType || "" === machineCylinder || "" === shipNo || "" === cs) {
         alert("请完善机器信息");
     } else {
-        let url = "api/files/export/machine?machineName=" + machineName;
+        let url = "api/files/export/machine?machineName=" + machineName + "&status=" + status;
         let link = $('<a href="' + url + '"></a>');
         link.get(0).click();
     }

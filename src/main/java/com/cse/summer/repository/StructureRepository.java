@@ -43,6 +43,15 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
      * @param status      数据状态
      * @return 部套列表
      */
+    List<Structure> findAllByMachineNameAndStatusOrderByStructureNo(String machineName, Integer status);
+
+    /**
+     * 根据机器名和状态标识查询部套
+     *
+     * @param machineName 机器名
+     * @param status      数据状态
+     * @return 部套列表
+     */
     List<Structure> findAllByMachineNameAndStatusGreaterThanEqualOrderByStructureNo(String machineName, Integer status);
 
     /**

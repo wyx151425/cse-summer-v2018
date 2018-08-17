@@ -41,12 +41,12 @@
                 <thead>
                 <tr>
                     <th class="col-lg-1 col-md-1">名称</th>
-                    <th class="col-lg-2 col-md-2">机号</th>
-                    <th class="col-lg-2 col-md-2">机型</th>
+                    <th class="col-lg-1 col-md-1">机号</th>
+                    <th class="col-lg-1 col-md-1">机型</th>
                     <th class="col-lg-1 col-md-1">缸数</th>
-                    <th class="col-lg-2 col-md-2">船号</th>
-                    <th class="col-lg-2 col-md-2">船级社</th>
-                    <th class="col-lg-2 col-md-2">操作</th>
+                    <th class="col-lg-1 col-md-1">船号</th>
+                    <th class="col-lg-1 col-md-1">船级社</th>
+                    <th class="col-lg-6 col-md-6">操作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -62,8 +62,12 @@
                         <a href="javascript:;" style="margin-right: 16px" data-toggle="modal" data-target="#machineEdit"
                            th:onclick="|javascript:toUpdateMachine('${machine.id}', '${machine.name}', '${machine.machineNo}',
                            '${machine.type}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}');|">编辑</a>
+                        <a href="javascript:;" style="margin-right: 16px" th:onclick="|javascript:toExportMachineBom('${machine.name}', '${machine.machineNo}',
+                           '${machine.type}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}', 0)|">导出整机BOM</a>
+                        <a href="javascript:;" style="margin-right: 16px" th:onclick="|javascript:toExportMachineBom('${machine.name}', '${machine.machineNo}',
+                           '${machine.type}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}', 1)|">导出设计部套</a>
                         <a href="javascript:;" th:onclick="|javascript:toExportMachineBom('${machine.name}', '${machine.machineNo}',
-                           '${machine.type}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}')|">导出整机BOM</a>
+                           '${machine.type}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}', 2)|">导出发布部套</a>
                     </td>
                 </tr>
                 </tbody>

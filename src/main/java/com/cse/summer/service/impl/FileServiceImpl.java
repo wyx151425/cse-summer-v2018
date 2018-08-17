@@ -691,9 +691,14 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public Excel exportMachineExcel(String machineName) {
+    public Excel exportMachineExcel(String machineName, Integer status) {
         Machine machine = machineRepository.findMachineByName(machineName);
-        List<Structure> structureList = structureRepository.findAllByMachineNameAndStatusGreaterThanEqualOrderByStructureNo(machineName, 1);
+        List<Structure> structureList;
+        if (0 == status) {
+            structureList = structureRepository.findAllByMachineNameAndStatusGreaterThanEqualOrderByStructureNo(machineName, 1);
+        } else {
+            structureList = structureRepository.findAllByMachineNameAndStatusOrderByStructureNo(machineName, status);
+        }
         List<Material> materialList = new ArrayList<>();
         for (Structure structure : structureList) {
             List<Material> materials = materialRepository.findAllByAtNoAndAtRevisionAndVersion(
@@ -770,57 +775,58 @@ public class FileServiceImpl implements FileService {
             cell10.setCellValue("部套层次");
             XSSFCell cell13 = row1.createCell(3);
             cell13.setCellValue("物料信息");
-            XSSFCell cell16 = row1.createCell(6);
-            cell16.setCellValue("名称转换");
             XSSFCell cell18 = row1.createCell(8);
-            cell18.setCellValue("材料转换");
+            cell18.setCellValue("名称转换");
             XSSFCell cell110 = row1.createCell(10);
-            cell110.setCellValue("装机件");
-            XSSFCell cell113 = row1.createCell(13);
-            cell113.setCellValue("设计工艺信息");
-            XSSFCell cell114 = row1.createCell(14);
-            cell114.setCellValue("备件");
+            cell110.setCellValue("材料转换");
+            XSSFCell cell112 = row1.createCell(12);
+            cell112.setCellValue("装机件");
+            XSSFCell cell115 = row1.createCell(15);
+            cell115.setCellValue("备件");
+            XSSFCell cell116 = row1.createCell(16);
+            cell116.setCellValue("设计工艺信息");
             i++;
         }
 
         XSSFRow row = sheet.createRow(i);
         XSSFCell cell0 = row.createCell(0);
-        cell0.setCellValue("部套号");
+        cell0.setCellValue("部套");
         XSSFCell cell1 = row.createCell(1);
         cell1.setCellValue("层次");
         XSSFCell cell2 = row.createCell(2);
         cell2.setCellValue("件号");
         XSSFCell cell3 = row.createCell(3);
-        cell3.setCellValue("物料号");
+        cell3.setCellValue("图幅");
         XSSFCell cell4 = row.createCell(4);
         cell4.setCellValue("图号");
         XSSFCell cell5 = row.createCell(5);
-        cell5.setCellValue("图幅");
+        cell5.setCellValue("版本");
         XSSFCell cell6 = row.createCell(6);
-        cell6.setCellValue("名称（英文）");
+        cell6.setCellValue("物料号");
         XSSFCell cell7 = row.createCell(7);
-        cell7.setCellValue("名称（中文）");
+        cell7.setCellValue("版本");
         XSSFCell cell8 = row.createCell(8);
-        cell8.setCellValue("专利材料");
+        cell8.setCellValue("名称（英文）");
         XSSFCell cell9 = row.createCell(9);
-        cell9.setCellValue("国标材料");
+        cell9.setCellValue("名称（中文）");
         XSSFCell cell10 = row.createCell(10);
-        cell10.setCellValue("总数量");
+        cell10.setCellValue("专利材料");
         XSSFCell cell11 = row.createCell(11);
-        cell11.setCellValue("数量");
+        cell11.setCellValue("国标材料");
         XSSFCell cell12 = row.createCell(12);
-        cell12.setCellValue("单重");
-        XSSFCell cell13 = row.createCell(13);
-        cell13.setCellValue("更改");
         if (null == machine) {
-            XSSFCell cell14 = row.createCell(14);
-            cell14.setCellValue("专利方版本");
-            XSSFCell cell15 = row.createCell(15);
-            cell15.setCellValue("备件");
+            cell12.setCellValue("单位数量");
         } else {
-            XSSFCell cell15 = row.createCell(14);
-            cell15.setCellValue("数量");
+            cell12.setCellValue("总数量");
         }
+        XSSFCell cell13 = row.createCell(13);
+        cell13.setCellValue("货源");
+        XSSFCell cell14 = row.createCell(14);
+        cell14.setCellValue("单重");
+        XSSFCell cell15 = row.createCell(15);
+        cell15.setCellValue("备件数量");
+        XSSFCell cell16 = row.createCell(16);
+        cell16.setCellValue("更改记录");
         i++;
 
         int size = materialList.size();
@@ -841,7 +847,7 @@ public class FileServiceImpl implements FileService {
             }
             XSSFCell tempCell3 = tempRow.createCell(3);
             if (null != material.getMaterialNo()) {
-                tempCell3.setCellValue(material.getMaterialNo() + "." + material.getRevision());
+                tempCell3.setCellValue(material.getDrawingSize());
             }
             XSSFCell tempCell4 = tempRow.createCell(4);
             if (null != material.getDrawingNo()) {
@@ -849,57 +855,64 @@ public class FileServiceImpl implements FileService {
             }
             XSSFCell tempCell5 = tempRow.createCell(5);
             if (null != material.getDrawingSize()) {
-                tempCell5.setCellValue(material.getDrawingSize());
+                tempCell5.setCellValue(material.getDrawingVersion());
             }
             XSSFCell tempCell6 = tempRow.createCell(6);
-            if (null != material.getName()) {
-                tempCell6.setCellValue(material.getName());
+            if (null != material.getMaterialNo()) {
+                tempCell6.setCellValue(material.getMaterialNo());
             }
             XSSFCell tempCell7 = tempRow.createCell(7);
-            if (null != material.getChinese()) {
-                tempCell7.setCellValue(material.getChinese());
-            } else {
-                tempCell7.setCellValue("");
+            if (null != material.getRevision()) {
+                tempCell7.setCellValue(material.getRevision());
             }
             XSSFCell tempCell8 = tempRow.createCell(8);
-            if (null != material.getMaterial()) {
-                tempCell8.setCellValue(material.getMaterial());
+            if (null != material.getName()) {
+                tempCell8.setCellValue(material.getName());
             }
             XSSFCell tempCell9 = tempRow.createCell(9);
-            tempCell9.setCellValue("*");
-            XSSFCell tempCell11 = tempRow.createCell(11);
-            if (null != material.getAbsoluteAmount()) {
-                tempCell11.setCellValue(material.getAbsoluteAmount());
+            if (null != material.getChinese()) {
+                tempCell9.setCellValue(material.getChinese());
+            } else {
+                tempCell9.setCellValue("");
             }
+            XSSFCell tempCell10 = tempRow.createCell(10);
+            if (null != material.getMaterial()) {
+                tempCell10.setCellValue(material.getMaterial());
+            }
+            XSSFCell tempCell11 = tempRow.createCell(11);
+            tempCell11.setCellValue("*");
             XSSFCell tempCell12 = tempRow.createCell(12);
-            if (null != material.getWeight()) {
-                tempCell12.setCellValue(material.getWeight());
+            if (null == machine) {
+                if (null != material.getAbsoluteAmount()) {
+                    tempCell12.setCellValue(material.getAbsoluteAmount());
+                }
+            } else {
+                if (null != material.getAmount()) {
+                    tempCell12.setCellValue(material.getAmount());
+                }
             }
             XSSFCell tempCell13 = tempRow.createCell(13);
-            if (null != material.getModifyNote()) {
-                tempCell13.setCellValue(material.getModifyNote());
+            tempCell13.setCellValue("*");
+            XSSFCell tempCell14 = tempRow.createCell(14);
+            if (null != material.getWeight()) {
+                tempCell14.setCellValue(material.getWeight());
             }
             if (null == machine) {
-                XSSFCell tempCell14 = tempRow.createCell(14);
-                if (null != material.getRevision()) {
-                    tempCell14.setCellValue(material.getRevision());
-                }
                 XSSFCell tempCell15 = tempRow.createCell(15);
                 if (null != material.getSpareExp()) {
                     tempCell15.setCellValue(material.getSpareExp());
                 }
             } else {
-                if (null != material.getAmount()) {
-                    XSSFCell tempCell10 = tempRow.createCell(10);
-                    tempCell10.setCellValue(material.getAmount());
-                }
-                XSSFCell tempCell14 = tempRow.createCell(14);
+                XSSFCell tempCell15 = tempRow.createCell(15);
                 if (null != material.getSpare()) {
-                    tempCell14.setCellValue(material.getSpare());
+                    tempCell15.setCellValue(material.getSpare());
                 }
             }
+            XSSFCell tempCell16 = tempRow.createCell(16);
+            if (null != material.getModifyNote()) {
+                tempCell16.setCellValue(material.getModifyNote());
+            }
         }
-
         return workbook;
     }
 
