@@ -27,6 +27,7 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
+                <li><a href="#" data-toggle="modal" data-target="#importCSEBOM">CSE</a></li>
                 <li><a href="#" data-toggle="modal" data-target="#importManXml">MAN</a></li>
                 <li><a href="#" data-toggle="modal" data-target="#importWinGDExcel">WinGD</a></li>
             </ul>
@@ -70,6 +71,44 @@
         </div>
     </div>
 </main>
+<div class="modal fade" id="importCSEBOM" tabindex="-1" role="dialog" aria-labelledby="CSEBOMLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="CSEBOMLabel">导入CSE BOM文件</h4>
+            </div>
+            <form id="CSEBOMForm">
+                <div class="modal-body">
+                    <label for="machineName3" class="control-label col-lg-2 col-md-2">机器</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="machineName3" class="form-control" type="text"/>
+                    </div>
+                    <label for="CSEBOM3" class="control-label col-lg-2 col-md-2">文件</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="CSEBOM3" class="form-control" type="file" name="CSEBOM3"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="CSEBOMImport" type="button" class="btn btn-primary">导入</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </form>
+            <div id="CSEBOMConfirm" style="display: none">
+                <div class="modal-body">
+                    <div id="CSEBOMProgress" class="progress-prompt">
+                        <div class="loader loader-1">
+                            <div class="loader-outter"></div>
+                            <div class="loader-inner"></div>
+                        </div>
+                        文件上传中...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="importManXml" tabindex="-1" role="dialog" aria-labelledby="ManXmlLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">

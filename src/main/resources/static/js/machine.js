@@ -64,14 +64,13 @@ $(document).ready(function () {
         $("#name0").text(currentNode.name);
         $("#structureNo0").text(currentNode.structureNo);
         $("#materialNo0").text(currentNode.materialNo);
-        $("#materialVersion0").text(currentNode.materialVersion);
+        $("#materialVersion0").text(currentNode.revision);
         $("#material0").text(currentNode.material);
         $("#drawingNo0").text(currentNode.drawingNo);
         $("#drawingVersion0").text(currentNode.drawingVersion);
         $("#drawingSize0").text(currentNode.drawingSize);
         $("#positionNo0").text(currentNode.positionNo);
         $("#weight0").text(currentNode.weight);
-        $("#amount0").text(currentNode.amount);
         $("#absoluteAmount0").text(currentNode.absoluteAmount);
         $("#sequenceNo0").text(currentNode.sequenceNo);
         $("#modifyNote0").text(currentNode.modifyNote);

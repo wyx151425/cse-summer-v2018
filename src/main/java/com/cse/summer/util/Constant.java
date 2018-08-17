@@ -13,5 +13,6 @@ public class Constant {
     public static final class MachineType {
         public static final String MAN = "MAN";
         public static final String WIN_GD = "WinGD";
+        public static final String CSE = "CSE";
     }
 }

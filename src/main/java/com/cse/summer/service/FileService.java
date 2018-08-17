@@ -16,6 +16,17 @@ import java.io.IOException;
  */
 public interface FileService {
     /**
+     * 导入并解析CSE BOM文件
+     *
+     * @param user        用户对象
+     * @param machineName 机器名
+     * @param file        CSE BOM文件
+     * @throws InvalidFormatException 格式错误异常
+     * @throws IOException            输入输出异常
+     */
+    void importCSEBOM(User user, String machineName, MultipartFile file) throws InvalidFormatException, IOException;
+
+    /**
      * 导入并解析MAN XML文件
      *
      * @param machineName 机器名

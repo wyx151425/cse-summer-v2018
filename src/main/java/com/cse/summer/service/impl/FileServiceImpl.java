@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -62,6 +63,113 @@ public class FileServiceImpl implements FileService {
             }
         }
         return "";
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void importCSEBOM(User user, String machineName, MultipartFile file) throws InvalidFormatException, IOException {
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        Sheet sheet = workbook.getSheetAt(0);
+        List<Material> materialList = new ArrayList<>(1000);
+        List<Structure> structureList = new ArrayList<>(100);
+
+        cseBOMExcelProcess(user, machineName, sheet, materialList, structureList);
+
+        Machine targetMachine = machineRepository.findMachineByName(machineName);
+        if (null == targetMachine) {
+            Machine machine = new Machine();
+            machine.setObjectId(Generator.getObjectId());
+            machine.setStatus(1);
+            machine.setName(machineName);
+            machine.setPatent(Constant.MachineType.CSE);
+            machine.setMachineNo("");
+            machine.setType("");
+            machine.setCylinderAmount(0);
+            machine.setShipNo("");
+            machine.setClassificationSociety("");
+            machineRepository.save(machine);
+        }
+
+        structureRepository.saveAll(structureList);
+        materialRepository.saveAll(materialList);
+    }
+
+    private void cseBOMExcelProcess(User user, String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList) {
+        // 用于维护部套层级的数组
+        Material[] levelArr = new Material[12];
+        // Workbook行索引
+        int index = 0;
+        for (Row row : sheet) {
+            // 前三行数据为机器信息及字段的批注，所以不予解析
+            if (index < 3) {
+                index++;
+            } else {
+                int level = (int) Double.parseDouble(row.getCell(1).toString());
+                String materialNo = row.getCell(3).toString();
+                String revision = row.getCell(4).toString();
+                int latestVersion = 0;
+                if (0 == level) {
+                    // 如果通过该部套顶层物料的物料号和专利方版本查询到库中存在部套，则为库中的部套升级最新版本
+                    List<Material> materials = materialRepository.findAllByAtNoAndAtRevision(materialNo, revision);
+                    if (materials.size() > 0) {
+                        int oldLatestVersion = materials.get(0).getLatestVersion();
+                        latestVersion = oldLatestVersion + 1;
+                        for (int i = 0; i < materials.size(); i++) {
+                            materials.get(i).setLatestVersion(latestVersion);
+                        }
+                        materialRepository.saveAll(materials);
+                    }
+                    // 保存该部套
+                    Structure structure = new Structure();
+                    structure.setObjectId(Generator.getObjectId());
+                    structure.setStatus(1);
+                    structure.setCreateBy(user.getName());
+                    structure.setUpdateBy(user.getName());
+                    structure.setMachineName(machineName);
+                    structure.setStructureNo(row.getCell(0).toString());
+                    structure.setMaterialNo(materialNo);
+                    structure.setRevision(revision);
+                    structure.setAmount((int) Double.parseDouble(row.getCell(11).toString()));
+                    structureList.add(structure);
+                }
+                Material material = new Material(3);
+                material.setObjectId(Generator.getObjectId());
+                material.setStatus(1);
+                material.setVersion(latestVersion);
+                material.setLatestVersion(latestVersion);
+                material.setChildCount(0);
+                material.setLevel(level);
+                material.setPositionNo(row.getCell(2).toString());
+                material.setMaterialNo(materialNo);
+                material.setRevision(revision);
+                material.setDrawingNo(row.getCell(5).toString());
+                material.setDrawingSize(row.getCell(6).toString());
+                material.setName(row.getCell(7).toString());
+                material.setChinese(row.getCell(8).toString());
+                material.setMaterial(row.getCell(9).toString());
+                material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(12).toString()));
+                material.setWeight(row.getCell(13).toString());
+                material.setModifyNote(row.getCell(14).toString());
+                materialList.add(material);
+
+                if (0 == level) {
+                    // 最上层节点时不设置父节点
+                    levelArr[0] = material;
+                    material.setAtNo(materialNo);
+                    material.setAtRevision(revision);
+                } else {
+                    Material parentMat = levelArr[level - 1];
+                    parentMat.setChildCount(parentMat.getChildCount() + 1);
+                    // 根据最上级节点设置所属
+                    material.setAtNo(levelArr[0].getMaterialNo());
+                    material.setAtRevision(levelArr[0].getRevision());
+                    // 设置该节点所属上级节点的ID
+                    material.setParentId(parentMat.getObjectId());
+                    // 将该节点覆盖数组中相同层级的上一个节点
+                    levelArr[level] = material;
+                }
+            }
+        }
     }
 
     @Override
@@ -265,40 +373,33 @@ public class FileServiceImpl implements FileService {
     private int xmlPartsRecursiveTraversal(Element parts, List<Material> materialList, String parentId, String machineName, int parentLevel, String atNo, String atRevision, List<Name> names) {
         int childCount = 0;
         if (null != parts) {
+            List<Element> otherParts = new ArrayList<>();
             List<Element> partList = parts.elements("part");
-            if (partList.size() > 0) {
-                childCount += partList.size();
-                for (Element part : partList) {
-                    xmlRecursiveTraversal(part, materialList, null, parentId, machineName, parentLevel, atNo, atRevision, names);
-                }
-            }
             List<Element> standardParts = parts.elements("standardPart");
-            if (standardParts.size() > 0) {
-                childCount += standardParts.size();
-                for (Element standardPart : standardParts) {
-                    xmlRecursiveTraversal(standardPart, materialList, null, parentId, machineName, parentLevel, atNo, atRevision, names);
-                }
-            }
             List<Element> documents = parts.elements("document");
-            if (documents.size() > 0) {
-                childCount += documents.size();
-                for (Element document : documents) {
-                    xmlRecursiveTraversal(document, materialList, null, parentId, machineName, parentLevel, atNo, atRevision, names);
-                }
-            }
             List<Element> supDrawings = parts.elements("supDrawing");
-            if (supDrawings.size() > 0) {
-                childCount += supDrawings.size();
-                for (Element supDrawing : supDrawings) {
-                    xmlRecursiveTraversal(supDrawing, materialList, null, parentId, machineName, parentLevel, atNo, atRevision, names);
-                }
-            }
             List<Element> licData = parts.elements("licData");
+            if (partList.size() > 0) {
+                otherParts.addAll(partList);
+            }
+            if (standardParts.size() > 0) {
+                otherParts.addAll(standardParts);
+            }
+            if (documents.size() > 0) {
+                otherParts.addAll(documents);
+            }
+            if (supDrawings.size() > 0) {
+                otherParts.addAll(supDrawings);
+            }
             if (licData.size() > 0) {
-                childCount += licData.size();
-                for (Element aLicData : licData) {
-                    xmlRecursiveTraversal(aLicData, materialList, null, parentId, machineName, parentLevel, atNo, atRevision, names);
-                }
+                otherParts.addAll(licData);
+            }
+            childCount = otherParts.size();
+
+            otherParts.sort(Comparator.comparing(o -> o.element("revision").element("sequenceNo").getText()));
+
+            for (Element element : otherParts) {
+                xmlRecursiveTraversal(element, materialList, null, parentId, machineName, parentLevel, atNo, atRevision, names);
             }
         }
         return childCount;
@@ -740,7 +841,7 @@ public class FileServiceImpl implements FileService {
             }
             XSSFCell tempCell3 = tempRow.createCell(3);
             if (null != material.getMaterialNo()) {
-                tempCell3.setCellValue(material.getMaterialNo());
+                tempCell3.setCellValue(material.getMaterialNo() + "." + material.getRevision());
             }
             XSSFCell tempCell4 = tempRow.createCell(4);
             if (null != material.getDrawingNo()) {

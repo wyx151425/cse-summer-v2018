@@ -1,4 +1,22 @@
 $(document).ready(function () {
+    $("#CSEBOMImport").click(function () {
+        $("#CSEBOMForm").css("display", "none");
+        $("#CSEBOMConfirm").css("display", "block");
+        $.ajaxFileUpload({
+            url: 'api/files/import/cse',  // 用于文件上传的服务器端请求地址
+            secureuri: false,  // 是否需要安全协议，一般设置为false
+            fileElementId: 'CSEBOM3',  // 文件上传域的ID
+            dataType: 'json',  // 返回值类型 一般设置为json
+            data: {machineName: $("#machineName3").val()},
+            success: function (data) {
+                successCallback(data);
+            },
+            error: function () {
+                $(".progress-prompt").text("系统错误");
+            }
+        });
+    });
+
     $("#xmlImport").click(function () {
         $("#manXmlForm").css("display", "none");
         $("#manXmlConfirm").css("display", "block");
@@ -83,6 +101,7 @@ $(document).ready(function () {
     function successCallback(data) {
         if (200 === data.statusCode) {
             $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
+            location.reload();
         } else if (8001 === data.statusCode) {
             $(".progress-prompt").text("文件格式错误");
         } else if (8002 === data.statusCode) {

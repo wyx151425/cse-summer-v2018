@@ -32,6 +32,22 @@ public class FileController extends BaseFacade {
         this.fileService = fileService;
     }
 
+    @PostMapping(value = "files/import/cse")
+    public Response<Object> actionImportCSEBOM(
+            @RequestParam("machineName") String machineName,
+            @RequestParam("CSEBOM") MultipartFile cseBom
+    ) {
+        if (!Constant.DocType.XLSX.equals(cseBom.getContentType())) {
+            throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
+        }
+        try {
+            fileService.importCSEBOM(getHttpSessionUser(), machineName, cseBom);
+        } catch (InvalidFormatException | IOException e) {
+            throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
+        }
+        return new Response<>();
+    }
+
     @PostMapping(value = "files/import/xml")
     public Response<Object> actionImportMANXml(
             @RequestParam("machineName") String machineName,
