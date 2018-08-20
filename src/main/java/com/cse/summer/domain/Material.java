@@ -39,10 +39,10 @@ public class Material extends AuditorEntity implements Serializable {
      * 源类型（1=MAN/2=WinGD）
      */
     private Integer type;
-    /**
-     * 原层级字符串
-     */
-    private String srcLevel;
+//    /**
+//     * 原层级字符串
+//     */
+//    private String srcLevel;
     /**
      * 部件号
      */
@@ -191,14 +191,6 @@ public class Material extends AuditorEntity implements Serializable {
 
     public void setType(Integer type) {
         this.type = type;
-    }
-
-    public String getSrcLevel() {
-        return srcLevel;
-    }
-
-    public void setSrcLevel(String srcLevel) {
-        this.srcLevel = srcLevel;
     }
 
     public String getPositionNo() {

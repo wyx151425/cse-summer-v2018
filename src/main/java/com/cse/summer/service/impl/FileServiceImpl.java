@@ -105,8 +105,8 @@ public class FileServiceImpl implements FileService {
                 index++;
             } else {
                 int level = (int) Double.parseDouble(row.getCell(1).toString());
-                String materialNo = row.getCell(3).toString();
-                String revision = row.getCell(4).toString();
+                String materialNo = row.getCell(6).toString();
+                String revision = row.getCell(7).toString();
                 int latestVersion = 0;
                 if (0 == level) {
                     // 如果通过该部套顶层物料的物料号和专利方版本查询到库中存在部套，则为库中的部套升级最新版本
@@ -140,16 +140,18 @@ public class FileServiceImpl implements FileService {
                 material.setChildCount(0);
                 material.setLevel(level);
                 material.setPositionNo(row.getCell(2).toString());
+                material.setDrawingSize(row.getCell(3).toString());
+                material.setDrawingNo(row.getCell(4).toString());
+                material.setDrawingVersion(row.getCell(5).toString());
                 material.setMaterialNo(materialNo);
                 material.setRevision(revision);
-                material.setDrawingNo(row.getCell(5).toString());
-                material.setDrawingSize(row.getCell(6).toString());
-                material.setName(row.getCell(7).toString());
-                material.setChinese(row.getCell(8).toString());
-                material.setMaterial(row.getCell(9).toString());
-                material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(12).toString()));
-                material.setWeight(row.getCell(13).toString());
-                material.setModifyNote(row.getCell(14).toString());
+                material.setName(row.getCell(8).toString());
+                material.setChinese(row.getCell(9).toString());
+                material.setMaterial(row.getCell(10).toString());
+                material.setAmount((int) Double.parseDouble(row.getCell(12).toString()));
+                material.setWeight(row.getCell(14).toString());
+                material.setSpareExp(row.getCell(15).toString());
+                material.setModifyNote(row.getCell(16).toString());
                 materialList.add(material);
 
                 if (0 == level) {
@@ -157,12 +159,14 @@ public class FileServiceImpl implements FileService {
                     levelArr[0] = material;
                     material.setAtNo(materialNo);
                     material.setAtRevision(revision);
+                    material.setAbsoluteAmount(1);
                 } else {
                     Material parentMat = levelArr[level - 1];
                     parentMat.setChildCount(parentMat.getChildCount() + 1);
                     // 根据最上级节点设置所属
                     material.setAtNo(levelArr[0].getMaterialNo());
                     material.setAtRevision(levelArr[0].getRevision());
+                    material.setAbsoluteAmount(material.getAmount() / parentMat.getAmount());
                     // 设置该节点所属上级节点的ID
                     material.setParentId(parentMat.getObjectId());
                     // 将该节点覆盖数组中相同层级的上一个节点
@@ -525,8 +529,6 @@ public class FileServiceImpl implements FileService {
                     material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(19).toString()));
                 }
 
-                // 维护WinGD原层级格式
-                material.setSrcLevel(row.getCell(0).toString());
                 // 设置层级
                 material.setLevel(level);
                 if (0 == level) {
@@ -560,8 +562,8 @@ public class FileServiceImpl implements FileService {
     public void importNewStructureExcel(User user, Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Row structRow = workbook.getSheetAt(0).getRow(1);
-        String materNo = structRow.getCell(3).toString();
-        String materV = structRow.getCell(14).toString();
+        String materNo = structRow.getCell(6).toString();
+        String materV = structRow.getCell(7).toString();
         // 根据物料号和专利方版本检查
         List<Material> materials = materialRepository.findAllByMaterialNoAndRevisionAndLevel(materNo, materV, 0);
         if (materials.size() > 0) {
@@ -594,8 +596,8 @@ public class FileServiceImpl implements FileService {
                 material.setStatus(1);
                 material.setVersion(version);
                 material.setLatestVersion(version);
-                material.setMaterialNo(row.getCell(3).toString());
-                material.setRevision(row.getCell(14).toString());
+                material.setMaterialNo(row.getCell(6).toString());
+                material.setRevision(row.getCell(7).toString());
                 material.setChildCount(0);
                 material.setCreateBy(user.getName());
                 material.setUpdateBy(user.getName());
@@ -626,36 +628,37 @@ public class FileServiceImpl implements FileService {
                 if (null != row.getCell(2)) {
                     material.setPositionNo(row.getCell(2).toString());
                 }
+                if (null != row.getCell(3)) {
+                    material.setDrawingSize(row.getCell(3).toString());
+                }
                 if (null != row.getCell(4)) {
                     material.setDrawingNo(row.getCell(4).toString());
                 }
                 if (null != row.getCell(5)) {
-                    material.setDrawingSize(row.getCell(5).toString());
-                }
-                if (null != row.getCell(6)) {
-                    material.setName(row.getCell(6).toString());
-                }
-                if (null != row.getCell(7)) {
-                    material.setChinese(row.getCell(7).toString());
+                    material.setDrawingVersion(row.getCell(5).toString());
                 }
                 if (null != row.getCell(8)) {
-                    material.setMaterial(row.getCell(8).toString());
+                    material.setName(row.getCell(8).toString());
                 }
-                if (null != row.getCell(11)) {
-                    material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(11).toString()));
+                if (null != row.getCell(9)) {
+                    material.setChinese(row.getCell(9).toString());
+                }
+                if (null != row.getCell(10)) {
+                    material.setMaterial(row.getCell(10).toString());
                 }
                 if (null != row.getCell(12)) {
-                    material.setWeight(row.getCell(12).toString());
-                }
-                if (null != row.getCell(13)) {
-                    material.setModifyNote(row.getCell(13).toString());
+                    material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(12).toString()));
                 }
                 if (null != row.getCell(14)) {
-                    material.setRevision(row.getCell(14).toString());
+                    material.setWeight(row.getCell(14).toString());
                 }
                 if (null != row.getCell(15)) {
                     material.setSpareExp(row.getCell(15).toString().replace(".0", ""));
                 }
+                if (null != row.getCell(16)) {
+                    material.setModifyNote(row.getCell(16).toString());
+                }
+
                 materialList.add(material);
             }
         }
@@ -667,8 +670,8 @@ public class FileServiceImpl implements FileService {
         // 开始解析新版本数据
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Row structRow = workbook.getSheetAt(0).getRow(1);
-        String materNo = structRow.getCell(3).toString();
-        String materV = structRow.getCell(14).toString();
+        String materNo = structRow.getCell(6).toString();
+        String materV = structRow.getCell(7).toString();
 
         // 若能查询到旧部套则更新旧部套的最新版本号
         int latestVersion = 0;

@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,6 +85,37 @@ public class SummerApplicationTests {
 //                e.printStackTrace();
 //
 //            }
+//        }
+//    }
+
+//    @Test
+//    public void addUsers() {
+//        InputStream in = null;
+//        try {
+//            in = new FileInputStream(new File("role.xlsx"));
+//            Workbook workbook = WorkbookFactory.create(in);
+//            Sheet sheet = workbook.getSheet("BOM管理系统DMS权限");
+//            List<User> users = new ArrayList<>();
+//            for (Row row : sheet) {
+//                User user = new User();
+//                user.setObjectId(Generator.getObjectId());
+//                user.setStatus(1);
+//                user.setName(row.getCell(1).toString());
+//                user.setUsername(row.getCell(2).toString());
+//                user.setPassword("123456");
+//                String role = row.getCell(3).toString();
+//                if ("只读".equals(role)) {
+//                    user.setRole(1);
+//                } else if ("编辑".equals(role)) {
+//                    user.setRole(2);
+//                } else {
+//                    user.setRole(3);
+//                }
+//                users.add(user);
+//            }
+//            userRepository.saveAll(users);
+//        } catch (InvalidFormatException | IOException e) {
+//            e.printStackTrace();
 //        }
 //    }
 }

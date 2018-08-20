@@ -106,6 +106,8 @@ $(document).ready(function () {
             $(".progress-prompt").text("文件格式错误");
         } else if (8002 === data.statusCode) {
             $(".progress-prompt").text("文件解析错误");
+        } else if (9001 === data.statusCode) {
+            $(".progress-prompt").text("部套已存在");
         } else if (9002 === data.statusCode) {
             $(".progress-prompt").text("输入部套号与文件内部套号不相同");
         } else {

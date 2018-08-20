@@ -52,10 +52,12 @@ public class StructureServiceImpl implements StructureService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStructureVersion(Structure structure) {
-        Structure targetStructure = structureRepository.findStructureByMachineNameAndStructureNoAndStatusGreaterThanEqual(structure.getMachineName(), structure.getStructureNo(), 1);
-        targetStructure.setStatus(1);
-        targetStructure.setVersion(structure.getVersion());
-        structureRepository.save(targetStructure);
+        Structure targetStruct = structureRepository.findStructureByMachineNameAndStructureNoAndStatusGreaterThanEqual(structure.getMachineName(), structure.getStructureNo(), 1);
+        if (!structure.getVersion().equals(targetStruct.getVersion())) {
+            targetStruct.setStatus(1);
+            targetStruct.setVersion(structure.getVersion());
+            structureRepository.save(targetStruct);
+        }
     }
 
     @Override
