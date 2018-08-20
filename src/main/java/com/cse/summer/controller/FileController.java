@@ -35,13 +35,13 @@ public class FileController extends BaseFacade {
     @PostMapping(value = "files/import/cse")
     public Response<Object> actionImportCSEBOM(
             @RequestParam("machineName") String machineName,
-            @RequestParam("CSEBOM") MultipartFile cseBom
+            @RequestParam("csebom") MultipartFile cseBom
     ) {
         if (!Constant.DocType.XLSX.equals(cseBom.getContentType())) {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
-            fileService.importCSEBOM(getHttpSessionUser(), machineName, cseBom);
+            fileService.importCSEBOM(getSessionUser(), machineName, cseBom);
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
@@ -89,7 +89,7 @@ public class FileController extends BaseFacade {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
-            fileService.importNewStructureExcel(getHttpSessionUser(), structure, structureExcel);
+            fileService.importNewStructureExcel(getSessionUser(), structure, structureExcel);
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
@@ -105,7 +105,7 @@ public class FileController extends BaseFacade {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
-            fileService.importNewVersionStructureExcel(getHttpSessionUser(), structure, structureExcel);
+            fileService.importNewVersionStructureExcel(getSessionUser(), structure, structureExcel);
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
@@ -133,7 +133,7 @@ public class FileController extends BaseFacade {
     public void actionExportStructureExcel(
             @ModelAttribute Structure structure
     ) throws IOException {
-        Excel excel = fileService.exportStructureExcel(structure);
+        Excel excel = fileService.exportStructureExcel(getSessionUser(), structure);
         getResponse().reset();
         getResponse().setHeader("content-disposition", "attachment;filename="
                 + URLEncoder.encode(excel.getName(), "UTF-8"));

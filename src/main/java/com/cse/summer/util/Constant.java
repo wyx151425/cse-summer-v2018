@@ -15,4 +15,9 @@ public class Constant {
         public static final String WIN_GD = "WinGD";
         public static final String CSE = "CSE";
     }
+
+    public static final class Role {
+        public static final int COMMON = 1;
+        public static final int DESIGNER = 2;
+    }
 }

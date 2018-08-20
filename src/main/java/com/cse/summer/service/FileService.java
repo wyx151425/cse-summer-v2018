@@ -82,5 +82,5 @@ public interface FileService {
      * @param structure 部套对象
      * @return Excel文件
      */
-    Excel exportStructureExcel(Structure structure);
+    Excel exportStructureExcel(User user, Structure structure);
 }

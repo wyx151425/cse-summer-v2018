@@ -5,7 +5,7 @@ $(document).ready(function () {
         $.ajaxFileUpload({
             url: 'api/files/import/cse',  // 用于文件上传的服务器端请求地址
             secureuri: false,  // 是否需要安全协议，一般设置为false
-            fileElementId: 'CSEBOM3',  // 文件上传域的ID
+            fileElementId: 'csebom',  // 文件上传域的ID
             dataType: 'json',  // 返回值类型 一般设置为json
             data: {machineName: $("#machineName3").val()},
             success: function (data) {
@@ -102,6 +102,8 @@ $(document).ready(function () {
         if (200 === data.statusCode) {
             $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
             location.reload();
+        } else if (7004 === data.statusCode) {
+            location.reload();
         } else if (8001 === data.statusCode) {
             $(".progress-prompt").text("文件格式错误");
         } else if (8002 === data.statusCode) {
@@ -140,6 +142,8 @@ $(document).ready(function () {
             success: function (data) {
                 if (200 === data.statusCode) {
                     location.reload();
+                } else if (7004 === data.statusCode) {
+                    location.reload();
                 } else if (9001 === data.statusCode) {
                     $("#machineEditProgress").text("部套不存在");
                 } else {
@@ -149,6 +153,21 @@ $(document).ready(function () {
             // 请求出错时调用的函数
             error: function () {
                 $("#machineEditProgress").text("系统错误");
+            }
+        });
+    });
+
+    $("#logout").click(function () {
+        $.ajax({
+            url: "api/users/logout",
+            dataType: "json",
+            type: "post",
+            contentType: "application/json",
+            async: true,
+            success: function (data) {
+                if (200 === data.statusCode) {
+                    location.reload();
+                }
             }
         });
     });

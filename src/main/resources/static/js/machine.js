@@ -78,7 +78,7 @@ $(document).ready(function () {
         $("#childCount0").text(currentNode.childCount);
         if (0 === childUl.length) {
             $.ajax({
-                url: "api/materials?parentId=" + currentNode.objectId,
+                url: "api/materials?parentId=" + currentNode.objectId + "&structureNo=" + currentNode.structureNo,
                 dataType: "json",
                 type: "get",
                 contentType: "application/json",
@@ -147,6 +147,8 @@ $(document).ready(function () {
             success: function (data) {
                 if (200 === data.statusCode) {
                     location.reload();
+                } else if (7004 === data.statusCode) {
+                    location.reload();
                 } else {
                     $("#versionChooseProgress").text("系统错误");
                 }
@@ -195,6 +197,8 @@ $(document).ready(function () {
             success: function (data) {
                 if (200 === data.statusCode) {
                     location.reload();
+                } else if (7004 === data.statusCode) {
+                    location.reload();
                 } else if (9001 === data.statusCode) {
                     $("#addDbStructureProgress").text("该物料已经添加为该机器的部套");
                 } else if (10001 === data.statusCode) {
@@ -223,18 +227,22 @@ $(document).ready(function () {
             async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
             // 请求成功后的回调函数。
             success: function (data) {
-                search.text("查询");
-                list = data.data;
-                let revisionSel = $("#revision7");
-                revisionSel.empty();
-                let versionSel = $("#version7");
-                versionSel.empty();
-                $.each(list, function (index, value) {
-                    revisionSel.append('<option value="' + value.revision + '">' + value.revision + '</option>');
-                });
-                let latestVersion = list[0].latestVersion;
-                for (let index = 0; index <= latestVersion; index++) {
-                    versionSel.append('<option value="' + index + '">' + index + '</option>');
+                if (200 === data.statusCode) {
+                    search.text("查询");
+                    list = data.data;
+                    let revisionSel = $("#revision7");
+                    revisionSel.empty();
+                    let versionSel = $("#version7");
+                    versionSel.empty();
+                    $.each(list, function (index, value) {
+                        revisionSel.append('<option value="' + value.revision + '">' + value.revision + '</option>');
+                    });
+                    let latestVersion = list[0].latestVersion;
+                    for (let index = 0; index <= latestVersion; index++) {
+                        versionSel.append('<option value="' + index + '">' + index + '</option>');
+                    }
+                } else if (7004 === data.statusCode) {
+                    location.reload();
                 }
             },
             // 请求出错时调用的函数
@@ -277,9 +285,8 @@ $(document).ready(function () {
             // 请求成功后的回调函数。
             success: function (data) {
                 if (200 === data.statusCode) {
-                    // structurePublishProgress.text("发布成功，刷新界面查看更新");
-                    // publishBtn.css("display", "none");
-                    // publishCancel.text("确定");
+                    location.reload();
+                } else if (7004 === data.statusCode) {
                     location.reload();
                 } else {
                     structurePublishProgress.text("系统错误");
@@ -311,6 +318,8 @@ function deleteStructure(id) {
         // 请求成功后的回调函数。
         success: function (data) {
             if (200 === data.statusCode) {
+                location.reload();
+            } else if (7004 === data.statusCode) {
                 location.reload();
             } else {
                 alert("系统错误");

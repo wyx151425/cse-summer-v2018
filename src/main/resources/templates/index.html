@@ -23,7 +23,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">CSE DMS</a>
+            <a class="navbar-brand" th:href="@{/index}">CSE DMS</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
@@ -36,7 +36,8 @@
 </header>
 <main class="container">
     <div class="material-detail" style="margin-top: 10px">
-        <div class="table-wrap" style="margin-top: 50px">
+        <div class="table-wrap">
+            <button id="logout" class="btn btn-primary pull-right" style="margin-bottom: 20px">退出登录</button>
             <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
@@ -59,7 +60,7 @@
                     <td th:text="${machine.classificationSociety}"></td>
                     <td>
                         <a th:href="@{|/machine?machineId=${machine.id}|}" style="margin-right: 16px">查看</a>
-                        <a href="javascript:;" style="margin-right: 16px" data-toggle="modal" data-target="#machineEdit"
+                        <a href="javascript:;" style="margin-right: 16px" data-toggle="modal" data-target="#machineEdit" th:if="${session.user.role == 2}"
                            th:onclick="|javascript:toUpdateMachine('${machine.id}', '${machine.name}', '${machine.machineNo}',
                            '${machine.type}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}');|">编辑</a>
                         <a href="javascript:;" style="margin-right: 16px" th:onclick="|javascript:toExportMachineBom('${machine.name}', '${machine.machineNo}',
@@ -89,9 +90,9 @@
                     <div class="form-group col-lg-10 col-md-10">
                         <input id="machineName3" class="form-control" type="text"/>
                     </div>
-                    <label for="CSEBOM3" class="control-label col-lg-2 col-md-2">文件</label>
+                    <label for="csebom" class="control-label col-lg-2 col-md-2">文件</label>
                     <div class="form-group col-lg-10 col-md-10">
-                        <input id="CSEBOM3" class="form-control" type="file" name="CSEBOM3"/>
+                        <input id="csebom" class="form-control" type="file" name="csebom"/>
                     </div>
                 </div>
                 <div class="modal-footer">

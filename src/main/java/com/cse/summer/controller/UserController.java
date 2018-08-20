@@ -26,7 +26,13 @@ public class UserController extends BaseFacade {
     @PostMapping(value = "users/login")
     public Response<User> actionUserLogin(@RequestBody User user) {
         User targetUser = userService.login(user);
-        addHttpSessionUser(targetUser);
+        addSessionUser(targetUser);
+        return new Response<>();
+    }
+
+    @PostMapping(value = "users/logout")
+    public Response<User> actionUserLogout() {
+        removeSessionUser();
         return new Response<>();
     }
 }

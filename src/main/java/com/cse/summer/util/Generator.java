@@ -10,4 +10,8 @@ public class Generator {
     public static String getObjectId() {
         return UUID.randomUUID().toString().replace("-", "").toUpperCase();
     }
+
+    public static String getReadonlyPassword() {
+        return UUID.randomUUID().toString();
+    }
 }

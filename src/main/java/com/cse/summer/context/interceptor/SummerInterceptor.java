@@ -1,7 +1,10 @@
 package com.cse.summer.context.interceptor;
 
+import com.cse.summer.domain.Response;
 import com.cse.summer.domain.User;
 import com.cse.summer.util.Constant;
+import com.cse.summer.util.StatusCode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
@@ -10,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 
 /**
  * 请求拦截器
@@ -21,6 +25,7 @@ public class SummerInterceptor implements HandlerInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(SummerInterceptor.class);
 
     private static final String LOGIN_PAGE_URI = "%s/login";
+    private static final String USER_LOGIN_URI = "%s/api/users/login";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -37,14 +42,22 @@ public class SummerInterceptor implements HandlerInterceptor {
         response.setContentType("text/plain;charset=UTF-8");
 
         /* 2.非拦截路由 检查 */
-        if (String.format(LOGIN_PAGE_URI, contextPath).equals(uri)) {
+        if (String.format(LOGIN_PAGE_URI, contextPath).equals(uri)
+                || String.format(USER_LOGIN_URI, contextPath).equals(uri)) {
             return true;
         }
 
         /* 3.Token 检查 */
         User user = (User) request.getSession().getAttribute(Constant.USER);
         if (null == user) {
-            response.sendRedirect(request.getContextPath() + "/login");
+//            if (uri.contains("/api")) {
+//                ObjectMapper om = new ObjectMapper();
+//                PrintWriter out = response.getWriter();
+//                out.print(om.writeValueAsString(new Response<String>(StatusCode.USER_LOGIN_TIMEOUT)));
+//                out.flush();
+//            } else {
+                response.sendRedirect(request.getContextPath() + "/login");
+//            }
             return false;
         } else {
             return true;

@@ -129,7 +129,8 @@ public class FileServiceImpl implements FileService {
                     structure.setStructureNo(row.getCell(0).toString());
                     structure.setMaterialNo(materialNo);
                     structure.setRevision(revision);
-                    structure.setAmount((int) Double.parseDouble(row.getCell(11).toString()));
+                    structure.setVersion(latestVersion);
+                    structure.setAmount((int) Double.parseDouble(row.getCell(12).toString()));
                     structureList.add(structure);
                 }
                 Material material = new Material(3);
@@ -150,8 +151,12 @@ public class FileServiceImpl implements FileService {
                 material.setMaterial(row.getCell(10).toString());
                 material.setAmount((int) Double.parseDouble(row.getCell(12).toString()));
                 material.setWeight(row.getCell(14).toString());
-                material.setSpareExp(row.getCell(15).toString());
-                material.setModifyNote(row.getCell(16).toString());
+                if (null != row.getCell(15)) {
+                    material.setSpareExp(row.getCell(15).toString());
+                }
+                if (null != row.getCell(16)) {
+                    material.setModifyNote(row.getCell(16).toString());
+                }
                 materialList.add(material);
 
                 if (0 == level) {
@@ -167,6 +172,8 @@ public class FileServiceImpl implements FileService {
                     material.setAtNo(levelArr[0].getMaterialNo());
                     material.setAtRevision(levelArr[0].getRevision());
                     material.setAbsoluteAmount(material.getAmount() / parentMat.getAmount());
+                    material.setVersion(levelArr[0].getVersion());
+                    material.setLatestVersion(levelArr[0].getLatestVersion());
                     // 设置该节点所属上级节点的ID
                     material.setParentId(parentMat.getObjectId());
                     // 将该节点覆盖数组中相同层级的上一个节点
@@ -709,7 +716,7 @@ public class FileServiceImpl implements FileService {
             dataHandler(materials, machine.getCylinderAmount(), structure);
             materialList.addAll(materials);
         }
-        XSSFWorkbook workbook = buildExcelWorkbook(materialList, machine);
+        XSSFWorkbook workbook = buildExcelWorkbook(null, materialList, machine);
         return new Excel(machineName + ".xlsx", workbook);
     }
 
@@ -737,7 +744,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public Excel exportStructureExcel(Structure structure) {
+    public Excel exportStructureExcel(User user, Structure structure) {
         List<Material> materialList = materialRepository.findAllByAtNoAndAtRevisionAndVersion(
                 structure.getMaterialNo(), structure.getRevision(), structure.getVersion()
         );
@@ -745,16 +752,17 @@ public class FileServiceImpl implements FileService {
             material.setStructureNo(structure.getStructureNo());
         }
 
-        XSSFWorkbook workbook = buildExcelWorkbook(materialList, null);
+        XSSFWorkbook workbook = buildExcelWorkbook(user, materialList, null);
         String name = structure.getStructureNo() + "_" + structure.getMaterialNo() + "." + structure.getRevision() + "_" + structure.getVersion() + ".xlsx";
         return new Excel(name, workbook);
     }
 
-    private XSSFWorkbook buildExcelWorkbook(List<Material> materialList, Machine machine) {
+    private XSSFWorkbook buildExcelWorkbook(User user, List<Material> materialList, Machine machine) {
         int i = 0;
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet();
         if (null != machine) {
+            sheet.protectSheet(Generator.getReadonlyPassword());
             XSSFRow row0 = sheet.createRow(i);
             XSSFCell cell00 = row0.createCell(0);
             cell00.setCellValue("机号");

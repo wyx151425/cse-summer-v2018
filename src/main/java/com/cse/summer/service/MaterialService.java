@@ -15,10 +15,11 @@ public interface MaterialService {
     /**
      * 根据父节点的ObjectId获得父节点包含的直接子节点
      *
-     * @param parentId 父节点ObjectId
+     * @param structureNo 部套号
+     * @param parentId    父节点ObjectId
      * @return 查询获得的BomRecord列表对象
      */
-    List<Material> findMaterialListByParentId(String parentId);
+    List<Material> findMaterialListByParentId(String structureNo, String parentId);
 
     /**
      * 根据机器的名称获取直接子节点

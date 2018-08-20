@@ -18,6 +18,7 @@ public class SummerWebConfigurer implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new SummerInterceptor())
+                .addPathPatterns("/api/**")
                 .addPathPatterns("")
                 .addPathPatterns("/")
                 .addPathPatterns("/index")

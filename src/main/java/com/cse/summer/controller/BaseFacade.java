@@ -36,15 +36,15 @@ public class BaseFacade {
         return session;
     }
 
-    void addHttpSessionUser(User user) {
+    void addSessionUser(User user) {
         session.setAttribute(Constant.USER, user);
     }
 
-    User getHttpSessionUser() {
+    User getSessionUser() {
         return (User) session.getAttribute(Constant.USER);
     }
 
-    void removeHttpSessionUser() {
+    void removeSessionUser() {
         session.setAttribute(Constant.USER, null);
     }
 }

@@ -60,8 +60,8 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
      * @param machineName 机器名
      * @return 部套对应的物料数据集合
      */
-    @Query("select m from Structure s left join Material m on s.materialNo = m.materialNo and s.revision = m.revision and s.version = m.version where s.status > 0 and s.machineName = :machineName and m.level = 0 order by s.structureNo")
-    List<Material> findStructureMaterial(@Param("machineName") String machineName);
+    @Query("select new com.cse.summer.domain.StructMater(s, m) from Structure s left join Material m on s.materialNo = m.materialNo and s.revision = m.revision and s.version = m.version where s.status > 0 and s.machineName = :machineName and m.level = 0 order by s.structureNo")
+    List<StructMater> findStructureMaterial(@Param("machineName") String machineName);
 
     /**
      * 连接查询机器部套

@@ -1,6 +1,8 @@
 package com.cse.summer.service.impl;
 
 import com.cse.summer.domain.Material;
+import com.cse.summer.domain.StructMater;
+import com.cse.summer.domain.Structure;
 import com.cse.summer.repository.MaterialRepository;
 import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.MaterialService;
@@ -30,14 +32,26 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public List<Material> findMaterialListByParentId(String parentId) {
-        return materialRepository.findAllByParentId(parentId);
+    public List<Material> findMaterialListByParentId(String structureNo, String parentId) {
+        List<Material> materialList = materialRepository.findAllByParentId(parentId);
+        for (Material material : materialList) {
+            material.setStructureNo(structureNo);
+        }
+        return materialList;
     }
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List<Material> findDirectLevelMaterialListByMachineName(String machineName) {
-        return structureRepository.findStructureMaterial(machineName);
+        List<StructMater> list = structureRepository.findStructureMaterial(machineName);
+        List<Material> materials = new ArrayList<>();
+        for (StructMater structMater : list) {
+            Structure structure = structMater.getStructure();
+            Material material = structMater.getMaterial();
+            material.setStructureNo(structure.getStructureNo());
+            materials.add(material);
+        }
+        return materials;
     }
 
     @Override

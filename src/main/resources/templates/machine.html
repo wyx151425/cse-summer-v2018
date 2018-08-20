@@ -24,7 +24,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">CSE DMS</a>
+            <a class="navbar-brand" th:href="@{/index}">CSE DMS</a>
         </div>
     </div>
 </header>
@@ -40,18 +40,24 @@
     <main class="container">
         <div class="material-detail">
             <div class="table-wrap">
-                <button id="addNewVersion" type="button" data-target="#importNewVersionStructure" data-toggle="modal"
-                        class="btn btn-primary pull-right"
-                        style="margin-bottom: 20px">导入新版本部套
-                </button>
-                <button id="addNewStructure" type="button" data-target="#importNewStructure" data-toggle="modal"
-                        class="btn btn-primary pull-right"
-                        style="margin-bottom: 20px; margin-right: 16px">导入新部套
-                </button>
-                <button id="addDbButton" type="button" data-target="#addDbStructure" data-toggle="modal"
-                        class="btn btn-primary pull-right"
-                        style="margin-bottom: 20px; margin-right: 16px">添加库中部套
-                </button>
+                <div th:if="${session.user.role == 2}">
+                    <button id="addDbButton" type="button" data-target="#addDbStructure" data-toggle="modal"
+                            class="btn btn-primary pull-right"
+                            style="margin-bottom: 20px">添加库中部套
+                    </button>
+                </div>
+                <div th:if="${session.user.role == 3}">
+                    <button id="addNewVersion" type="button" data-target="#importNewVersionStructure"
+                            data-toggle="modal"
+                            class="btn btn-primary pull-right"
+                            style="margin-bottom: 20px">导入新版本部套
+                    </button>
+                    <button id="addNewStructure" type="button" data-target="#importNewStructure" data-toggle="modal"
+                            class="btn btn-primary pull-right"
+                            style="margin-bottom: 20px; margin-right: 16px">导入新部套
+                    </button>
+                </div>
+                <div th:if="${session.user.role == 1}" style="margin-top: 50px"></div>
                 <table id="table" class="table table-bordered table-hover">
                     <thead>
                     <tr>
@@ -78,8 +84,11 @@
                         <td th:text="${structure.version}"></td>
                         <td th:text="${structure.material.latestVersion}"></td>
                         <td>
-                            <a href="javascript:;" th:onclick="|javascript:publishStructure('${structure.id}', '${structure.structureNo}');|">
-                                <span th:if="${structure.status == 1}" data-target="#structurePublish" data-toggle="modal">设计</span></a>
+                            <a href="javascript:;" th:if="${session.user.role == 2}"
+                               th:onclick="|javascript:publishStructure('${structure.id}', '${structure.structureNo}');|">
+                                <span th:if="${structure.status == 1}" data-target="#structurePublish"
+                                      data-toggle="modal">设计</span></a>
+                            <span th:if="${session.user.role != 2 && structure.status == 1}">设计</span>
                             <span th:if="${structure.status == 2}">发布</span>
                         </td>
                         <td>
@@ -87,11 +96,11 @@
                                th:onclick="|javascript:structureExport('${structure.structureNo}', '${structure.materialNo}', '${structure.revision}', '${structure.material.latestVersion}');|">
                                 <span data-target="#structureExport" data-toggle="modal">导出</span>
                             </a>
-                            <a href="javascript:;" style="margin-right: 16px"
+                            <a href="javascript:;" style="margin-right: 16px" th:if="${session.user.role == 3}"
                                th:onclick="|javascript:deleteStructure('${structure.id}');|">删除</a>
                             <a href="javascript:;"
                                th:onclick="|javascript:versionList('${structure.structureNo}', '${structure.materialNo}', '${structure.revision}', '${structure.material.latestVersion}');|"
-                               th:if="${structure.material.latestVersion > 0}">
+                               th:if="${session.user.role == 2 && structure.material.latestVersion > 0}">
                                 <span data-target="#versionChoose" data-toggle="modal">修改版本</span>
                             </a>
                         </td>
@@ -244,7 +253,8 @@
                 <div class="modal-body">
                     <label for="machineName8" class="control-label col-lg-2 col-md-2">机器名</label>
                     <div class="form-group col-lg-10 col-md-10">
-                        <input id="machineName8" type="text" class="form-control" th:value="${machine.name}" readonly="readonly"/>
+                        <input id="machineName8" type="text" class="form-control" th:value="${machine.name}"
+                               readonly="readonly"/>
                     </div>
                     <label for="structureNo8" class="control-label col-lg-2 col-md-2">部套号</label>
                     <div class="form-group col-lg-10 col-md-10">
