@@ -34,18 +34,27 @@ public class SummerApplicationTests {
     public void contextLoads() {
     }
 
-    @Test
-    public void addUser() {
-        User user = new User();
-        user.setObjectId(Generator.getObjectId());
-        user.setStatus(1);
-        user.setUsername("wangzhenqi");
-        user.setName("王振琦");
-        user.setPassword("151425");
-        user.setRole(2);
-        userRepository.save(user);
-    }
-
+//    @Test
+//    public void addUser() {
+//        User user = new User();
+//        user.setObjectId(Generator.getObjectId());
+//        user.setStatus(1);
+//        user.setUsername("wangzhenqi");
+//        user.setName("王振琦");
+//        user.setPassword("151425");
+//        user.setRole(2);
+//        userRepository.save(user);
+//
+//        User user2 = new User();
+//        user2.setObjectId(Generator.getObjectId());
+//        user2.setStatus(1);
+//        user2.setUsername("nancongjia");
+//        user2.setName("南琮嘉");
+//        user2.setPassword("151425");
+//        user2.setRole(3);
+//        userRepository.save(user2);
+//    }
+//
 //    @Test
 //    public void addNameRelation() {
 //        InputStream in = null;
@@ -88,35 +97,35 @@ public class SummerApplicationTests {
 //            }
 //        }
 //    }
-
-    @Test
-    public void addUsers() {
-        InputStream in = null;
-        try {
-            in = new FileInputStream(new File("role.xlsx"));
-            Workbook workbook = WorkbookFactory.create(in);
-            Sheet sheet = workbook.getSheet("BOM管理系统DMS权限");
-            List<User> users = new ArrayList<>();
-            for (Row row : sheet) {
-                User user = new User();
-                user.setObjectId(Generator.getObjectId());
-                user.setStatus(1);
-                user.setName(row.getCell(1).toString());
-                user.setUsername(row.getCell(2).toString());
-                user.setPassword("123456");
-                String role = row.getCell(3).toString();
-                if ("用户1".equals(role)) {
-                    user.setRole(1);
-                } else if ("用户2".equals(role)) {
-                    user.setRole(2);
-                } else if ("用户3".equals(role)) {
-                    user.setRole(3);
-                }
-                users.add(user);
-            }
-            userRepository.saveAll(users);
-        } catch (InvalidFormatException | IOException e) {
-            e.printStackTrace();
-        }
-    }
+//
+//    @Test
+//    public void addUsers() {
+//        InputStream in = null;
+//        try {
+//            in = new FileInputStream(new File("role.xlsx"));
+//            Workbook workbook = WorkbookFactory.create(in);
+//            Sheet sheet = workbook.getSheet("BOM管理系统DMS权限");
+//            List<User> users = new ArrayList<>();
+//            for (Row row : sheet) {
+//                User user = new User();
+//                user.setObjectId(Generator.getObjectId());
+//                user.setStatus(1);
+//                user.setName(row.getCell(1).toString());
+//                user.setUsername(row.getCell(2).toString());
+//                user.setPassword("123456");
+//                String role = row.getCell(3).toString();
+//                if ("用户1".equals(role)) {
+//                    user.setRole(1);
+//                } else if ("用户2".equals(role)) {
+//                    user.setRole(2);
+//                } else if ("用户3".equals(role)) {
+//                    user.setRole(3);
+//                }
+//                users.add(user);
+//            }
+//            userRepository.saveAll(users);
+//        } catch (InvalidFormatException | IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

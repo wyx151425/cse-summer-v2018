@@ -13,11 +13,11 @@ import java.util.List;
 public class Machine extends AuditorEntity {
     private String name;
     private String machineNo;
-    private Integer cylinderAmount;
-    private String shipNo;
-    private String classificationSociety;
     private String patent;
+    private String shipNo;
     private String type;
+    private Integer cylinderAmount;
+    private String classificationSociety;
 
     @Transient
     private List<Structure> structureList;
