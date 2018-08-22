@@ -696,8 +696,12 @@ public class FileServiceImpl implements FileService {
             }
             materialRepository.saveAll(oldMaterialList);
         } else {
-            Structure targetStruct = new Structure();
-            // TODO: 为机器保存新设计版本部套
+            structure.setStatus(1);
+            structure.setMaterialNo(materNo);
+            structure.setRevision(materV);
+            structure.setVersion(0);
+            structure.setAmount(0);
+            structureRepository.save(structure);
         }
 
         List<Material> materialList = new ArrayList<>(100);
