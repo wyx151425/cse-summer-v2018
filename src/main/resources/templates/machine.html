@@ -83,7 +83,15 @@
                         <td th:text="${structure.material.name}"></td>
                         <td th:text="${structure.material.chinese}"></td>
                         <td th:text="${structure.amount}"></td>
-                        <td>
+                        <td th:if="${structure.status == 1}" style="background-color: #ffc000">
+                            <a href="javascript:;" th:if="${session.user.role == 2}"
+                               th:onclick="|javascript:publishStructure('${structure.id}', '${structure.structureNo}');|">
+                                <span th:if="${structure.status == 1}" data-target="#structurePublish"
+                                      data-toggle="modal">设计</span></a>
+                            <span th:if="${session.user.role != 2 && structure.status == 1}">设计</span>
+                            <span th:if="${structure.status == 2}">发布</span>
+                        </td>
+                        <td th:if="${structure.status == 2}" style="background-color: #92d050">
                             <a href="javascript:;" th:if="${session.user.role == 2}"
                                th:onclick="|javascript:publishStructure('${structure.id}', '${structure.structureNo}');|">
                                 <span th:if="${structure.status == 1}" data-target="#structurePublish"

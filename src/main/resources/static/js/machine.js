@@ -140,6 +140,8 @@ $(document).ready(function () {
             data: JSON.stringify({
                 machineName: $("#machineName4").val(),
                 structureNo: $("#structureNo4").val(),
+                materialNo: $("#materialNo4").val(),
+                revision: $("#revision4").val(),
                 version: $("#version4").val()
             }),
             async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求

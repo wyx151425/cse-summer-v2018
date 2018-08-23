@@ -21,7 +21,17 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
      * @param status      状态标识
      * @return 部套数据
      */
-    Structure findStructureByMachineNameAndStructureNoAndStatusGreaterThanEqual(String machineName, String structureNo, Integer status);
+    List<Structure> findStructureByMachineNameAndStructureNoAndStatusGreaterThanEqual(String machineName, String structureNo, Integer status);
+
+    /**
+     * 根据机器名、部套号和状态标识获取指定部套
+     *
+     * @param machineName 机器名
+     * @param structureNo      部套号
+     * @param status      状态标识
+     * @return 部套数据
+     */
+    Structure findStructureByMachineNameAndStructureNoAndMaterialNoAndRevisionAndStatusGreaterThanEqual(String machineName, String structureNo, String materialNo, String revision, Integer status);
 
     /**
      * 添加库中部套时使用，精准查询部套是否存在

@@ -151,7 +151,11 @@ public class FileServiceImpl implements FileService {
                 if (0 == level) {
                     material.setAbsoluteAmount(1);
                 } else {
-                    material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(12).toString()));
+                    if (null == row.getCell(12).toString() || "".equals(row.getCell(12).toString())) {
+                        material.setAbsoluteAmount(0);
+                    } else {
+                        material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(12).toString()));
+                    }
                 }
                 material.setWeight(row.getCell(15).toString());
                 if (null != row.getCell(16)) {
