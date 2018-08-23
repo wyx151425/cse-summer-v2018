@@ -8,15 +8,14 @@ import com.cse.summer.repository.MaterialRepository;
 import com.cse.summer.repository.NameRepository;
 import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.FileService;
+import com.cse.summer.util.Constant;
 import com.cse.summer.util.Generator;
 import com.cse.summer.util.StatusCode;
-import com.cse.summer.util.Constant;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFPalette;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.xssf.usermodel.*;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -105,8 +104,8 @@ public class FileServiceImpl implements FileService {
                 index++;
             } else {
                 int level = (int) Double.parseDouble(row.getCell(1).toString());
-                String materialNo = row.getCell(6).toString();
-                String revision = row.getCell(7).toString();
+                String materialNo = row.getCell(3).toString();
+                String revision = row.getCell(4).toString();
                 int latestVersion = 0;
                 if (0 == level) {
                     // 如果通过该部套顶层物料的物料号和专利方版本查询到库中存在部套，则为库中的部套升级最新版本
@@ -130,7 +129,7 @@ public class FileServiceImpl implements FileService {
                     structure.setMaterialNo(materialNo);
                     structure.setRevision(revision);
                     structure.setVersion(latestVersion);
-                    structure.setAmount((int) Double.parseDouble(row.getCell(12).toString()));
+                    structure.setAmount((int) Double.parseDouble(row.getCell(13).toString()));
                     structureList.add(structure);
                 }
                 Material material = new Material(3);
@@ -141,21 +140,25 @@ public class FileServiceImpl implements FileService {
                 material.setChildCount(0);
                 material.setLevel(level);
                 material.setPositionNo(row.getCell(2).toString());
-                material.setDrawingSize(row.getCell(3).toString());
-                material.setDrawingNo(row.getCell(4).toString());
-                material.setDrawingVersion(row.getCell(5).toString());
                 material.setMaterialNo(materialNo);
                 material.setRevision(revision);
+                material.setDrawingNo(row.getCell(5).toString());
+                material.setDrawingVersion(row.getCell(6).toString());
+                material.setDrawingSize(row.getCell(7).toString());
                 material.setName(row.getCell(8).toString());
                 material.setChinese(row.getCell(9).toString());
                 material.setMaterial(row.getCell(10).toString());
-//                material.setAmount((int) Double.parseDouble(row.getCell(12).toString()));
-                material.setWeight(row.getCell(14).toString());
-                if (null != row.getCell(15)) {
-                    material.setSpareExp(row.getCell(15).toString());
+                if (0 == level) {
+                    material.setAbsoluteAmount(1);
+                } else {
+                    material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(12).toString()));
                 }
+                material.setWeight(row.getCell(15).toString());
                 if (null != row.getCell(16)) {
-                    material.setModifyNote(row.getCell(16).toString());
+                    material.setSpareExp(row.getCell(16).toString());
+                }
+                if (null != row.getCell(17)) {
+                    material.setModifyNote(row.getCell(17).toString());
                 }
                 materialList.add(material);
 
@@ -171,7 +174,6 @@ public class FileServiceImpl implements FileService {
                     // 根据最上级节点设置所属
                     material.setAtNo(levelArr[0].getMaterialNo());
                     material.setAtRevision(levelArr[0].getRevision());
-//                    material.setAbsoluteAmount(material.getAmount() / parentMat.getAmount());
                     material.setVersion(levelArr[0].getVersion());
                     material.setLatestVersion(levelArr[0].getLatestVersion());
                     // 设置该节点所属上级节点的ID
@@ -772,25 +774,52 @@ public class FileServiceImpl implements FileService {
         int i = 0;
         XSSFWorkbook workbook = new XSSFWorkbook();
 
-        // 设置文本对齐方向
-        CellStyle direct = workbook.createCellStyle();
-        direct.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        XSSFFont font = workbook.createFont();
+        font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
 
-        XSSFCellStyle green = workbook.createCellStyle();
-        green.setFillBackgroundColor(new XSSFColor(new Color(146, 208, 80)));
-        green.setFillPattern(FillPatternType.FINE_DOTS);
+        // 设置文本对齐方向
+        XSSFCellStyle direct = workbook.createCellStyle();
+        direct.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+        direct.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        direct.setFillForegroundColor(new XSSFColor(new Color(0, 176, 240)));
+        direct.setBorderTop(XSSFCellStyle.BORDER_THIN);
+        direct.setBorderRight(XSSFCellStyle.BORDER_THIN);
+        direct.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+        direct.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+        direct.setFont(font);
+
+        XSSFCellStyle border = workbook.createCellStyle();
+        border.setBorderTop(XSSFCellStyle.BORDER_THIN);
+        border.setBorderRight(XSSFCellStyle.BORDER_THIN);
+        border.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+        border.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+        border.setFont(font);
 
         XSSFCellStyle blue = workbook.createCellStyle();
-        blue.setFillBackgroundColor(new XSSFColor(new Color(0, 178, 240)));
-        green.setFillPattern(FillPatternType.FINE_DOTS);
+        blue.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        blue.setFillForegroundColor(new XSSFColor(new Color(0, 176, 240)));
+        blue.setBorderTop(XSSFCellStyle.BORDER_THIN);
+        blue.setBorderRight(XSSFCellStyle.BORDER_THIN);
+        blue.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+        blue.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+        blue.setFont(font);
+
+        XSSFCellStyle green = workbook.createCellStyle();
+        green.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        green.setFillForegroundColor(new XSSFColor(new Color(146, 208, 80)));
+        green.setBorderTop(XSSFCellStyle.BORDER_THIN);
+        green.setBorderRight(XSSFCellStyle.BORDER_THIN);
+        green.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+        green.setBorderLeft(XSSFCellStyle.BORDER_THIN);
 
         XSSFSheet sheet = workbook.createSheet();
         sheet.setColumnWidth(0, 2720);
         sheet.setColumnWidth(1, 3200);
         sheet.setColumnWidth(3, 3840);
+        sheet.setColumnWidth(5, 3840);
         sheet.setColumnWidth(8, 6720);
         sheet.setColumnWidth(9, 6720);
-        sheet.setColumnWidth(12, 3840);
+        sheet.setColumnWidth(17, 3840);
         if (null != machine) {
             sheet.protectSheet(Generator.getReadonlyPassword());
             XSSFRow row0 = sheet.createRow(i);
@@ -799,120 +828,107 @@ public class FileServiceImpl implements FileService {
             cell00.setCellStyle(blue);
             XSSFCell cell01 = row0.createCell(1);
             cell01.setCellValue(machine.getMachineNo());
+            cell01.setCellStyle(border);
             XSSFCell cell02 = row0.createCell(2);
             cell02.setCellValue("机型");
             cell02.setCellStyle(blue);
             XSSFCell cell03 = row0.createCell(3);
             cell03.setCellValue(machine.getType());
+            cell03.setCellStyle(border);
             XSSFCell cell04 = row0.createCell(4);
             cell04.setCellValue("船号");
             cell04.setCellStyle(blue);
             XSSFCell cell05 = row0.createCell(5);
             cell05.setCellValue(machine.getShipNo());
+            cell05.setCellStyle(border);
             XSSFCell cell06 = row0.createCell(6);
             cell06.setCellValue("船级社");
             cell06.setCellStyle(blue);
             XSSFCell cell07 = row0.createCell(7);
             cell07.setCellValue(machine.getClassificationSociety());
+            cell07.setCellStyle(border);
             i++;
             XSSFRow row1 = sheet.createRow(i);
             XSSFCell cell10 = row1.createCell(0);
             cell10.setCellValue("部套层次");
             cell10.setCellStyle(direct);
-            cell10.setCellStyle(blue);
             // 参数依次为：起始行，终止行，起始列，终止列
             CellRangeAddress cra0 = new CellRangeAddress(1, 1, 0, 2);
+            setBorderForMergeCell(CellStyle.BORDER_THIN, cra0, sheet, workbook);
             sheet.addMergedRegion(cra0);
             XSSFCell cell13 = row1.createCell(3);
             cell13.setCellValue("物料信息");
             cell13.setCellStyle(direct);
-            cell13.setCellStyle(blue);
             CellRangeAddress cra3 = new CellRangeAddress(1, 1, 3, 7);
+            setBorderForMergeCell(CellStyle.BORDER_THIN, cra3, sheet, workbook);
             sheet.addMergedRegion(cra3);
             XSSFCell cell18 = row1.createCell(8);
             cell18.setCellValue("名称转换");
             cell18.setCellStyle(direct);
-            cell18.setCellStyle(blue);
             CellRangeAddress cra8 = new CellRangeAddress(1, 1, 8, 9);
+            setBorderForMergeCell(CellStyle.BORDER_THIN, cra8, sheet, workbook);
             sheet.addMergedRegion(cra8);
             XSSFCell cell110 = row1.createCell(10);
             cell110.setCellValue("材料转换");
             cell110.setCellStyle(direct);
-            cell110.setCellStyle(blue);
             CellRangeAddress cra10 = new CellRangeAddress(1, 1, 10, 11);
+            setBorderForMergeCell(CellStyle.BORDER_THIN, cra10, sheet, workbook);
             sheet.addMergedRegion(cra10);
             XSSFCell cell112 = row1.createCell(12);
             cell112.setCellValue("装机件");
             cell112.setCellStyle(direct);
-            cell112.setCellStyle(blue);
             CellRangeAddress cra12 = new CellRangeAddress(1, 1, 12, 15);
+            setBorderForMergeCell(CellStyle.BORDER_THIN, cra12, sheet, workbook);
             sheet.addMergedRegion(cra12);
             XSSFCell cell116 = row1.createCell(16);
             cell116.setCellValue("备件");
             cell116.setCellStyle(direct);
-            cell116.setCellStyle(blue);
             XSSFCell cell117 = row1.createCell(17);
             cell117.setCellValue("设计工艺信息");
             cell117.setCellStyle(direct);
-            cell117.setCellStyle(blue);
             i++;
         }
 
         XSSFRow row = sheet.createRow(i);
         XSSFCell cell0 = row.createCell(0);
         cell0.setCellValue("部套");
-        cell0.setCellStyle(blue);
         XSSFCell cell1 = row.createCell(1);
         cell1.setCellValue("层次");
-        cell1.setCellStyle(blue);
         XSSFCell cell2 = row.createCell(2);
         cell2.setCellValue("件号");
-        cell2.setCellStyle(blue);
         XSSFCell cell3 = row.createCell(3);
         cell3.setCellValue("物料号");
-        cell3.setCellStyle(blue);
         XSSFCell cell4 = row.createCell(4);
         cell4.setCellValue("版本");
-        cell4.setCellStyle(blue);
         XSSFCell cell5 = row.createCell(5);
         cell5.setCellValue("图号");
-        cell5.setCellStyle(blue);
         XSSFCell cell6 = row.createCell(6);
         cell6.setCellValue("版本");
-        cell6.setCellStyle(blue);
         XSSFCell cell7 = row.createCell(7);
         cell7.setCellValue("图幅");
-        cell7.setCellStyle(blue);
         XSSFCell cell8 = row.createCell(8);
         cell8.setCellValue("名称（英文）");
-        cell8.setCellStyle(blue);
         XSSFCell cell9 = row.createCell(9);
         cell9.setCellValue("名称（中文）");
-        cell9.setCellStyle(blue);
         XSSFCell cell10 = row.createCell(10);
         cell10.setCellValue("专利材料");
-        cell10.setCellStyle(blue);
         XSSFCell cell11 = row.createCell(11);
         cell11.setCellValue("国标材料");
-        cell11.setCellStyle(blue);
         XSSFCell cell12 = row.createCell(12);
         cell12.setCellValue("层数量");
-        cell12.setCellStyle(blue);
         XSSFCell cell13 = row.createCell(13);
         cell13.setCellValue("总数量");
-        cell13.setCellStyle(blue);
         XSSFCell cell14 = row.createCell(14);
         cell14.setCellValue("货源");
-        cell14.setCellStyle(blue);
         XSSFCell cell15 = row.createCell(15);
         cell15.setCellValue("重量");
-        cell15.setCellStyle(blue);
         XSSFCell cell16 = row.createCell(16);
         cell16.setCellValue("备件数量");
-        cell16.setCellStyle(blue);
         XSSFCell cell17 = row.createCell(17);
         cell17.setCellValue("更改记录");
-        cell17.setCellStyle(blue);
+        for (Cell cell : row) {
+            cell.setCellStyle(blue);
+        }
         i++;
 
         int size = materialList.size();
@@ -1009,6 +1025,11 @@ public class FileServiceImpl implements FileService {
             if (null != material.getModifyNote()) {
                 tempCell17.setCellValue(material.getModifyNote());
             }
+            if (0 == level) {
+                for (Cell cell : tempRow) {
+                    cell.setCellStyle(green);
+                }
+            }
         }
         return workbook;
     }
@@ -1033,5 +1054,12 @@ public class FileServiceImpl implements FileService {
             mantissa = Integer.parseInt(exp);
         }
         return multiplier * cylinderAmount + mantissa;
+    }
+
+    private void setBorderForMergeCell(int i, CellRangeAddress cellRangeTitle, Sheet sheet, XSSFWorkbook workbook) {
+        RegionUtil.setBorderBottom(i, cellRangeTitle, sheet, workbook);
+        RegionUtil.setBorderLeft(i, cellRangeTitle, sheet, workbook);
+        RegionUtil.setBorderRight(i, cellRangeTitle, sheet, workbook);
+        RegionUtil.setBorderTop(i, cellRangeTitle, sheet, workbook);
     }
 }
