@@ -171,6 +171,44 @@ $(document).ready(function () {
             }
         });
     });
+
+    $("#pwdBtn").click(function () {
+        let pwdBtn = $(this);
+        pwdBtn.attr("disabled", "disabled");
+        let response = $("#response");
+        response.text("");
+        let newPwd = $("#newPwd").val();
+        let confirmPwd = $("#confirmPwd").val();
+        if (confirmPwd !== newPwd) {
+            response.text("两次密码不一致");
+            pwdBtn.removeAttr("disabled");
+            return;
+        }
+        if (newPwd.length < 6) {
+            response.text("密码长度应不少于6位");
+            pwdBtn.removeAttr("disabled");
+            return;
+        }
+        pwdBtn.text("修改中...");
+        $.ajax({
+            url: "api/users/password",
+            dataType: "json",
+            type: "put",
+            contentType: "application/json",
+            data: JSON.stringify({
+                password: newPwd
+            }),
+            async: true,
+            success: function (data) {
+                if (200 === data.statusCode) {
+                    window.location.href = "index";
+                }
+            },
+            error: function () {
+                response.text("系统错误");
+            }
+        });
+    });
 });
 
 function toUpdateMachine(machineId, machineName, machineNo, machineType, cylinderAmount, shipNo, classificationSociety) {

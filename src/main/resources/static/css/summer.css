@@ -205,3 +205,82 @@ main.container {
         transform: rotate(-360deg);
     }
 }
+
+.dialog-bg {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 9000;
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+.dialog {
+    position: relative;
+    margin: 100px auto;
+    width: 500px;
+    background-color: #fff;
+    border: 1px solid #dedfe0;
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05), 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.dialog-title {
+    font-size: 18px;
+    text-align: center;
+    padding: 12px;
+    font-weight: bold;
+    border-bottom: solid 1px #dedfe0;
+}
+
+.dialog-content {
+    padding: 32px 64px;
+}
+
+.ipt-group {
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.ipt-item {
+    display: block;
+    width: 100%;
+    height: 45px;
+    line-height: 45px;
+    border: 1px solid #dedfe0;
+    padding: 0 12px;
+    color: #444;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.ipt-item:focus {
+    border-color: #337ab7;
+}
+
+.response {
+    margin: 0;
+    font-size: 14px;
+    line-height: 20px;
+    padding: 4px 0;
+    color: #ff4e43;
+}
+
+.pwd-btn {
+    outline: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    width: 384px;
+    height: 54px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 8px;
+    background-color: #337ab7;
+}
+
+.pwd-btn:hover, .pwd-btn:active {
+    background-color: #204d74;
+}

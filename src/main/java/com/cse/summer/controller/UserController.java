@@ -4,10 +4,7 @@ import com.cse.summer.domain.Response;
 import com.cse.summer.domain.User;
 import com.cse.summer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author 王振琦
@@ -33,6 +30,14 @@ public class UserController extends BaseFacade {
     @PostMapping(value = "users/logout")
     public Response<User> actionUserLogout() {
         removeSessionUser();
+        return new Response<>();
+    }
+
+    @PutMapping(value = "users/password")
+    public Response<User> actionUpdatePassword(@RequestBody User reqUser) {
+        User user = getSessionUser();
+        user.setPassword(reqUser.getPassword());
+        userService.updatePassword(user);
         return new Response<>();
     }
 }

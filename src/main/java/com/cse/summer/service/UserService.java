@@ -12,4 +12,10 @@ public interface UserService {
      * @return 登录成功后返回的用户对象
      */
     User login(User user);
+
+    /**
+     * 更新密码
+     * @param user 用户对象
+     */
+    void updatePassword(User user);
 }

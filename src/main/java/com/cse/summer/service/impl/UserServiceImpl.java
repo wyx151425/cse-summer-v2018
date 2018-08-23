@@ -7,6 +7,7 @@ import com.cse.summer.service.UserService;
 import com.cse.summer.util.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author 王振琦
@@ -22,6 +23,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true, rollbackFor = Exception.class)
     public User login(User user) {
         User targetUser = userRepository.findUserByUsername(user.getName());
         if (null == targetUser) {
@@ -37,5 +39,11 @@ public class UserServiceImpl implements UserService {
                 }
             }
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePassword(User user) {
+        userRepository.save(user);
     }
 }

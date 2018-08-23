@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>CSE DMS</title>
     <link rel="shortcut icon" th:href="@{/images/CSE.png}" type="image/x-icon"/>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/summer.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/css/summer.css}"/>
     <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
     <script th:src="@{/js/ajaxfileupload.js}"></script>
     <script th:src="@{/js/bootstrap.min.js}"></script>
@@ -235,6 +235,23 @@
                 <div class="modal-body">
                     <p id="machineEditProgress" class="progress-prompt">文件上传中...</p>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="dialog-bg" th:if="${session.user.password == '123456'}">
+    <div class="dialog">
+        <p class="dialog-title"><span>修改密码</span></p>
+        <div class="dialog-content">
+            <div class="ipt-group">
+                <input id="newPwd" class="ipt-item" type="password" placeholder="新密码，不少于6位"/>
+            </div>
+            <div class="ipt-group">
+                <input id="confirmPwd" class="ipt-item" type="password" placeholder="确认您的密码"/>
+            </div>
+            <p id="response" class="response"></p>
+            <div class="ipt-group">
+                <button id="pwdBtn" class="pwd-btn" type="button">修改</button>
             </div>
         </div>
     </div>
