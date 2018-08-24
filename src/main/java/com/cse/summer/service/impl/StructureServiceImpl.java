@@ -30,15 +30,14 @@ public class StructureServiceImpl implements StructureService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addDbStructure(Structure structure) {
-        Material material = materialRepository.findMaterialByMaterialNoAndRevisionAndVersionAndLevel(
-                structure.getMaterialNo(), structure.getRevision(), structure.getVersion(), 0);
+        Material material = materialRepository.findMaterialByMaterialNoAndVersionAndLevel(structure.getMaterialNo(), structure.getVersion(), 0);
         if (null == material) {
             // 检查库中是否有该物料
             throw new SummerException(StatusCode.MATERIAL_NO_EXIST);
         } else {
             // 检查该部套是否已经与该物料关联
-            Structure target = structureRepository.findStructureByMachineNameAndMaterialNoAndRevisionAndVersionAndStatusGreaterThanEqual(
-                    structure.getMachineName(), structure.getMaterialNo(), structure.getRevision(), structure.getVersion(), 1);
+            Structure target = structureRepository.findStructureByMachineNameAndMaterialNoAndVersionAndStatusGreaterThanEqual(
+                    structure.getMachineName(), structure.getMaterialNo(), structure.getVersion(), 1);
             if (null == target) {
                 structure.setObjectId(Generator.getObjectId());
                 structure.setStatus(1);
@@ -52,8 +51,8 @@ public class StructureServiceImpl implements StructureService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStructureVersion(Structure structure) {
-        Structure targetStruct = structureRepository.findStructureByMachineNameAndStructureNoAndMaterialNoAndRevisionAndStatusGreaterThanEqual(
-                structure.getMachineName(), structure.getStructureNo(), structure.getMaterialNo(), structure.getRevision(), 1);
+        Structure targetStruct = structureRepository.findStructureByMachineNameAndStructureNoAndMaterialNoAndStatusGreaterThanEqual(
+                structure.getMachineName(), structure.getStructureNo(), structure.getMaterialNo(), 1);
         if (!structure.getVersion().equals(targetStruct.getVersion())) {
             targetStruct.setStatus(1);
             targetStruct.setVersion(structure.getVersion());

@@ -40,7 +40,7 @@ public class MaterialController {
 
     @GetMapping(value = "materials/search")
     public Response<List<Map<String, String>>> actionSearchStructureMaterialVersion(@RequestParam("materialNo") String materialNo) {
-        List<Map<String, String>> list = materialService.findRevisionAndLatestVersion(materialNo);
+        List<Map<String, String>> list = materialService.findMaterialNoAndLatestVersion(materialNo);
         return new Response<>(list);
     }
 }

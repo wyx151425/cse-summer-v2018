@@ -1,7 +1,5 @@
 package com.cse.summer.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.io.Serializable;
@@ -9,16 +7,15 @@ import java.io.Serializable;
 /**
  * @author 王振琦
  */
-@Entity
+@javax.persistence.Entity
 @Table(name = "cse_material")
-public class Material extends AuditorEntity implements Serializable {
+public class Material extends Entity implements Serializable {
     /**
      * 部套号
      */
     @Transient
     private String structureNo;
     private String atNo;
-    private String atRevision;
     /**
      * 物料名称
      */
@@ -36,14 +33,6 @@ public class Material extends AuditorEntity implements Serializable {
      */
     private Integer level;
     /**
-     * 源类型（1=MAN/2=WinGD）
-     */
-    private Integer type;
-//    /**
-//     * 原层级字符串
-//     */
-//    private String srcLevel;
-    /**
      * 部件号
      */
     private String positionNo;
@@ -51,10 +40,6 @@ public class Material extends AuditorEntity implements Serializable {
      * 排序号
      */
     private String sequenceNo;
-    /**
-     * 专利方版本
-     */
-    private String revision;
     /**
      * 当前版本号
      */
@@ -81,10 +66,6 @@ public class Material extends AuditorEntity implements Serializable {
      * 图纸编号
      */
     private String drawingNo;
-    /**
-     * 图纸版本
-     */
-    private String drawingVersion;
 
     /**
      * 重量
@@ -99,11 +80,6 @@ public class Material extends AuditorEntity implements Serializable {
      * 数量
      */
     private Integer absoluteAmount;
-
-    /**
-     * 更改通知
-     */
-    private String modifyNote;
     /**
      * 页数
      */
@@ -121,12 +97,24 @@ public class Material extends AuditorEntity implements Serializable {
      * 备件表达式
      */
     private String spareExp;
+    /**
+     * 备件货源
+     */
+    private String spareSrc;
+    /**
+     * 设计备注
+     */
+    private String designNote;
+    /**
+     * 喷漆防护
+     */
+    private String paintProtect;
+    /**
+     * 更改通知
+     */
+    private String modifyNote;
 
     public Material() {
-    }
-
-    public Material(Integer type) {
-        this.type = type;
     }
 
     public String getStructureNo() {
@@ -143,14 +131,6 @@ public class Material extends AuditorEntity implements Serializable {
 
     public void setAtNo(String atNo) {
         this.atNo = atNo;
-    }
-
-    public String getAtRevision() {
-        return atRevision;
-    }
-
-    public void setAtRevision(String atRevision) {
-        this.atRevision = atRevision;
     }
 
     public String getName() {
@@ -183,14 +163,6 @@ public class Material extends AuditorEntity implements Serializable {
 
     public void setLevel(Integer level) {
         this.level = level;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
     }
 
     public String getPositionNo() {
@@ -233,14 +205,6 @@ public class Material extends AuditorEntity implements Serializable {
         this.materialNo = materialNo;
     }
 
-    public String getRevision() {
-        return revision;
-    }
-
-    public void setRevision(String revision) {
-        this.revision = revision;
-    }
-
     public String getMaterial() {
         return material;
     }
@@ -263,14 +227,6 @@ public class Material extends AuditorEntity implements Serializable {
 
     public void setDrawingNo(String drawingNo) {
         this.drawingNo = drawingNo;
-    }
-
-    public String getDrawingVersion() {
-        return drawingVersion;
-    }
-
-    public void setDrawingVersion(String drawingVersion) {
-        this.drawingVersion = drawingVersion;
     }
 
     public String getWeight() {
@@ -337,11 +293,34 @@ public class Material extends AuditorEntity implements Serializable {
         this.spareExp = spareExp;
     }
 
+    public String getSpareSrc() {
+        return spareSrc;
+    }
+
+    public void setSpareSrc(String spareSrc) {
+        this.spareSrc = spareSrc;
+    }
+
+    public String getDesignNote() {
+        return designNote;
+    }
+
+    public void setDesignNote(String designNote) {
+        this.designNote = designNote;
+    }
+
+    public String getPaintProtect() {
+        return paintProtect;
+    }
+
+    public void setPaintProtect(String paintProtect) {
+        this.paintProtect = paintProtect;
+    }
+
     @Override
     public String toString() {
         return "Material{" +
                 "materialNo='" + materialNo  +
-                ", revision='" + revision + '\'' +
                 ", version=" + version + '\'' +
                 ", latestVersion=" + latestVersion + '\'' +
                 '}';

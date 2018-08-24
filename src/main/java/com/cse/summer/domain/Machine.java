@@ -1,6 +1,5 @@
 package com.cse.summer.domain;
 
-import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.util.List;
@@ -8,12 +7,11 @@ import java.util.List;
 /**
  * @author 王振琦
  */
-@Entity
+@javax.persistence.Entity
 @Table(name = "cse_machine")
-public class Machine extends AuditorEntity {
+public class Machine extends Entity {
     private String name;
     private String machineNo;
-    private String patent;
     private String shipNo;
     private String type;
     private Integer cylinderAmount;
@@ -63,14 +61,6 @@ public class Machine extends AuditorEntity {
 
     public void setClassificationSociety(String classificationSociety) {
         this.classificationSociety = classificationSociety;
-    }
-
-    public String getPatent() {
-        return patent;
-    }
-
-    public void setPatent(String patent) {
-        this.patent = patent;
     }
 
     public String getType() {

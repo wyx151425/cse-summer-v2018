@@ -35,5 +35,5 @@ public interface MaterialService {
      * @param materialNo 物料号
      * @return 数据传输对象
      */
-    List<Map<String, String>> findRevisionAndLatestVersion(String materialNo);
+    List<Map<String, String>> findMaterialNoAndLatestVersion(String materialNo);
 }

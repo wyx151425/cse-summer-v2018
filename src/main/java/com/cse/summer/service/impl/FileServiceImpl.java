@@ -8,7 +8,6 @@ import com.cse.summer.repository.MaterialRepository;
 import com.cse.summer.repository.NameRepository;
 import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.FileService;
-import com.cse.summer.util.Constant;
 import com.cse.summer.util.Generator;
 import com.cse.summer.util.StatusCode;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -55,6 +54,7 @@ public class FileServiceImpl implements FileService {
         this.nameRepository = nameRepository;
     }
 
+    // 从数据库中英文名称参照表中查找中文名称
     private String findChineseName(String englishName, List<Name> names) {
         for (Name name : names) {
             if (name.getEnglish().equals(englishName)) {
@@ -64,28 +64,49 @@ public class FileServiceImpl implements FileService {
         return "";
     }
 
+    // 新建机器通用方法
+    private Machine createNewMachine(String machineName) {
+        Machine machine = new Machine();
+        machine.setObjectId(Generator.getObjectId());
+        machine.setStatus(1);
+        machine.setName(machineName);
+        machine.setMachineNo("");
+        machine.setType("");
+        machine.setCylinderAmount(0);
+        machine.setShipNo("");
+        machine.setClassificationSociety("");
+        return machine;
+    }
+
+    private Structure createNewStructure(String machineName) {
+        Structure structure = new Structure();
+        structure.setObjectId(Generator.getObjectId());
+        structure.setStatus(1);
+        structure.setMachineName(machineName);
+        return structure;
+    }
+
+    private Material createNewMaterial() {
+        Material material = new Material();
+        material.setObjectId(Generator.getObjectId());
+        material.setStatus(1);
+        return material;
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importCSEBOM(User user, String machineName, MultipartFile file) throws InvalidFormatException, IOException {
+    public void importCSEBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
 
-        cseBOMExcelProcess(user, machineName, sheet, materialList, structureList);
+        cseBOMExcelProcess(machineName, sheet, materialList, structureList);
 
+        // 检查机器是否存在
         Machine targetMachine = machineRepository.findMachineByName(machineName);
         if (null == targetMachine) {
-            Machine machine = new Machine();
-            machine.setObjectId(Generator.getObjectId());
-            machine.setStatus(1);
-            machine.setName(machineName);
-            machine.setPatent(Constant.MachineType.CSE);
-            machine.setMachineNo("");
-            machine.setType("");
-            machine.setCylinderAmount(0);
-            machine.setShipNo("");
-            machine.setClassificationSociety("");
+            Machine machine = createNewMachine(machineName);
             machineRepository.save(machine);
         }
 
@@ -93,7 +114,7 @@ public class FileServiceImpl implements FileService {
         materialRepository.saveAll(materialList);
     }
 
-    private void cseBOMExcelProcess(User user, String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList) {
+    private void cseBOMExcelProcess(String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList) {
         // 用于维护部套层级的数组
         Material[] levelArr = new Material[12];
         // Workbook行索引
@@ -103,13 +124,12 @@ public class FileServiceImpl implements FileService {
             if (index < 3) {
                 index++;
             } else {
-                int level = (int) Double.parseDouble(row.getCell(1).toString());
+                int level = (int) Double.parseDouble(row.getCell(1).toString().trim());
                 String materialNo = row.getCell(3).toString();
-                String revision = row.getCell(4).toString();
                 int latestVersion = 0;
                 if (0 == level) {
                     // 如果通过该部套顶层物料的物料号和专利方版本查询到库中存在部套，则为库中的部套升级最新版本
-                    List<Material> materials = materialRepository.findAllByAtNoAndAtRevision(materialNo, revision);
+                    List<Material> materials = materialRepository.findAllByAtNo(materialNo);
                     if (materials.size() > 0) {
                         int oldLatestVersion = materials.get(0).getLatestVersion();
                         latestVersion = oldLatestVersion + 1;
@@ -119,50 +139,40 @@ public class FileServiceImpl implements FileService {
                         materialRepository.saveAll(materials);
                     }
                     // 保存该部套
-                    Structure structure = new Structure();
-                    structure.setObjectId(Generator.getObjectId());
-                    structure.setStatus(1);
-                    structure.setCreateBy(user.getName());
-                    structure.setUpdateBy(user.getName());
-                    structure.setMachineName(machineName);
+                    Structure structure = createNewStructure(machineName);
                     structure.setStructureNo(row.getCell(0).toString());
                     structure.setMaterialNo(materialNo);
-                    structure.setRevision(revision);
                     structure.setVersion(latestVersion);
-                    structure.setAmount((int) Double.parseDouble(row.getCell(13).toString()));
+                    structure.setAmount((int) Double.parseDouble(row.getCell(11).toString()));
                     structureList.add(structure);
                 }
-                Material material = new Material(3);
-                material.setObjectId(Generator.getObjectId());
-                material.setStatus(1);
+                Material material = createNewMaterial();
                 material.setVersion(latestVersion);
                 material.setLatestVersion(latestVersion);
                 material.setChildCount(0);
                 material.setLevel(level);
                 material.setPositionNo(row.getCell(2).toString());
                 material.setMaterialNo(materialNo);
-                material.setRevision(revision);
-                material.setDrawingNo(row.getCell(5).toString());
-                material.setDrawingVersion(row.getCell(6).toString());
-                material.setDrawingSize(row.getCell(7).toString());
-                material.setName(row.getCell(8).toString());
-                material.setChinese(row.getCell(9).toString());
-                material.setMaterial(row.getCell(10).toString());
+                material.setDrawingNo(row.getCell(4).toString());
+                material.setDrawingSize(row.getCell(5).toString());
+                material.setName(row.getCell(6).toString());
+                material.setChinese(row.getCell(7).toString());
+                material.setMaterial(row.getCell(8).toString());
                 if (0 == level) {
                     material.setAbsoluteAmount(1);
                 } else {
-                    if (null == row.getCell(12).toString() || "".equals(row.getCell(12).toString())) {
+                    if (null == row.getCell(10).toString() || "".equals(row.getCell(10).toString())) {
                         material.setAbsoluteAmount(0);
                     } else {
-                        material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(12).toString()));
+                        material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(10).toString()));
                     }
                 }
-                material.setWeight(row.getCell(15).toString());
-                if (null != row.getCell(16)) {
-                    material.setSpareExp(row.getCell(16).toString());
+                material.setWeight(row.getCell(13).toString());
+                if (null != row.getCell(14)) {
+                    material.setSpareExp(row.getCell(14).toString());
                 }
-                if (null != row.getCell(17)) {
-                    material.setModifyNote(row.getCell(17).toString());
+                if (null != row.getCell(15)) {
+                    material.setModifyNote(row.getCell(15).toString());
                 }
                 materialList.add(material);
 
@@ -170,14 +180,12 @@ public class FileServiceImpl implements FileService {
                     // 最上层节点时不设置父节点
                     levelArr[0] = material;
                     material.setAtNo(materialNo);
-                    material.setAtRevision(revision);
                     material.setAbsoluteAmount(1);
                 } else {
                     Material parentMat = levelArr[level - 1];
                     parentMat.setChildCount(parentMat.getChildCount() + 1);
                     // 根据最上级节点设置所属
                     material.setAtNo(levelArr[0].getMaterialNo());
-                    material.setAtRevision(levelArr[0].getRevision());
                     material.setVersion(levelArr[0].getVersion());
                     material.setLatestVersion(levelArr[0].getLatestVersion());
                     // 设置该节点所属上级节点的ID
@@ -200,20 +208,11 @@ public class FileServiceImpl implements FileService {
 
         List<Name> names = nameRepository.findAll();
 
-        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, null, null, names);
+        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, null, names);
 
         Machine targetMachine = machineRepository.findMachineByName(machineName);
         if (null == targetMachine) {
-            Machine machine = new Machine();
-            machine.setObjectId(Generator.getObjectId());
-            machine.setStatus(1);
-            machine.setName(machineName);
-            machine.setPatent(Constant.MachineType.MAN);
-            machine.setMachineNo("");
-            machine.setType("");
-            machine.setCylinderAmount(0);
-            machine.setShipNo("");
-            machine.setClassificationSociety("");
+            Machine machine = createNewMachine(machineName);
             machineRepository.save(machine);
         }
 
@@ -236,81 +235,76 @@ public class FileServiceImpl implements FileService {
      */
     @SuppressWarnings("unchecked")
     private void xmlRecursiveTraversal(Element element, List<Material> materialList, List<Structure> structureList,
-                                       String parentId, String machineName, int parentLevel, String atNo, String atRevision, List<Name> names) {
+                                       String parentId, String machineName, int parentLevel, String atNo, List<Name> names) {
         if ("designSpec".equals(element.getName())) {
             logger.info("装置号id: " + element.attributeValue("id"));
             Element revision = element.element("revision");
             Element modules = revision.element("moduleList");
             List<Element> moduleList = modules.elements("module");
             for (Element module : moduleList) {
-                xmlRecursiveTraversal(module, materialList, structureList, null, machineName, parentLevel, null, null, names);
+                xmlRecursiveTraversal(module, materialList, structureList, null, machineName, parentLevel, null, names);
             }
         } else if ("module".equals(element.getName())) {
             Element revision = element.element("revision");
             String structNoM = revision.element("structureNo").getText();
             String materNoM = element.attributeValue("id");
             String revisionM = revision.attributeValue("revision");
+            String materialNo = materNoM + "." + revisionM;
             // 判断部套是否存在，不存在的情况下才需要保存该部套信息
-            Structure targetStruct = structureRepository.findExistStructure(machineName, structNoM, materNoM, revisionM);
+            Structure targetStruct = structureRepository.findExistStructure(machineName, structNoM, materialNo);
             // 如果部套不存在，则保存部套，并判断库中是否有部套对应的物料，物料存在则重用库中物料，不存在则新建物料
             // 如果部套已经存在，那么物料一定也存在了，那么该部套对应的物料所有的子节点都不需要遍历了
             if (null == targetStruct) {
-                targetStruct = new Structure();
-                targetStruct.setObjectId(Generator.getObjectId());
-                targetStruct.setStatus(1);
-                targetStruct.setMachineName(machineName);
+                targetStruct = createNewStructure(machineName);
                 targetStruct.setStructureNo(structNoM);
-                targetStruct.setMaterialNo(materNoM);
-                targetStruct.setRevision(revisionM);
+                targetStruct.setMaterialNo(materialNo);
                 targetStruct.setVersion(0);
 
                 // 判断待保存的物料是否存在
-                List<Material> materials = materialRepository.findAllByMaterialNoAndRevisionAndLevel(materNoM, revisionM, 0);
+                List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(materialNo, 0);
                 // 集合大于0表示物料存在
                 if (0 == materials.size()) {
                     // 如果物料不存在，则需要保存物料的数据，并遍历物料的所有子节点
-                    Material material = new Material(1);
-                    material.setAtNo(materNoM);
-                    material.setAtRevision(revisionM);
+                    Material material = createNewMaterial();
+                    material.setAtNo(materialNo);
                     int level = parentLevel + 1;
                     material.setLevel(level);
-                    material.setObjectId(Generator.getObjectId());
-                    material.setStatus(1);
                     material.setVersion(0);
                     material.setLatestVersion(0);
-                    material.setMaterialNo(materNoM);
+                    material.setMaterialNo(materialNo);
                     material.setName(element.element("name").getText());
                     String chineseName = findChineseName(element.element("name").getText(), names);
                     material.setChinese(chineseName);
-                    material.setRevision(revisionM);
                     material.setPage(revision.element("noOfPages").getText());
                     material.setWeight(revision.element("mass").getText());
                     material.setAbsoluteAmount(1);
                     materialList.add(material);
                     Element parts = revision.element("partList");
-                    int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, materNoM, revisionM, names);
+                    int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, materialNo, names);
                     material.setChildCount(childCount);
                 }
                 targetStruct.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
                 structureList.add(targetStruct);
             }
         } else if ("part".equals(element.getName())) {
-            Material material = new Material(1);
+            Material material = createNewMaterial();
             material.setAtNo(atNo);
-            material.setAtRevision(atRevision);
             int level = parentLevel + 1;
             material.setLevel(level);
-            material.setObjectId(Generator.getObjectId());
-            material.setStatus(1);
             material.setVersion(0);
             material.setLatestVersion(0);
             material.setParentId(parentId);
-            material.setMaterialNo(element.attributeValue("id"));
+
+            String materNoM = element.attributeValue("id");
+            Element revision = element.element("revision");
+            String revisionM = revision.attributeValue("revision");
+            String materialNo = materNoM + "." + revisionM;
+
+            material.setMaterialNo(materialNo);
             material.setName(element.element("name").getText());
             String chineseName = findChineseName(element.element("name").getText(), names);
             material.setChinese(chineseName);
-            Element revision = element.element("revision");
-            material.setRevision(revision.attributeValue("revision"));
+
             if (null != revision.element("mass")) {
                 material.setWeight(revision.element("mass").getText());
             }
@@ -334,27 +328,29 @@ public class FileServiceImpl implements FileService {
             }
             materialList.add(material);
             Element parts = revision.element("partList");
-            int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, atNo, atRevision, names);
+            int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, atNo, names);
 
             material.setChildCount(childCount);
         } else if ("standardPart".equals(element.getName()) || "document".equals(element.getName())
                 || "supDrawing".equals(element.getName()) || "licData".equals(element.getName())) {
-            Material material = new Material(1);
+            Material material = createNewMaterial();
             material.setAtNo(atNo);
-            material.setAtRevision(atRevision);
             int level = parentLevel + 1;
             material.setLevel(level);
-            material.setObjectId(Generator.getObjectId());
-            material.setStatus(1);
             material.setVersion(0);
             material.setLatestVersion(0);
             material.setParentId(parentId);
-            material.setMaterialNo(element.attributeValue("id"));
+
+            String materNoM = element.attributeValue("id");
+            Element revision = element.element("revision");
+            String revisionM = revision.attributeValue("revision");
+            String materialNo = materNoM + "." + revisionM;
+
+            material.setMaterialNo(materialNo);
             material.setName(element.element("name").getText());
             String chineseName = findChineseName(element.element("name").getText(), names);
             material.setChinese(chineseName);
-            Element revision = element.element("revision");
-            material.setRevision(revision.attributeValue("revision"));
+
             if (null != revision.element("mass")) {
                 material.setWeight(revision.element("mass").getText());
             }
@@ -391,7 +387,7 @@ public class FileServiceImpl implements FileService {
      * @return 该层元素子节点数
      */
     @SuppressWarnings("unchecked")
-    private int xmlPartsRecursiveTraversal(Element parts, List<Material> materialList, String parentId, String machineName, int parentLevel, String atNo, String atRevision, List<Name> names) {
+    private int xmlPartsRecursiveTraversal(Element parts, List<Material> materialList, String parentId, String machineName, int parentLevel, String atNo, List<Name> names) {
         int childCount = 0;
         if (null != parts) {
             List<Element> otherParts = new ArrayList<>();
@@ -420,7 +416,7 @@ public class FileServiceImpl implements FileService {
             otherParts.sort(Comparator.comparing(o -> o.element("revision").element("sequenceNo").getText()));
 
             for (Element element : otherParts) {
-                xmlRecursiveTraversal(element, materialList, null, parentId, machineName, parentLevel, atNo, atRevision, names);
+                xmlRecursiveTraversal(element, materialList, null, parentId, machineName, parentLevel, atNo, names);
             }
         }
         return childCount;
@@ -439,16 +435,7 @@ public class FileServiceImpl implements FileService {
 
         Machine targetMachine = machineRepository.findMachineByName(machineName);
         if (null == targetMachine) {
-            Machine machine = new Machine();
-            machine.setObjectId(Generator.getObjectId());
-            machine.setStatus(1);
-            machine.setName(machineName);
-            machine.setPatent(Constant.MachineType.WIN_GD);
-            machine.setMachineNo("");
-            machine.setType("");
-            machine.setCylinderAmount(0);
-            machine.setShipNo("");
-            machine.setClassificationSociety("");
+            Machine machine = createNewMachine(machineName);
             machineRepository.save(machine);
         }
 
@@ -468,58 +455,47 @@ public class FileServiceImpl implements FileService {
             } else {
                 String materNo = row.getCell(4).toString();
                 String materVersion = row.getCell(5).toString();
+                String materialNo = materNo + materVersion;
                 // 获取该节点层级，从0开始
                 int level = row.getCell(0).toString().length() / 3 - 1;
                 if (0 == level) {
                     // 设为空，防止多个部套，部套名相同但物料号不同的情况
                     unImportMater = "";
                     String structNo = row.getCell(8).toString();
-                    Structure targetStruct = structureRepository.findExistStructure(machineName, structNo, materNo, materVersion);
+                    Structure targetStruct = structureRepository.findExistStructure(machineName, structNo, materialNo);
 
                     // 当部套不存在的时候就新创建部套
                     if (null == targetStruct) {
-                        targetStruct = new Structure();
-                        targetStruct.setObjectId(Generator.getObjectId());
-                        targetStruct.setStatus(1);
-                        targetStruct.setMachineName(machineName);
+                        targetStruct = createNewStructure(machineName);
                         targetStruct.setStructureNo(structNo);
-                        targetStruct.setMaterialNo(materNo);
-                        targetStruct.setRevision(materVersion);
+                        targetStruct.setMaterialNo(materialNo);
                         targetStruct.setAmount((int) Double.parseDouble(row.getCell(14).toString()));
 
                         // 当物料存在时就为部套设置物料最新的版本
-                        List<Material> materials = materialRepository.findAllByMaterialNoAndRevisionAndLevel(materNo, materVersion, 0);
+                        List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(materialNo, 0);
                         if (materials.size() > 0) {
                             // 当物料存在时，不需要再导入
-                            unImportMater = materNo;
+                            unImportMater = materialNo;
                         }
                         targetStruct.setVersion(0);
                         structureList.add(targetStruct);
                     } else {
                         // 当该部套存在时，该部套存在的物料也已经存在，所以不需要导入
-                        unImportMater = materNo;
+                        unImportMater = materialNo;
                     }
                 }
 
                 // 此处，即使部套已经存在也还需要遍历表，因为此处不是树级结构
-                Material material = new Material(2);
-                material.setObjectId(Generator.getObjectId());
-                material.setStatus(1);
+                Material material = createNewMaterial();
                 material.setVersion(0);
                 material.setLatestVersion(0);
                 material.setChildCount(0);
-                material.setMaterialNo(materNo);
-                material.setRevision(materVersion);
+                material.setMaterialNo(materialNo);
 
                 if (null != row.getCell(1)) {
                     material.setDrawingSize(row.getCell(1).toString());
                 }
-                if (null != row.getCell(2)) {
-                    material.setDrawingNo(row.getCell(2).toString());
-                }
-                if (null != row.getCell(3)) {
-                    material.setDrawingVersion(row.getCell(3).toString());
-                }
+                material.setDrawingNo(row.getCell(2).toString() + row.getCell(3).toString());
                 if (null != row.getCell(7)) {
                     material.setName(row.getCell(7).toString());
                 }
@@ -552,13 +528,11 @@ public class FileServiceImpl implements FileService {
                     // 最上层节点时不设置父节点
                     levelArray[0] = material;
                     material.setAtNo(material.getMaterialNo());
-                    material.setAtRevision(material.getRevision());
                 } else {
                     Material parentMat = levelArray[level - 1];
                     parentMat.setChildCount(parentMat.getChildCount() + 1);
                     // 根据最上级节点设置所属
                     material.setAtNo(levelArray[0].getMaterialNo());
-                    material.setAtRevision(levelArray[0].getRevision());
                     // 设置该节点所属上级节点的ID
                     material.setParentId(parentMat.getObjectId());
                     // 将该节点覆盖数组中相同层级的上一个节点
@@ -576,48 +550,39 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importNewStructureExcel(User user, Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
+    public void importNewStructureExcel(Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
-        Row structRow = workbook.getSheetAt(0).getRow(1);
+        Row structRow = workbook.getSheetAt(0).getRow(2);
         String materNo = structRow.getCell(3).toString();
-        String materV = structRow.getCell(4).toString();
         // 根据物料号和专利方版本检查
-        List<Material> materials = materialRepository.findAllByMaterialNoAndRevisionAndLevel(materNo, materV, 0);
+        List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(materNo, 0);
         if (materials.size() > 0) {
             throw new SummerException(StatusCode.STRUCTURE_EXIST);
         } else {
             List<Material> materialList = new ArrayList<>(500);
-            newStructureAnalysis(workbook.getSheetAt(0), user, structure, materialList, 0);
+            newStructureAnalysis(workbook.getSheetAt(0), structure, materialList, 0);
             materialRepository.saveAll(materialList);
 
             structure.setObjectId(Generator.getObjectId());
             structure.setStatus(1);
-            structure.setCreateBy(user.getName());
-            structure.setUpdateBy(user.getName());
             structure.setMaterialNo(materNo);
-            structure.setRevision(materV);
             structure.setVersion(0);
             structureRepository.save(structure);
         }
     }
 
-    private void newStructureAnalysis(Sheet sheet, User user, Structure structure, List<Material> materialList, int version) {
+    private void newStructureAnalysis(Sheet sheet, Structure structure, List<Material> materialList, int version) {
         Material[] levelArray = new Material[12];
         int index = 0;
         for (Row row : sheet) {
-            if (index < 1) {
+            if (index < 2) {
                 index++;
             } else {
-                Material material = new Material();
-                material.setObjectId(Generator.getObjectId());
-                material.setStatus(1);
+                Material material = createNewMaterial();
                 material.setVersion(version);
                 material.setLatestVersion(version);
                 material.setMaterialNo(row.getCell(3).toString());
-                material.setRevision(row.getCell(4).toString());
                 material.setChildCount(0);
-                material.setCreateBy(user.getName());
-                material.setUpdateBy(user.getName());
                 if (null != row.getCell(1)) {
                     int level = (int) Double.parseDouble(row.getCell(1).toString().trim());
                     material.setLevel(level);
@@ -625,8 +590,6 @@ public class FileServiceImpl implements FileService {
                         // 最上层节点时不设置父节点
                         levelArray[0] = material;
                         material.setAtNo(material.getMaterialNo());
-                        material.setAtRevision(material.getRevision());
-
                         String structNo = row.getCell(0).toString();
                         if (!structure.getStructureNo().equals(structNo)) {
                             throw new SummerException(StatusCode.STRUCTURE_NO_ERROR);
@@ -637,7 +600,6 @@ public class FileServiceImpl implements FileService {
                         // 设置该节点所属上级节点的ID
                         material.setParentId(parentMat.getObjectId());
                         material.setAtNo(parentMat.getAtNo());
-                        material.setAtRevision(parentMat.getAtRevision());
                         // 将该节点覆盖数组中相同层级的上一个节点
                         levelArray[level] = material;
                     }
@@ -645,35 +607,41 @@ public class FileServiceImpl implements FileService {
                 if (null != row.getCell(2)) {
                     material.setPositionNo(row.getCell(2).toString());
                 }
+                if (null != row.getCell(4)) {
+                    material.setDrawingNo(row.getCell(4).toString());
+                }
                 if (null != row.getCell(5)) {
-                    material.setDrawingNo(row.getCell(5).toString());
+                    material.setDrawingSize(row.getCell(5).toString());
                 }
                 if (null != row.getCell(6)) {
-                    material.setDrawingVersion(row.getCell(6).toString());
+                    material.setName(row.getCell(6).toString());
                 }
                 if (null != row.getCell(7)) {
-                    material.setDrawingSize(row.getCell(7).toString());
+                    material.setChinese(row.getCell(7).toString());
                 }
                 if (null != row.getCell(8)) {
-                    material.setName(row.getCell(8).toString());
-                }
-                if (null != row.getCell(9)) {
-                    material.setChinese(row.getCell(9).toString());
+                    material.setMaterial(row.getCell(8).toString());
                 }
                 if (null != row.getCell(10)) {
-                    material.setMaterial(row.getCell(10).toString());
+                    material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(10).toString()));
                 }
-                if (null != row.getCell(12)) {
-                    material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(12).toString()));
+                if (null != row.getCell(13)) {
+                    material.setWeight(row.getCell(13).toString());
+                }
+                if (null != row.getCell(14)) {
+                    material.setSpareExp(row.getCell(14).toString().replace(".0", ""));
                 }
                 if (null != row.getCell(15)) {
-                    material.setWeight(row.getCell(15).toString());
+                    material.setSpareSrc(row.getCell(15).toString());
                 }
                 if (null != row.getCell(16)) {
-                    material.setSpareExp(row.getCell(16).toString().replace(".0", ""));
+                    material.setSpareSrc(row.getCell(16).toString());
                 }
                 if (null != row.getCell(17)) {
-                    material.setModifyNote(row.getCell(17).toString());
+                    material.setSpareSrc(row.getCell(17).toString());
+                }
+                if (null != row.getCell(18)) {
+                    material.setModifyNote(row.getCell(18).toString());
                 }
 
                 materialList.add(material);
@@ -683,16 +651,15 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importNewVersionStructureExcel(User user, Structure structure, MultipartFile file) throws IOException, InvalidFormatException {
+    public void importNewVersionStructureExcel(Structure structure, MultipartFile file) throws IOException, InvalidFormatException {
         // 开始解析新版本数据
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
-        Row structRow = workbook.getSheetAt(0).getRow(1);
+        Row structRow = workbook.getSheetAt(0).getRow(2);
         String materNo = structRow.getCell(3).toString();
-        String materV = structRow.getCell(4).toString();
 
         // 若能查询到旧部套则更新旧部套的最新版本号
         int latestVersion = 0;
-        List<Material> oldMaterialList = materialRepository.findAllByAtNoAndAtRevision(materNo, materV);
+        List<Material> oldMaterialList = materialRepository.findAllByAtNo(materNo);
         if (oldMaterialList.size() > 0) {
             int oldVersion = oldMaterialList.get(0).getLatestVersion();
             latestVersion = oldVersion + 1;
@@ -702,17 +669,12 @@ public class FileServiceImpl implements FileService {
             }
             materialRepository.saveAll(oldMaterialList);
         } else {
-            structure.setStatus(1);
-            structure.setMaterialNo(materNo);
-            structure.setRevision(materV);
-            structure.setVersion(0);
-            structure.setAmount(0);
-            structureRepository.save(structure);
+            throw new SummerException(StatusCode.STRUCTURE_MATERIAL_NOT_EXIST);
         }
 
         List<Material> materialList = new ArrayList<>(100);
         Sheet sheet = workbook.getSheetAt(0);
-        newStructureAnalysis(sheet, user, structure, materialList, latestVersion);
+        newStructureAnalysis(sheet, structure, materialList, latestVersion);
         materialRepository.saveAll(materialList);
     }
 
@@ -728,16 +690,15 @@ public class FileServiceImpl implements FileService {
         }
         List<Material> materialList = new ArrayList<>();
         for (Structure structure : structureList) {
-            List<Material> materials = materialRepository.findAllByAtNoAndAtRevisionAndVersion(
-                    structure.getMaterialNo(), structure.getRevision(), structure.getVersion());
-            dataHandler(materials, machine.getCylinderAmount(), structure);
+            List<Material> materials = materialRepository.findAllByAtNoAndVersion(structure.getMaterialNo(), structure.getVersion());
+            amountAndSpareHandler(materials, machine.getCylinderAmount(), structure);
             materialList.addAll(materials);
         }
         XSSFWorkbook workbook = buildExcelWorkbook(materialList, machine);
         return new Excel(machineName + ".xlsx", workbook);
     }
 
-    private void dataHandler(List<Material> materialList, int cylinderAmount, Structure structure) {
+    private void amountAndSpareHandler(List<Material> materialList, int cylinderAmount, Structure structure) {
         Material[] materArray = new Material[12];
         for (int index = 0; index < materialList.size(); index++) {
             Material material = materialList.get(index);
@@ -762,15 +723,13 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public Excel exportStructureExcel(User user, Structure structure) {
-        List<Material> materialList = materialRepository.findAllByAtNoAndAtRevisionAndVersion(
-                structure.getMaterialNo(), structure.getRevision(), structure.getVersion()
-        );
+        List<Material> materialList = materialRepository.findAllByAtNoAndVersion(structure.getMaterialNo(), structure.getVersion());
         for (Material material : materialList) {
             material.setStructureNo(structure.getStructureNo());
         }
 
         XSSFWorkbook workbook = buildExcelWorkbook(materialList, null);
-        String name = structure.getStructureNo() + "_" + structure.getMaterialNo() + "." + structure.getRevision() + "_" + structure.getVersion() + ".xlsx";
+        String name = structure.getStructureNo() + "_" + structure.getMaterialNo() + "_" + structure.getVersion() + ".xlsx";
         return new Excel(name, workbook);
     }
 
@@ -820,10 +779,11 @@ public class FileServiceImpl implements FileService {
         sheet.setColumnWidth(0, 2720);
         sheet.setColumnWidth(1, 3200);
         sheet.setColumnWidth(3, 3840);
-        sheet.setColumnWidth(5, 3840);
+        sheet.setColumnWidth(4, 3840);
+        sheet.setColumnWidth(6, 6720);
+        sheet.setColumnWidth(7, 6720);
         sheet.setColumnWidth(8, 6720);
-        sheet.setColumnWidth(9, 6720);
-        sheet.setColumnWidth(17, 3840);
+        sheet.setColumnWidth(18, 3840);
         if (null != machine) {
             sheet.protectSheet(Generator.getReadonlyPassword());
             XSSFRow row0 = sheet.createRow(i);
@@ -852,84 +812,101 @@ public class FileServiceImpl implements FileService {
             cell07.setCellValue(machine.getClassificationSociety());
             cell07.setCellStyle(border);
             i++;
-            XSSFRow row1 = sheet.createRow(i);
-            XSSFCell cell10 = row1.createCell(0);
-            cell10.setCellValue("部套层次");
-            cell10.setCellStyle(direct);
-            // 参数依次为：起始行，终止行，起始列，终止列
-            CellRangeAddress cra0 = new CellRangeAddress(1, 1, 0, 2);
-            setBorderForMergeCell(CellStyle.BORDER_THIN, cra0, sheet, workbook);
-            sheet.addMergedRegion(cra0);
-            XSSFCell cell13 = row1.createCell(3);
-            cell13.setCellValue("物料信息");
-            cell13.setCellStyle(direct);
-            CellRangeAddress cra3 = new CellRangeAddress(1, 1, 3, 7);
-            setBorderForMergeCell(CellStyle.BORDER_THIN, cra3, sheet, workbook);
-            sheet.addMergedRegion(cra3);
-            XSSFCell cell18 = row1.createCell(8);
-            cell18.setCellValue("名称转换");
-            cell18.setCellStyle(direct);
-            CellRangeAddress cra8 = new CellRangeAddress(1, 1, 8, 9);
-            setBorderForMergeCell(CellStyle.BORDER_THIN, cra8, sheet, workbook);
-            sheet.addMergedRegion(cra8);
-            XSSFCell cell110 = row1.createCell(10);
-            cell110.setCellValue("材料转换");
-            cell110.setCellStyle(direct);
-            CellRangeAddress cra10 = new CellRangeAddress(1, 1, 10, 11);
-            setBorderForMergeCell(CellStyle.BORDER_THIN, cra10, sheet, workbook);
-            sheet.addMergedRegion(cra10);
-            XSSFCell cell112 = row1.createCell(12);
-            cell112.setCellValue("装机件");
-            cell112.setCellStyle(direct);
-            CellRangeAddress cra12 = new CellRangeAddress(1, 1, 12, 15);
-            setBorderForMergeCell(CellStyle.BORDER_THIN, cra12, sheet, workbook);
-            sheet.addMergedRegion(cra12);
-            XSSFCell cell116 = row1.createCell(16);
-            cell116.setCellValue("备件");
-            cell116.setCellStyle(direct);
-            XSSFCell cell117 = row1.createCell(17);
-            cell117.setCellValue("设计工艺信息");
-            cell117.setCellStyle(direct);
-            i++;
         }
 
+        XSSFRow row1 = sheet.createRow(i);
+
+        XSSFCell cell10 = row1.createCell(0);
+        cell10.setCellValue("部套层次");
+        cell10.setCellStyle(direct);
+        // 参数依次为：起始行，终止行，起始列，终止列
+        CellRangeAddress cra0 = new CellRangeAddress(i, i, 0, 2);
+        setBorderForMergeCell(CellStyle.BORDER_THIN, cra0, sheet, workbook);
+        sheet.addMergedRegion(cra0);
+
+        XSSFCell cell13 = row1.createCell(3);
+        cell13.setCellValue("物料信息");
+        cell13.setCellStyle(direct);
+        CellRangeAddress cra3 = new CellRangeAddress(i, i, 3, 5);
+        setBorderForMergeCell(CellStyle.BORDER_THIN, cra3, sheet, workbook);
+        sheet.addMergedRegion(cra3);
+
+        XSSFCell cell16 = row1.createCell(6);
+        cell16.setCellValue("名称转换");
+        cell16.setCellStyle(direct);
+        CellRangeAddress cra6 = new CellRangeAddress(i, i, 6, 7);
+        setBorderForMergeCell(CellStyle.BORDER_THIN, cra6, sheet, workbook);
+        sheet.addMergedRegion(cra6);
+
+        XSSFCell cell18 = row1.createCell(8);
+        cell18.setCellValue("材料转换");
+        cell18.setCellStyle(direct);
+        CellRangeAddress cra8 = new CellRangeAddress(i, i, 8, 9);
+        setBorderForMergeCell(CellStyle.BORDER_THIN, cra8, sheet, workbook);
+        sheet.addMergedRegion(cra8);
+
+        XSSFCell cell110 = row1.createCell(10);
+        cell110.setCellValue("装机件");
+        cell110.setCellStyle(direct);
+        CellRangeAddress cra10 = new CellRangeAddress(i, i, 10, 13);
+        setBorderForMergeCell(CellStyle.BORDER_THIN, cra10, sheet, workbook);
+        sheet.addMergedRegion(cra10);
+
+        XSSFCell cell114 = row1.createCell(14);
+        cell114.setCellValue("备件");
+        cell114.setCellStyle(direct);
+        CellRangeAddress cra14 = new CellRangeAddress(i, i, 14, 15);
+        setBorderForMergeCell(CellStyle.BORDER_THIN, cra14, sheet, workbook);
+        sheet.addMergedRegion(cra14);
+
+        XSSFCell cell116 = row1.createCell(16);
+        cell116.setCellValue("设计工艺信息");
+        cell116.setCellStyle(direct);
+        CellRangeAddress cra16 = new CellRangeAddress(i, i, 16, 18);
+        setBorderForMergeCell(CellStyle.BORDER_THIN, cra16, sheet, workbook);
+        sheet.addMergedRegion(cra16);
+        i++;
+
+
         XSSFRow row = sheet.createRow(i);
-        XSSFCell cell0 = row.createCell(0);
-        cell0.setCellValue("部套");
-        XSSFCell cell1 = row.createCell(1);
-        cell1.setCellValue("层次");
-        XSSFCell cell2 = row.createCell(2);
-        cell2.setCellValue("件号");
-        XSSFCell cell3 = row.createCell(3);
-        cell3.setCellValue("物料号");
-        XSSFCell cell4 = row.createCell(4);
-        cell4.setCellValue("版本");
-        XSSFCell cell5 = row.createCell(5);
-        cell5.setCellValue("图号");
-        XSSFCell cell6 = row.createCell(6);
-        cell6.setCellValue("版本");
-        XSSFCell cell7 = row.createCell(7);
-        cell7.setCellValue("图幅");
-        XSSFCell cell8 = row.createCell(8);
-        cell8.setCellValue("名称（英文）");
-        XSSFCell cell9 = row.createCell(9);
-        cell9.setCellValue("名称（中文）");
-        XSSFCell cell10 = row.createCell(10);
-        cell10.setCellValue("专利材料");
-        XSSFCell cell11 = row.createCell(11);
-        cell11.setCellValue("国标材料");
-        XSSFCell cell12 = row.createCell(12);
-        cell12.setCellValue("层数量");
-        XSSFCell cell13 = row.createCell(13);
-        cell13.setCellValue("总数量");
-        XSSFCell cell14 = row.createCell(14);
-        cell14.setCellValue("货源");
-        XSSFCell cell15 = row.createCell(15);
-        cell15.setCellValue("重量");
-        XSSFCell cell16 = row.createCell(16);
-        cell16.setCellValue("备件数量");
-        XSSFCell cell17 = row.createCell(17);
-        cell17.setCellValue("更改记录");
+        XSSFCell cell20 = row.createCell(0);
+        cell20.setCellValue("部套");
+        XSSFCell cell21 = row.createCell(1);
+        cell21.setCellValue("层次+件号");
+        XSSFCell cell22 = row.createCell(2);
+        cell22.setCellValue("件号");
+        XSSFCell cell23 = row.createCell(3);
+        cell23.setCellValue("物料号");
+        XSSFCell cell24 = row.createCell(4);
+        cell24.setCellValue("图号");
+        XSSFCell cell25 = row.createCell(5);
+        cell25.setCellValue("图幅");
+        XSSFCell cell26 = row.createCell(6);
+        cell26.setCellValue("名称（英文）");
+        XSSFCell cell27 = row.createCell(7);
+        cell27.setCellValue("名称（中文）");
+        XSSFCell cell28 = row.createCell(8);
+        cell28.setCellValue("专利材料");
+        XSSFCell cell29 = row.createCell(9);
+        cell29.setCellValue("国标材料");
+        XSSFCell cell210 = row.createCell(10);
+        cell210.setCellValue("层数量");
+        XSSFCell cell211 = row.createCell(11);
+        cell211.setCellValue("总数量");
+        XSSFCell cell212 = row.createCell(12);
+        cell212.setCellValue("货源");
+        XSSFCell cell213 = row.createCell(13);
+        cell213.setCellValue("重量");
+        XSSFCell cell214 = row.createCell(14);
+        cell214.setCellValue("备件数量");
+        XSSFCell cell215 = row.createCell(15);
+        cell215.setCellValue("备件货源");
+        XSSFCell cell216 = row.createCell(16);
+        cell216.setCellValue("设计备注");
+        XSSFCell cell217 = row.createCell(17);
+        cell217.setCellValue("喷漆防护");
+        XSSFCell cell218 = row.createCell(18);
+        cell218.setCellValue("更改记录");
         for (Cell cell : row) {
             cell.setCellStyle(blue);
         }
@@ -966,68 +943,61 @@ public class FileServiceImpl implements FileService {
                 tempCell3.setCellValue(material.getMaterialNo());
             }
             XSSFCell tempCell4 = tempRow.createCell(4);
-            if (null != material.getRevision()) {
-                tempCell4.setCellValue(material.getRevision());
+            if (null != material.getDrawingNo()) {
+                tempCell4.setCellValue(material.getDrawingNo());
             }
             XSSFCell tempCell5 = tempRow.createCell(5);
-            if (null != material.getDrawingNo()) {
-                tempCell5.setCellValue(material.getDrawingNo());
+            if (null != material.getDrawingSize()) {
+                tempCell5.setCellValue(material.getDrawingSize());
             }
             XSSFCell tempCell6 = tempRow.createCell(6);
-            if (null != material.getDrawingVersion()) {
-                tempCell6.setCellValue(material.getDrawingVersion());
+            if (null != material.getName()) {
+                tempCell6.setCellValue(material.getName());
             }
             XSSFCell tempCell7 = tempRow.createCell(7);
-            if (null != material.getDrawingSize()) {
-                tempCell7.setCellValue(material.getDrawingSize());
+            if (null != material.getChinese()) {
+                tempCell7.setCellValue(material.getChinese());
+            } else {
+                tempCell7.setCellValue("");
             }
-
             XSSFCell tempCell8 = tempRow.createCell(8);
-            if (null != material.getName()) {
-                tempCell8.setCellValue(material.getName());
+            if (null != material.getMaterial()) {
+                tempCell8.setCellValue(material.getMaterial());
             }
             XSSFCell tempCell9 = tempRow.createCell(9);
-            if (null != material.getChinese()) {
-                tempCell9.setCellValue(material.getChinese());
-            } else {
-                tempCell9.setCellValue("");
-            }
+            tempCell9.setCellValue("*");
 
             XSSFCell tempCell10 = tempRow.createCell(10);
-            if (null != material.getMaterial()) {
-                tempCell10.setCellValue(material.getMaterial());
+            if (null != material.getAbsoluteAmount()) {
+                tempCell10.setCellValue(String.valueOf(material.getAbsoluteAmount()));
             }
             XSSFCell tempCell11 = tempRow.createCell(11);
-            tempCell11.setCellValue("*");
-
-            XSSFCell tempCell12 = tempRow.createCell(12);
-            if (null != material.getAbsoluteAmount()) {
-                tempCell12.setCellValue(String.valueOf(material.getAbsoluteAmount()));
-            }
-            XSSFCell tempCell13 = tempRow.createCell(13);
             if (null != material.getAmount()) {
-                tempCell13.setCellValue(String.valueOf(material.getAmount()));
+                tempCell11.setCellValue(String.valueOf(material.getAmount()));
             }
-            XSSFCell tempCell14 = tempRow.createCell(14);
-            tempCell14.setCellValue("*");
-            XSSFCell tempCell15 = tempRow.createCell(15);
+            XSSFCell tempCell12 = tempRow.createCell(12);
+            tempCell12.setCellValue("*");
+            XSSFCell tempCell13 = tempRow.createCell(13);
             if (null != material.getWeight()) {
-                tempCell15.setCellValue(material.getWeight());
+                tempCell13.setCellValue(material.getWeight());
             }
 
-            XSSFCell tempCell16 = tempRow.createCell(16);
+            XSSFCell tempCell14 = tempRow.createCell(14);
             if (null == machine) {
                 if (null != material.getSpareExp()) {
-                    tempCell16.setCellValue(material.getSpareExp());
+                    tempCell14.setCellValue(material.getSpareExp());
                 }
             } else {
                 if (null != material.getSpare()) {
-                    tempCell16.setCellValue(String.valueOf(material.getSpare()));
+                    tempCell14.setCellValue(String.valueOf(material.getSpare()));
                 }
             }
-            XSSFCell tempCell17 = tempRow.createCell(17);
+            tempRow.createCell(15);
+            tempRow.createCell(16);
+            tempRow.createCell(17);
+            XSSFCell tempCell18 = tempRow.createCell(18);
             if (null != material.getModifyNote()) {
-                tempCell17.setCellValue(material.getModifyNote());
+                tempCell18.setCellValue(material.getModifyNote());
             }
             if (0 == level) {
                 for (Cell cell : tempRow) {

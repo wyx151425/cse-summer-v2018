@@ -33,7 +33,7 @@ public class MachineServiceImpl implements MachineService {
     public Machine findMachine(Integer id) {
         Machine machine = machineRepository.getOne(id);
 
-        List<StructMater> list = structureRepository.findAllStructureAndMaterial(machine.getName());
+        List<StructMater> list = structureRepository.findAllStructureMaterial(machine.getName());
         List<Structure> structures = new ArrayList<>();
         for (StructMater structMater : list) {
             Structure structure = structMater.getStructure();

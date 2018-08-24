@@ -112,6 +112,8 @@ $(document).ready(function () {
             $(".progress-prompt").text("部套已存在");
         } else if (9002 === data.statusCode) {
             $(".progress-prompt").text("输入部套号与文件内部套号不相同");
+        } else if (9003 === data.statusCode) {
+            $(".progress-prompt").text("部套关联的物料不存在，无法更新版本");
         } else {
             $(".progress-prompt").text("系统错误");
         }

@@ -41,7 +41,7 @@ public class FileController extends BaseFacade {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
-            fileService.importCSEBOM(getSessionUser(), machineName, cseBom);
+            fileService.importCSEBOM(machineName, cseBom);
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
@@ -89,7 +89,7 @@ public class FileController extends BaseFacade {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
-            fileService.importNewStructureExcel(getSessionUser(), structure, structureExcel);
+            fileService.importNewStructureExcel(structure, structureExcel);
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
@@ -105,7 +105,9 @@ public class FileController extends BaseFacade {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
         try {
-            fileService.importNewVersionStructureExcel(getSessionUser(), structure, structureExcel);
+            fileService.importNewVersionStructureExcel(structure, structureExcel);
+        } catch (SummerException e) {
+            throw e;
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }

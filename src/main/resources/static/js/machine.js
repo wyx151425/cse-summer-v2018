@@ -65,10 +65,8 @@ $(document).ready(function () {
         $("#chinese0").text(currentNode.chinese);
         $("#structureNo0").text(currentNode.structureNo);
         $("#materialNo0").text(currentNode.materialNo);
-        $("#materialVersion0").text(currentNode.revision);
         $("#material0").text(currentNode.material);
         $("#drawingNo0").text(currentNode.drawingNo);
-        $("#drawingVersion0").text(currentNode.drawingVersion);
         $("#drawingSize0").text(currentNode.drawingSize);
         $("#positionNo0").text(currentNode.positionNo);
         $("#weight0").text(currentNode.weight);
@@ -141,7 +139,6 @@ $(document).ready(function () {
                 machineName: $("#machineName4").val(),
                 structureNo: $("#structureNo4").val(),
                 materialNo: $("#materialNo4").val(),
-                revision: $("#revision4").val(),
                 version: $("#version4").val()
             }),
             async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
@@ -165,9 +162,8 @@ $(document).ready(function () {
     $("#exportStructure").click(function () {
         let structureNo = $("#structureNo5").val();
         let materialNo = $("#materialNo5").val();
-        let revision = $("#revision5").val();
         let version = $("#version5").val();
-        let url = "api/files/export/structure?structureNo=" + structureNo + "&materialNo=" + materialNo + "&revision=" + revision + "&version=" + version;
+        let url = "api/files/export/structure?structureNo=" + structureNo + "&materialNo=" + materialNo + "&version=" + version;
         let link = $('<a href="' + url + '"></a>');
         link.get(0).click();
     });
@@ -190,7 +186,6 @@ $(document).ready(function () {
                 machineName: $("#machineName7").val(),
                 structureNo: $("#structureNo7").val(),
                 materialNo: $("#materialNo7").val(),
-                revision: $("#revision7").val(),
                 version: $("#version7").val(),
                 amount: $("#amount7").val()
             }),
@@ -222,7 +217,7 @@ $(document).ready(function () {
         let search = $(this);
         search.text("查询中...");
         $.ajax({
-            url: "api/materials/search?materialNo=" + $("#materialNo7").val(),
+            url: "api/materials/search?materialNo=" + $("#materNo7").val(),
             dataType: "json", // 预期服务器返回的数据类型
             type: "get", // 请求方式GET
             contentType: "application/json", // 发送信息至服务器时的内容编码类型
@@ -232,12 +227,12 @@ $(document).ready(function () {
                 if (200 === data.statusCode) {
                     search.text("查询");
                     list = data.data;
-                    let revisionSel = $("#revision7");
+                    let revisionSel = $("#materialNo7");
                     revisionSel.empty();
                     let versionSel = $("#version7");
                     versionSel.empty();
                     $.each(list, function (index, value) {
-                        revisionSel.append('<option value="' + value.revision + '">' + value.revision + '</option>');
+                        revisionSel.append('<option value="' + value.materialNo + '">' + value.materialNo + '</option>');
                     });
                     let latestVersion = list[0].latestVersion;
                     for (let index = 0; index <= latestVersion; index++) {
@@ -255,12 +250,12 @@ $(document).ready(function () {
         });
     });
 
-    $("#revision7").change(function () {
+    $("#materialNo7").change(function () {
         let revision7 = $(this);
         let revision = revision7.val();
         let latestVersion;
         for (let index = 0; index < list.length; index++) {
-            if (revision == list[index].revision) {
+            if (revision == list[index].materialNo) {
                 latestVersion = list[index].latestVersion;
                 break;
             }
@@ -334,12 +329,11 @@ function deleteStructure(id) {
     });
 }
 
-function versionList(structureNo, materialNo, revision, latestVersion) {
+function versionList(structureNo, materialNo, latestVersion) {
     $("#versionChooseForm").css("display", "block");
     $("#versionChooseConfirm").css("display", "none");
     $("#structureNo4").attr("value", structureNo);
     $("#materialNo4").attr("value", materialNo);
-    $("#revision4").attr("value", revision);
     let select = $("#version4");
     select.empty();
     for (let index = 0; index <= latestVersion; index++) {
@@ -347,10 +341,9 @@ function versionList(structureNo, materialNo, revision, latestVersion) {
     }
 }
 
-function structureExport(structureNo, materialNo, revision, latestVersion) {
+function structureExport(structureNo, materialNo, latestVersion) {
     $("#structureNo5").attr("value", structureNo);
     $("#materialNo5").attr("value", materialNo);
-    $("#revision5").attr("value", revision);
     let select = $("#version5");
     select.empty();
     for (let index = 0; index <= latestVersion; index++) {

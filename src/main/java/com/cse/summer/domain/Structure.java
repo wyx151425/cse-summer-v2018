@@ -1,14 +1,13 @@
 package com.cse.summer.domain;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
 
 /**
  * @author 王振琦
  */
-@Entity
+@javax.persistence.Entity
 @Table(name = "cse_structure")
-public class Structure extends AuditorEntity {
+public class Structure extends Entity {
     /**
      * 0-删除/1-设计/2-发布
      * private Integer status;
@@ -25,10 +24,6 @@ public class Structure extends AuditorEntity {
      * 物料号
      */
     private String materialNo;
-    /**
-     * 物料专利方版本
-     */
-    private String revision;
     /**
      * 物料版本
      */
@@ -68,14 +63,6 @@ public class Structure extends AuditorEntity {
         this.materialNo = materialNo;
     }
 
-    public String getRevision() {
-        return revision;
-    }
-
-    public void setRevision(String revision) {
-        this.revision = revision;
-    }
-
     public Integer getVersion() {
         return version;
     }
@@ -106,7 +93,6 @@ public class Structure extends AuditorEntity {
                 "machineName='" + machineName + '\'' +
                 ", structureNo='" + structureNo + '\'' +
                 ", materialNo='" + materialNo + '\'' +
-                ", revision='" + revision + '\'' +
                 ", version=" + version + '\'' +
                 ", material=" + material + '\'' +
                 '}';

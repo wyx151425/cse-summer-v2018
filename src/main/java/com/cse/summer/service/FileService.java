@@ -18,13 +18,12 @@ public interface FileService {
     /**
      * 导入并解析CSE BOM文件
      *
-     * @param user        用户对象
      * @param machineName 机器名
      * @param file        CSE BOM文件
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    void importCSEBOM(User user, String machineName, MultipartFile file) throws InvalidFormatException, IOException;
+    void importCSEBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入并解析MAN XML文件
@@ -49,24 +48,22 @@ public interface FileService {
     /**
      * 导入新部套
      *
-     * @param user      操作该部套的用户对象
      * @param structure 封装了部套信息的部套对象
      * @param file      部套Excel文件
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    void importNewStructureExcel(User user, Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
+    void importNewStructureExcel(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入新版本部套的BOM文件
      *
-     * @param user      操作该部套的用户对象
      * @param structure 部套
      * @param file      Excel文件
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    void importNewVersionStructureExcel(User user, Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
+    void importNewVersionStructureExcel(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导出机器的完整BOM文件

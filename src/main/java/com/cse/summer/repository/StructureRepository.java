@@ -17,21 +17,12 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
      * 根据机器名、部套号和状态标识获取指定部套
      *
      * @param machineName 机器名
-     * @param structureNo      部套号
+     * @param structureNo 部套号
+     * @param materialNo  物料号
      * @param status      状态标识
      * @return 部套数据
      */
-    List<Structure> findStructureByMachineNameAndStructureNoAndStatusGreaterThanEqual(String machineName, String structureNo, Integer status);
-
-    /**
-     * 根据机器名、部套号和状态标识获取指定部套
-     *
-     * @param machineName 机器名
-     * @param structureNo      部套号
-     * @param status      状态标识
-     * @return 部套数据
-     */
-    Structure findStructureByMachineNameAndStructureNoAndMaterialNoAndRevisionAndStatusGreaterThanEqual(String machineName, String structureNo, String materialNo, String revision, Integer status);
+    Structure findStructureByMachineNameAndStructureNoAndMaterialNoAndStatusGreaterThanEqual(String machineName, String structureNo, String materialNo, Integer status);
 
     /**
      * 添加库中部套时使用，精准查询部套是否存在
@@ -39,12 +30,10 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
      * @param machineName 机器名
      * @param structureNo 部套号
      * @param materialNo  物料号
-     * @param revision    版本
      * @return 查询到的部套
      */
-    @Query("select s from Structure s where s.machineName = :machineName and s.structureNo = :structureNo and s.materialNo = :materialNo and s.revision = :revision and s.status > 0")
-    Structure findExistStructure(@Param("machineName") String machineName, @Param("structureNo") String structureNo,
-                                 @Param("materialNo") String materialNo, @Param("revision") String revision);
+    @Query("select s from Structure s where s.machineName = :machineName and s.structureNo = :structureNo and s.materialNo = :materialNo and s.status > 0")
+    Structure findExistStructure(@Param("machineName") String machineName, @Param("structureNo") String structureNo, @Param("materialNo") String materialNo);
 
     /**
      * 根据机器名和状态标识查询部套
@@ -70,29 +59,19 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
      * @param machineName 机器名
      * @return 部套对应的物料数据集合
      */
-    @Query("select new com.cse.summer.domain.StructMater(s, m) from Structure s left join Material m on s.materialNo = m.materialNo and s.revision = m.revision and s.version = m.version where s.status > 0 and s.machineName = :machineName and m.level = 0 order by s.structureNo")
-    List<StructMater> findStructureMaterial(@Param("machineName") String machineName);
-
-    /**
-     * 连接查询机器部套
-     *
-     * @param machineName 机器名
-     * @return 部套对应的物料数据集合
-     */
-    @Query("select new com.cse.summer.domain.StructMater(s, m) from Structure s left join Material m on s.materialNo = m.materialNo and s.revision = m.revision and s.version = m.version where s.status > 0 and s.machineName = :machineName and m.level = 0 order by s.structureNo")
-    List<StructMater> findAllStructureAndMaterial(@Param("machineName") String machineName);
+    @Query("select new com.cse.summer.domain.StructMater(s, m) from Structure s left join Material m on s.materialNo = m.materialNo and s.version = m.version where s.status > 0 and s.machineName = :machineName and m.level = 0 order by s.structureNo")
+    List<StructMater> findAllStructureMaterial(@Param("machineName") String machineName);
 
     /**
      * 保存部套时使用，检查部套是否已经与物料关联
      *
      * @param machineName 机器名
      * @param materialNo  物料号
-     * @param revision    专利方版本
      * @param version     版本号
      * @param status      状态标识
      * @return 查询到的部套
      */
-    Structure findStructureByMachineNameAndMaterialNoAndRevisionAndVersionAndStatusGreaterThanEqual(
-            String machineName, String materialNo, String revision, Integer version, Integer status
+    Structure findStructureByMachineNameAndMaterialNoAndVersionAndStatusGreaterThanEqual(
+            String machineName, String materialNo, Integer version, Integer status
     );
 }

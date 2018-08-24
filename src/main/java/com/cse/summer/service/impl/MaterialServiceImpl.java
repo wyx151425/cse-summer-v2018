@@ -43,7 +43,7 @@ public class MaterialServiceImpl implements MaterialService {
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List<Material> findDirectLevelMaterialListByMachineName(String machineName) {
-        List<StructMater> list = structureRepository.findStructureMaterial(machineName);
+        List<StructMater> list = structureRepository.findAllStructureMaterial(machineName);
         List<Material> materials = new ArrayList<>();
         for (StructMater structMater : list) {
             Structure structure = structMater.getStructure();
@@ -56,12 +56,12 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public List<Map<String, String>> findRevisionAndLatestVersion(String materialNo) {
-        List<Material> materialList = materialRepository.findAllByMaterialNo(materialNo);
+    public List<Map<String, String>> findMaterialNoAndLatestVersion(String materialNo) {
+        List<Material> materialList = materialRepository.findAllByMaterialNoLike(materialNo);
         List<Map<String, String>> list = new ArrayList<>();
         for (Material material : materialList) {
             Map<String, String> map = new HashMap<>();
-            map.put("revision", material.getRevision());
+            map.put("materialNo", material.getMaterialNo());
             map.put("latestVersion", String.valueOf(material.getLatestVersion()));
             list.add(map);
         }
