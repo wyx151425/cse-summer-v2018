@@ -90,6 +90,23 @@ public class FileServiceImpl implements FileService {
         Material material = new Material();
         material.setObjectId(Generator.getObjectId());
         material.setStatus(1);
+        material.setLevel(-1);
+        material.setPositionNo("");
+        material.setMaterialNo("");
+        material.setDrawingNo("");
+        material.setDrawingSize("");
+        material.setName("");
+        material.setChinese("");
+        material.setMaterial("*");
+        material.setStandard("*");
+        material.setWeight("");
+        material.setSource("*");
+        material.setSpareExp("");
+        material.setSpareSrc("");
+        material.setDesignNote("");
+        material.setPaintProtect("");
+        material.setModifyNote("");
+        material.setErpParent("");
         return material;
     }
 
@@ -713,7 +730,7 @@ public class FileServiceImpl implements FileService {
                     material.setAmount(parentAmount * material.getAbsoluteAmount());
                 }
             }
-            if (null != material.getSpareExp() && !"".equals(material.getSpareExp())) {
+            if (!"".equals(material.getSpareExp())) {
                 int spare = spareAnalysis(cylinderAmount, material.getSpareExp());
                 material.setSpare(spare);
             }
@@ -760,7 +777,7 @@ public class FileServiceImpl implements FileService {
 
         XSSFCellStyle blue = workbook.createCellStyle();
         blue.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-        blue.setFillForegroundColor(new XSSFColor(new Color(0, 176, 240)));
+        blue.setFillForegroundColor(new XSSFColor(new Color(197, 217, 241)));
         blue.setBorderTop(XSSFCellStyle.BORDER_THIN);
         blue.setBorderRight(XSSFCellStyle.BORDER_THIN);
         blue.setBorderBottom(XSSFCellStyle.BORDER_THIN);
@@ -862,11 +879,10 @@ public class FileServiceImpl implements FileService {
         XSSFCell cell116 = row1.createCell(16);
         cell116.setCellValue("设计工艺信息");
         cell116.setCellStyle(direct);
-        CellRangeAddress cra16 = new CellRangeAddress(i, i, 16, 18);
+        CellRangeAddress cra16 = new CellRangeAddress(i, i, 16, 19);
         setBorderForMergeCell(CellStyle.BORDER_THIN, cra16, sheet, workbook);
         sheet.addMergedRegion(cra16);
         i++;
-
 
         XSSFRow row = sheet.createRow(i);
         XSSFCell cell20 = row.createCell(0);
@@ -898,15 +914,17 @@ public class FileServiceImpl implements FileService {
         XSSFCell cell213 = row.createCell(13);
         cell213.setCellValue("重量");
         XSSFCell cell214 = row.createCell(14);
-        cell214.setCellValue("备件数量");
+        cell214.setCellValue("数量");
         XSSFCell cell215 = row.createCell(15);
-        cell215.setCellValue("备件货源");
+        cell215.setCellValue("货源");
         XSSFCell cell216 = row.createCell(16);
         cell216.setCellValue("设计备注");
         XSSFCell cell217 = row.createCell(17);
         cell217.setCellValue("喷漆防护");
         XSSFCell cell218 = row.createCell(18);
-        cell218.setCellValue("更改记录");
+        cell218.setCellValue("更改");
+        XSSFCell cell219 = row.createCell(19);
+        cell219.setCellValue("ERP-父项");
         for (Cell cell : row) {
             cell.setCellStyle(blue);
         }
@@ -957,15 +975,15 @@ public class FileServiceImpl implements FileService {
             XSSFCell tempCell7 = tempRow.createCell(7);
             if (null != material.getChinese()) {
                 tempCell7.setCellValue(material.getChinese());
-            } else {
-                tempCell7.setCellValue("");
             }
             XSSFCell tempCell8 = tempRow.createCell(8);
             if (null != material.getMaterial()) {
                 tempCell8.setCellValue(material.getMaterial());
             }
             XSSFCell tempCell9 = tempRow.createCell(9);
-            tempCell9.setCellValue("*");
+            if (null != material.getMaterial()) {
+                tempCell9.setCellValue(material.getStandard());
+            }
 
             XSSFCell tempCell10 = tempRow.createCell(10);
             if (null != material.getAbsoluteAmount()) {
@@ -976,12 +994,13 @@ public class FileServiceImpl implements FileService {
                 tempCell11.setCellValue(String.valueOf(material.getAmount()));
             }
             XSSFCell tempCell12 = tempRow.createCell(12);
-            tempCell12.setCellValue("*");
+            if (null != material.getAmount()) {
+                tempCell12.setCellValue(material.getSource());
+            }
             XSSFCell tempCell13 = tempRow.createCell(13);
             if (null != material.getWeight()) {
                 tempCell13.setCellValue(material.getWeight());
             }
-
             XSSFCell tempCell14 = tempRow.createCell(14);
             if (null == machine) {
                 if (null != material.getSpareExp()) {
@@ -992,12 +1011,25 @@ public class FileServiceImpl implements FileService {
                     tempCell14.setCellValue(String.valueOf(material.getSpare()));
                 }
             }
-            tempRow.createCell(15);
-            tempRow.createCell(16);
-            tempRow.createCell(17);
+            XSSFCell tempCell15 = tempRow.createCell(15);
+            if (null != material.getSpareSrc()) {
+                tempCell15.setCellValue(material.getSpareSrc());
+            }
+            XSSFCell tempCell16 = tempRow.createCell(16);
+            if (null != material.getSpareSrc()) {
+                tempCell16.setCellValue(material.getDesignNote());
+            }
+            XSSFCell tempCell17 = tempRow.createCell(17);
+            if (null != material.getSpareSrc()) {
+                tempCell17.setCellValue(material.getPaintProtect());
+            }
             XSSFCell tempCell18 = tempRow.createCell(18);
             if (null != material.getModifyNote()) {
                 tempCell18.setCellValue(material.getModifyNote());
+            }
+            XSSFCell tempCell19 = tempRow.createCell(19);
+            if (null != material.getErpParent()) {
+                tempCell18.setCellValue(material.getErpParent());
             }
             if (0 == level) {
                 for (Cell cell : tempRow) {

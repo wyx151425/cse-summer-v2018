@@ -15,88 +15,64 @@ public class Material extends Entity implements Serializable {
      */
     @Transient
     private String structureNo;
-    private String atNo;
     /**
-     * 物料名称
-     */
-    private String name;
-    /**
-     * 中文名
-     */
-    private String chinese;
-    /**
-     * 父物料的objectId
-     */
-    private String parentId;
-    /**
-     * 所在层级
+     * 层级
      */
     private Integer level;
     /**
-     * 部件号
+     * 件号
      */
     private String positionNo;
-    /**
-     * 排序号
-     */
-    private String sequenceNo;
-    /**
-     * 当前版本号
-     */
-    private Integer version;
-    /**
-     * 最新版本号
-     */
-    private Integer latestVersion;
-
     /**
      * 物料号
      */
     private String materialNo;
     /**
-     * 材料名称
+     * 图纸编号
      */
-    private String material;
-
+    private String drawingNo;
     /**
      * 图纸大小
      */
     private String drawingSize;
     /**
-     * 图纸编号
+     * 英文名称
      */
-    private String drawingNo;
-
+    private String name;
     /**
-     * 重量
+     * 中文名称
      */
-    private String weight;
+    private String chinese;
+    /**
+     * 专利材料
+     */
+    private String material;
+    /**
+     * 国标材料
+     */
+    private String standard;
+    /**
+     * 层数量
+     */
+    private Integer absoluteAmount;
     /**
      * 总数量
      */
     @Transient
     private Integer amount;
     /**
-     * 数量
+     * 货源
      */
-    private Integer absoluteAmount;
+    private String source;
     /**
-     * 页数
+     * 单重
      */
-    private String page;
-    /**
-     * 子节点数量
-     */
-    private Integer childCount;
+    private String weight;
     /**
      * 备件数
      */
     @Transient
     private Integer spare;
-    /**
-     * 备件表达式
-     */
-    private String spareExp;
     /**
      * 备件货源
      */
@@ -110,9 +86,47 @@ public class Material extends Entity implements Serializable {
      */
     private String paintProtect;
     /**
-     * 更改通知
+     * 更改
      */
     private String modifyNote;
+    /**
+     * ERP-父项
+     */
+    private String erpParent;
+
+    /**
+     * 排序号
+     */
+    private String sequenceNo;
+    /**
+     * 页数
+     */
+    private String page;
+    /**
+     * 备件表达式
+     */
+    private String spareExp;
+
+    /**
+     * 父物料的objectId
+     */
+    private String parentId;
+    /**
+     * 所在部套的顶层物料号
+     */
+    private String atNo;
+    /**
+     * 当前版本号
+     */
+    private Integer version;
+    /**
+     * 最新版本号
+     */
+    private Integer latestVersion;
+    /**
+     * 子节点数量
+     */
+    private Integer childCount;
 
     public Material() {
     }
@@ -123,38 +137,6 @@ public class Material extends Entity implements Serializable {
 
     public void setStructureNo(String structureNo) {
         this.structureNo = structureNo;
-    }
-
-    public String getAtNo() {
-        return atNo;
-    }
-
-    public void setAtNo(String atNo) {
-        this.atNo = atNo;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getChinese() {
-        return chinese;
-    }
-
-    public void setChinese(String chinese) {
-        this.chinese = chinese;
-    }
-
-    public String getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(String parentId) {
-        this.parentId = parentId;
     }
 
     public Integer getLevel() {
@@ -173,52 +155,12 @@ public class Material extends Entity implements Serializable {
         this.positionNo = positionNo;
     }
 
-    public String getSequenceNo() {
-        return sequenceNo;
-    }
-
-    public void setSequenceNo(String sequenceNo) {
-        this.sequenceNo = sequenceNo;
-    }
-
-    public Integer getVersion() {
-        return version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-
-    public Integer getLatestVersion() {
-        return latestVersion;
-    }
-
-    public void setLatestVersion(Integer latestVersion) {
-        this.latestVersion = latestVersion;
-    }
-
     public String getMaterialNo() {
         return materialNo;
     }
 
     public void setMaterialNo(String materialNo) {
         this.materialNo = materialNo;
-    }
-
-    public String getMaterial() {
-        return material;
-    }
-
-    public void setMaterial(String material) {
-        this.material = material;
-    }
-
-    public String getDrawingSize() {
-        return drawingSize;
-    }
-
-    public void setDrawingSize(String drawingSize) {
-        this.drawingSize = drawingSize;
     }
 
     public String getDrawingNo() {
@@ -229,20 +171,44 @@ public class Material extends Entity implements Serializable {
         this.drawingNo = drawingNo;
     }
 
-    public String getWeight() {
-        return weight;
+    public String getDrawingSize() {
+        return drawingSize;
     }
 
-    public void setWeight(String weight) {
-        this.weight = weight;
+    public void setDrawingSize(String drawingSize) {
+        this.drawingSize = drawingSize;
     }
 
-    public Integer getAmount() {
-        return amount;
+    public String getName() {
+        return name;
     }
 
-    public void setAmount(Integer amount) {
-        this.amount = amount;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getChinese() {
+        return chinese;
+    }
+
+    public void setChinese(String chinese) {
+        this.chinese = chinese;
+    }
+
+    public String getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(String material) {
+        this.material = material;
+    }
+
+    public String getStandard() {
+        return standard;
+    }
+
+    public void setStandard(String standard) {
+        this.standard = standard;
     }
 
     public Integer getAbsoluteAmount() {
@@ -253,28 +219,28 @@ public class Material extends Entity implements Serializable {
         this.absoluteAmount = absoluteAmount;
     }
 
-    public String getModifyNote() {
-        return modifyNote;
+    public Integer getAmount() {
+        return amount;
     }
 
-    public void setModifyNote(String modifyNote) {
-        this.modifyNote = modifyNote;
+    public void setAmount(Integer amount) {
+        this.amount = amount;
     }
 
-    public String getPage() {
-        return page;
+    public String getSource() {
+        return source;
     }
 
-    public void setPage(String page) {
-        this.page = page;
+    public void setSource(String source) {
+        this.source = source;
     }
 
-    public Integer getChildCount() {
-        return childCount;
+    public String getWeight() {
+        return weight;
     }
 
-    public void setChildCount(Integer childCount) {
-        this.childCount = childCount;
+    public void setWeight(String weight) {
+        this.weight = weight;
     }
 
     public Integer getSpare() {
@@ -283,14 +249,6 @@ public class Material extends Entity implements Serializable {
 
     public void setSpare(Integer spare) {
         this.spare = spare;
-    }
-
-    public String getSpareExp() {
-        return spareExp;
-    }
-
-    public void setSpareExp(String spareExp) {
-        this.spareExp = spareExp;
     }
 
     public String getSpareSrc() {
@@ -317,12 +275,83 @@ public class Material extends Entity implements Serializable {
         this.paintProtect = paintProtect;
     }
 
-    @Override
-    public String toString() {
-        return "Material{" +
-                "materialNo='" + materialNo  +
-                ", version=" + version + '\'' +
-                ", latestVersion=" + latestVersion + '\'' +
-                '}';
+    public String getModifyNote() {
+        return modifyNote;
+    }
+
+    public void setModifyNote(String modifyNote) {
+        this.modifyNote = modifyNote;
+    }
+
+    public String getErpParent() {
+        return erpParent;
+    }
+
+    public void setErpParent(String erpParent) {
+        this.erpParent = erpParent;
+    }
+
+    public String getSequenceNo() {
+        return sequenceNo;
+    }
+
+    public void setSequenceNo(String sequenceNo) {
+        this.sequenceNo = sequenceNo;
+    }
+
+    public String getPage() {
+        return page;
+    }
+
+    public void setPage(String page) {
+        this.page = page;
+    }
+
+    public String getSpareExp() {
+        return spareExp;
+    }
+
+    public void setSpareExp(String spareExp) {
+        this.spareExp = spareExp;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getAtNo() {
+        return atNo;
+    }
+
+    public void setAtNo(String atNo) {
+        this.atNo = atNo;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public Integer getLatestVersion() {
+        return latestVersion;
+    }
+
+    public void setLatestVersion(Integer latestVersion) {
+        this.latestVersion = latestVersion;
+    }
+
+    public Integer getChildCount() {
+        return childCount;
+    }
+
+    public void setChildCount(Integer childCount) {
+        this.childCount = childCount;
     }
 }
