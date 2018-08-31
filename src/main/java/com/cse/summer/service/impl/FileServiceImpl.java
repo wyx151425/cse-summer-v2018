@@ -175,6 +175,7 @@ public class FileServiceImpl implements FileService {
                 material.setName(row.getCell(6).toString());
                 material.setChinese(row.getCell(7).toString());
                 material.setMaterial(row.getCell(8).toString());
+                material.setErpParent(row.getCell(19).toString());
                 if (0 == level) {
                     material.setAbsoluteAmount(1);
                 } else {
@@ -829,6 +830,8 @@ public class FileServiceImpl implements FileService {
             cell07.setCellValue(machine.getClassificationSociety());
             cell07.setCellStyle(border);
             i++;
+        } else {
+            i += 2;
         }
 
         XSSFRow row1 = sheet.createRow(i);
@@ -965,25 +968,15 @@ public class FileServiceImpl implements FileService {
                 tempCell4.setCellValue(material.getDrawingNo());
             }
             XSSFCell tempCell5 = tempRow.createCell(5);
-            if (null != material.getDrawingSize()) {
-                tempCell5.setCellValue(material.getDrawingSize());
-            }
+            tempCell5.setCellValue(material.getDrawingSize());
             XSSFCell tempCell6 = tempRow.createCell(6);
-            if (null != material.getName()) {
-                tempCell6.setCellValue(material.getName());
-            }
+            tempCell6.setCellValue(material.getName());
             XSSFCell tempCell7 = tempRow.createCell(7);
-            if (null != material.getChinese()) {
-                tempCell7.setCellValue(material.getChinese());
-            }
+            tempCell7.setCellValue(material.getChinese());
             XSSFCell tempCell8 = tempRow.createCell(8);
-            if (null != material.getMaterial()) {
-                tempCell8.setCellValue(material.getMaterial());
-            }
+            tempCell8.setCellValue(material.getMaterial());
             XSSFCell tempCell9 = tempRow.createCell(9);
-            if (null != material.getMaterial()) {
-                tempCell9.setCellValue(material.getStandard());
-            }
+            tempCell9.setCellValue(material.getStandard());
 
             XSSFCell tempCell10 = tempRow.createCell(10);
             if (null != material.getAbsoluteAmount()) {
@@ -994,16 +987,12 @@ public class FileServiceImpl implements FileService {
                 tempCell11.setCellValue(String.valueOf(material.getAmount()));
             }
             XSSFCell tempCell12 = tempRow.createCell(12);
-            if (null != material.getAmount()) {
-                tempCell12.setCellValue(material.getSource());
-            }
+            tempCell12.setCellValue(material.getSource());
             XSSFCell tempCell13 = tempRow.createCell(13);
-            if (null != material.getWeight()) {
                 tempCell13.setCellValue(material.getWeight());
-            }
             XSSFCell tempCell14 = tempRow.createCell(14);
             if (null == machine) {
-                if (null != material.getSpareExp()) {
+                if (!"".equals(material.getSpareExp())) {
                     tempCell14.setCellValue(material.getSpareExp());
                 }
             } else {
@@ -1012,25 +1001,16 @@ public class FileServiceImpl implements FileService {
                 }
             }
             XSSFCell tempCell15 = tempRow.createCell(15);
-            if (null != material.getSpareSrc()) {
-                tempCell15.setCellValue(material.getSpareSrc());
-            }
+            tempCell15.setCellValue(material.getSpareSrc());
             XSSFCell tempCell16 = tempRow.createCell(16);
-            if (null != material.getSpareSrc()) {
-                tempCell16.setCellValue(material.getDesignNote());
-            }
+            tempCell16.setCellValue(material.getDesignNote());
             XSSFCell tempCell17 = tempRow.createCell(17);
-            if (null != material.getSpareSrc()) {
-                tempCell17.setCellValue(material.getPaintProtect());
-            }
+            tempCell17.setCellValue(material.getPaintProtect());
             XSSFCell tempCell18 = tempRow.createCell(18);
-            if (null != material.getModifyNote()) {
-                tempCell18.setCellValue(material.getModifyNote());
-            }
+            tempCell18.setCellValue(material.getModifyNote());
             XSSFCell tempCell19 = tempRow.createCell(19);
-            if (null != material.getErpParent()) {
-                tempCell18.setCellValue(material.getErpParent());
-            }
+            tempCell19.setCellValue(material.getErpParent());
+
             if (0 == level) {
                 for (Cell cell : tempRow) {
                     cell.setCellStyle(green);
