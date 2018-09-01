@@ -57,7 +57,7 @@ public class MaterialServiceImpl implements MaterialService {
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List<Map<String, String>> findMaterialNoAndLatestVersion(String materialNo) {
-        List<Material> materialList = materialRepository.findAllByMaterialNoLike(materialNo);
+        List<Material> materialList = materialRepository.findAllByMaterialNoLike(materialNo + "%");
         List<Map<String, String>> list = new ArrayList<>();
         for (Material material : materialList) {
             Map<String, String> map = new HashMap<>();

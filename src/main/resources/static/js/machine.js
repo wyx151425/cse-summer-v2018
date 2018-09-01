@@ -197,7 +197,7 @@ $(document).ready(function () {
                 } else if (7004 === data.statusCode) {
                     location.reload();
                 } else if (9001 === data.statusCode) {
-                    $("#addDbStructureProgress").text("该物料已经添加为该机器的部套");
+                    $("#addDbStructureProgress").text("该部套已存在于该机器中");
                 } else if (10001 === data.statusCode) {
                     $("#addDbStructureProgress").text("物料不存在");
                 } else {
@@ -225,7 +225,7 @@ $(document).ready(function () {
             // 请求成功后的回调函数。
             success: function (data) {
                 if (200 === data.statusCode) {
-                    search.text("查询");
+                    search.text("模糊查询");
                     list = data.data;
                     let revisionSel = $("#materialNo7");
                     revisionSel.empty();
@@ -244,7 +244,7 @@ $(document).ready(function () {
             },
             // 请求出错时调用的函数
             error: function () {
-                search.text("查询");
+                search.text("模糊查询");
                 alert("数据发送失败");
             }
         });

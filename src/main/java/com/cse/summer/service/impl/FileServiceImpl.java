@@ -606,7 +606,7 @@ public class FileServiceImpl implements FileService {
     public void importNewStructureExcel(Structure structure, MultipartFile file) throws
             InvalidFormatException, IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
-        Row structRow = workbook.getSheetAt(0).getRow(2);
+        Row structRow = workbook.getSheetAt(0).getRow(4);
         String materNo = structRow.getCell(3).toString();
         // 根据物料号和专利方版本检查
         List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(materNo, 0);
@@ -629,7 +629,7 @@ public class FileServiceImpl implements FileService {
         Material[] levelArray = new Material[12];
         int index = 0;
         for (Row row : sheet) {
-            if (index < 4) {
+            if (index < 2) {
                 index++;
             } else {
                 Material material = createNewMaterial();
@@ -719,7 +719,7 @@ public class FileServiceImpl implements FileService {
             IOException, InvalidFormatException {
         // 开始解析新版本数据
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
-        Row structRow = workbook.getSheetAt(0).getRow(2);
+        Row structRow = workbook.getSheetAt(0).getRow(4);
         String materNo = structRow.getCell(3).toString();
 
         // 若能查询到旧部套则更新旧部套的最新版本号

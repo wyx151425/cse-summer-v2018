@@ -36,8 +36,8 @@ public class StructureServiceImpl implements StructureService {
             throw new SummerException(StatusCode.MATERIAL_NO_EXIST);
         } else {
             // 检查该部套是否已经与该物料关联
-            Structure target = structureRepository.findStructureByMachineNameAndMaterialNoAndVersionAndStatusGreaterThanEqual(
-                    structure.getMachineName(), structure.getMaterialNo(), structure.getVersion(), 1);
+            Structure target = structureRepository.findStructureByMachineNameAndMaterialNoAndStatusGreaterThanEqual(
+                    structure.getMachineName(), structure.getMaterialNo(), 1);
             if (null == target) {
                 structure.setObjectId(Generator.getObjectId());
                 structure.setStatus(1);

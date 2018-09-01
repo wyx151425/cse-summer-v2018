@@ -74,4 +74,16 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
     Structure findStructureByMachineNameAndMaterialNoAndVersionAndStatusGreaterThanEqual(
             String machineName, String materialNo, Integer version, Integer status
     );
+
+    /**
+     * 保存部套时使用，检查部套是否已经与物料关联
+     *
+     * @param machineName 机器名
+     * @param materialNo  物料号
+     * @param status      状态标识
+     * @return 查询到的部套
+     */
+    Structure findStructureByMachineNameAndMaterialNoAndStatusGreaterThanEqual(
+            String machineName, String materialNo, Integer status
+    );
 }
