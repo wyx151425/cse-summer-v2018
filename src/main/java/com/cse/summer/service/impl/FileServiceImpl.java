@@ -141,7 +141,14 @@ public class FileServiceImpl implements FileService {
             if (index < 3) {
                 index++;
             } else {
-                int level = (int) Double.parseDouble(row.getCell(1).toString().trim());
+                if (null == row.getCell(3)) {
+                    break;
+                }
+                String levelStr = row.getCell(1).toString();
+                if ("".equals(levelStr)) {
+                    throw new SummerException(StatusCode.MATERIAL_LEVEL_BLANK);
+                }
+                int level = (int) Double.parseDouble(levelStr);
                 String materialNo = row.getCell(3).toString();
                 int latestVersion = 0;
                 if (0 == level) {
@@ -632,6 +639,10 @@ public class FileServiceImpl implements FileService {
             if (index < 4) {
                 index++;
             } else {
+                if (null == row.getCell(3)) {
+                    break;
+                }
+
                 Material material = createNewMaterial();
                 material.setVersion(version);
                 material.setLatestVersion(version);
@@ -639,7 +650,11 @@ public class FileServiceImpl implements FileService {
                 material.setChildCount(0);
 
                 // 解析物料层级
-                int level = (int) Double.parseDouble(row.getCell(1).toString().trim());
+                String levelStr = row.getCell(1).toString();
+                if ("".equals(levelStr)) {
+                    throw new SummerException(StatusCode.MATERIAL_LEVEL_BLANK);
+                }
+                int level = (int) Double.parseDouble(levelStr);
                 material.setLevel(level);
                 if (0 == level) {
                     // 最上层节点时不设置父节点
@@ -772,7 +787,8 @@ public class FileServiceImpl implements FileService {
             if (0 == material.getLevel()) {
                 material.setAmount(structure.getAmount());
                 material.setAbsoluteAmount(structure.getAmount());
-            } else {
+            }
+            if (0 != material.getLevel() && null != materArray[material.getLevel() - 1].getAmount()) {
                 Integer parentAmount = materArray[material.getLevel() - 1].getAmount();
                 if (null != material.getAbsoluteAmount()) {
                     material.setAmount(parentAmount * material.getAbsoluteAmount());
@@ -803,7 +819,9 @@ public class FileServiceImpl implements FileService {
         XSSFWorkbook workbook = new XSSFWorkbook();
 
         XSSFFont font = workbook.createFont();
-        font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+        font.setFontName("Arial");
+        font.setFontHeightInPoints((short) 8);
+//        font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
 
         // 设置文本对齐方向
         XSSFCellStyle direct = workbook.createCellStyle();
@@ -860,6 +878,14 @@ public class FileServiceImpl implements FileService {
         green.setBorderRight(XSSFCellStyle.BORDER_THIN);
         green.setBorderBottom(XSSFCellStyle.BORDER_THIN);
         green.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+        green.setFont(font);
+
+        XSSFCellStyle common = workbook.createCellStyle();
+        common.setBorderTop(XSSFCellStyle.BORDER_THIN);
+        common.setBorderRight(XSSFCellStyle.BORDER_THIN);
+        common.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+        common.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+        common.setFont(font);
 
         XSSFSheet sheet;
         if (null == machine) {
@@ -867,15 +893,26 @@ public class FileServiceImpl implements FileService {
         } else {
             sheet = workbook.createSheet("整机BOM表");
         }
-        sheet.setColumnWidth(0, 2720);
-        sheet.setColumnWidth(1, 3200);
-        sheet.setColumnWidth(3, 3840);
-        sheet.setColumnWidth(4, 3840);
-        sheet.setColumnWidth(6, 6720);
-        sheet.setColumnWidth(7, 6720);
-        sheet.setColumnWidth(8, 6720);
-        sheet.setColumnWidth(18, 3840);
-        sheet.setColumnWidth(19, 3840);
+        sheet.setColumnWidth(0, 77 * 32);
+        sheet.setColumnWidth(1, 101 *32);
+        sheet.setColumnWidth(2, 37 * 32);
+        sheet.setColumnWidth(3, 117 * 32);
+        sheet.setColumnWidth(4, 117 * 32);
+        sheet.setColumnWidth(5, 25 * 32);
+        sheet.setColumnWidth(6, 149 * 32);
+        sheet.setColumnWidth(7, 149 * 32);
+        sheet.setColumnWidth(8, 101 * 32);
+        sheet.setColumnWidth(9, 101 * 32);
+        sheet.setColumnWidth(10, 37 * 32);
+        sheet.setColumnWidth(11, 37 * 32);
+        sheet.setColumnWidth(12, 37 * 32);
+        sheet.setColumnWidth(13, 61 * 32);
+        sheet.setColumnWidth(14, 37 * 32);
+        sheet.setColumnWidth(15, 37 * 32);
+        sheet.setColumnWidth(16, 149 * 32);
+        sheet.setColumnWidth(17, 101 * 32);
+        sheet.setColumnWidth(18, 101 * 32);
+        sheet.setColumnWidth(19, 101 * 32);
 
         if (null == machine) {
             XSSFRow row0 = sheet.createRow(i);
@@ -1158,6 +1195,10 @@ public class FileServiceImpl implements FileService {
                 for (Cell cell : tempRow) {
                     cell.setCellStyle(green);
                 }
+            } else {
+                for (Cell cell : tempRow) {
+                    cell.setCellStyle(common);
+                }
             }
         }
         return workbook;
@@ -1180,7 +1221,7 @@ public class FileServiceImpl implements FileService {
                 mantissa = Integer.parseInt(exp.substring(plusIndex + 1, exp.length()));
             }
         } else {
-            mantissa = Integer.parseInt(exp);
+            mantissa = (int) Double.parseDouble(exp);
         }
         return multiplier * cylinderAmount + mantissa;
     }

@@ -21,4 +21,5 @@ public class StatusCode {
     public static final int STRUCTURE_NO_ERROR = 9002;
     public static final int STRUCTURE_MATERIAL_NOT_EXIST = 9003;
     public static final int MATERIAL_NO_EXIST = 10001;
+    public static final int MATERIAL_LEVEL_BLANK = 10002;
 }

@@ -66,6 +66,6 @@ public interface MaterialRepository extends JpaRepository<Material, Integer> {
      * @param materialNo 物料号
      * @return 物料号数据集合
      */
-    @Query("select m from Material m where m.materialNo like :materialNo group by m.materialNo")
+    @Query("select m from Material m where m.materialNo like :materialNo and level = 0 group by m.materialNo")
     List<Material> findAllByMaterialNoLike(@Param("materialNo") String materialNo);
 }
