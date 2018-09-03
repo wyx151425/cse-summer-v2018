@@ -629,7 +629,7 @@ public class FileServiceImpl implements FileService {
         Material[] levelArray = new Material[12];
         int index = 0;
         for (Row row : sheet) {
-            if (index < 2) {
+            if (index < 4) {
                 index++;
             } else {
                 Material material = createNewMaterial();
@@ -816,6 +816,27 @@ public class FileServiceImpl implements FileService {
         direct.setBorderLeft(XSSFCellStyle.BORDER_THIN);
         direct.setFont(font);
 
+        // 设置文本对齐方向
+        XSSFCellStyle centerBlue = workbook.createCellStyle();
+        centerBlue.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+        centerBlue.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+        centerBlue.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        centerBlue.setFillForegroundColor(new XSSFColor(new Color(197, 217, 241)));
+        centerBlue.setBorderTop(XSSFCellStyle.BORDER_THIN);
+        centerBlue.setBorderRight(XSSFCellStyle.BORDER_THIN);
+        centerBlue.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+        centerBlue.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+        centerBlue.setFont(font);
+
+        XSSFCellStyle center = workbook.createCellStyle();
+        center.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+        center.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+        center.setBorderTop(XSSFCellStyle.BORDER_THIN);
+        center.setBorderRight(XSSFCellStyle.BORDER_THIN);
+        center.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+        center.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+        center.setFont(font);
+
         XSSFCellStyle border = workbook.createCellStyle();
         border.setBorderTop(XSSFCellStyle.BORDER_THIN);
         border.setBorderRight(XSSFCellStyle.BORDER_THIN);
@@ -855,7 +876,78 @@ public class FileServiceImpl implements FileService {
         sheet.setColumnWidth(8, 6720);
         sheet.setColumnWidth(18, 3840);
         sheet.setColumnWidth(19, 3840);
-        if (null != machine) {
+
+        if (null == machine) {
+            XSSFRow row0 = sheet.createRow(i);
+            XSSFCell cell0 = row0.createCell(0);
+            cell0.setCellValue("文件号");
+            cell0.setCellStyle(blue);
+            XSSFCell cell1 = row0.createCell(1);
+            cell1.setCellValue(materialList.get(0).getMaterialNo());
+            cell1.setCellStyle(border);
+            XSSFCell cell2 = row0.createCell(2);
+            cell2.setCellValue("版本");
+            cell2.setCellStyle(blue);
+            XSSFCell cell3 = row0.createCell(3);
+            cell3.setCellValue("" + materialList.get(0).getVersion());
+            cell3.setCellStyle(border);
+            XSSFCell cell4 = row0.createCell(4);
+            cell4.setCellValue("编制");
+            cell4.setCellStyle(blue);
+            XSSFCell cell5 = row0.createCell(5);
+            cell5.setCellStyle(border);
+            XSSFCell cell6 = row0.createCell(6);
+            cell6.setCellValue("校对");
+            cell6.setCellStyle(blue);
+            XSSFCell cell7 = row0.createCell(7);
+            cell7.setCellStyle(border);
+            XSSFCell cell8 = row0.createCell(8);
+            cell8.setCellValue("审核");
+            cell8.setCellStyle(blue);
+            XSSFCell cell9 = row0.createCell(9);
+            cell9.setCellStyle(border);
+            i++;
+
+            XSSFRow row1 = sheet.createRow(i);
+            XSSFCell cell10 = row1.createCell(0);
+            cell10.setCellValue("机型");
+            cell10.setCellStyle(blue);
+            XSSFCell cell11 = row1.createCell(1);
+            cell11.setCellStyle(border);
+            row1.createCell(2);
+            row1.createCell(3);
+            i++;
+
+            cell4.setCellStyle(centerBlue);
+            CellRangeAddress cra4 = new CellRangeAddress(0, 1, 4, 4);
+            setBorderForMergeCell(CellStyle.BORDER_THIN, cra4, sheet, workbook);
+            sheet.addMergedRegion(cra4);
+
+            cell5.setCellStyle(center);
+            CellRangeAddress cra5 = new CellRangeAddress(0, 1, 5, 5);
+            setBorderForMergeCell(CellStyle.BORDER_THIN, cra5, sheet, workbook);
+            sheet.addMergedRegion(cra5);
+
+            cell6.setCellStyle(centerBlue);
+            CellRangeAddress cra6 = new CellRangeAddress(0, 1, 6, 6);
+            setBorderForMergeCell(CellStyle.BORDER_THIN, cra6, sheet, workbook);
+            sheet.addMergedRegion(cra6);
+
+            cell7.setCellStyle(center);
+            CellRangeAddress cra7 = new CellRangeAddress(0, 1, 7, 7);
+            setBorderForMergeCell(CellStyle.BORDER_THIN, cra7, sheet, workbook);
+            sheet.addMergedRegion(cra7);
+
+            cell8.setCellStyle(centerBlue);
+            CellRangeAddress cra8 = new CellRangeAddress(0, 1, 8, 8);
+            setBorderForMergeCell(CellStyle.BORDER_THIN, cra8, sheet, workbook);
+            sheet.addMergedRegion(cra8);
+
+            cell9.setCellStyle(center);
+            CellRangeAddress cra9 = new CellRangeAddress(0, 1, 9, 9);
+            setBorderForMergeCell(CellStyle.BORDER_THIN, cra9, sheet, workbook);
+            sheet.addMergedRegion(cra9);
+        } else {
             sheet.protectSheet(Generator.getReadonlyPassword());
             XSSFRow row0 = sheet.createRow(i);
             XSSFCell cell00 = row0.createCell(0);
@@ -883,8 +975,6 @@ public class FileServiceImpl implements FileService {
             cell07.setCellValue(machine.getClassificationSociety());
             cell07.setCellStyle(border);
             i++;
-        } else {
-            i += 2;
         }
 
         XSSFRow row1 = sheet.createRow(i);
@@ -944,7 +1034,7 @@ public class FileServiceImpl implements FileService {
         XSSFCell cell20 = row.createCell(0);
         cell20.setCellValue("部套");
         XSSFCell cell21 = row.createCell(1);
-        cell21.setCellValue("层次+件号");
+        cell21.setCellValue("层次");
         XSSFCell cell22 = row.createCell(2);
         cell22.setCellValue("件号");
         XSSFCell cell23 = row.createCell(3);
