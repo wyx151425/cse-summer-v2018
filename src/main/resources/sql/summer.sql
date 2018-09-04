@@ -4,7 +4,6 @@ CREATE TABLE `cse_machine` (
   `status` INT(1),
   `name` VARCHAR(255),
   `machine_no` varchar(255),
-  `patent` varchar(255),
   `ship_no` varchar(255),
   `type` varchar(255),
   `cylinder_amount` varchar(255),
@@ -19,7 +18,6 @@ CREATE TABLE `cse_structure` (
   `machine_name` VARCHAR(255),
   `structure_no` varchar(255),
   `material_no` VARCHAR(255),
-  `revision` varchar(255),
   `version` int(11),
   `amount` int(11),
   PRIMARY KEY (`id`)
@@ -29,30 +27,33 @@ CREATE TABLE `cse_material` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `object_id` char(32),
   `status` int(1),
-  `name` varchar(255),
-  `parent_id` char(32),
+
   `level` int(11),
-  `src_level` varchar(255),
   `position_no` varchar(255),
-  `sequence_no` varchar(255),
-  `revision` varchar(255),
-  `version` int(11),
-  `latest_version` int(11),
   `material_no` varchar(255),
-  `material` varchar(255),
   `drawing_no` varchar(255),
   `drawing_size` varchar(255),
-  `drawing_version` varchar(255),
+  `name` varchar(255),
+  `chinese` varchar(255),
+  `material` varchar(255),
+  `standard` varchar(255),
+  `absolute_amount` int(11),
+  `source` varchar(255),
   `weight` varchar(255),
-  `absolute_amount` varchar(255),
+  `spareSrc` varchar(255),
+  `design_note` varchar(255),
+  `paint_protect` varchar(255),
   `modify_note` varchar(255),
+  `erp_parent` varchar(255),
+
+  `sequence_no` varchar(255),
   `page` varchar(255),
-  `child_count` int(11),
-  `at_no` VARCHAR(255),
-  `at_revision` VARCHAR(255),
-  `chinese` VARCHAR(255),
   `spare_exp` VARCHAR(255),
-  `type` int(1),
+  `parent_id` char(32),
+  `at_no` VARCHAR(255),
+  `version` int(11),
+  `latest_version` int(11),
+  `child_count` int(11),
   PRIMARY KEY (`id`)
 )  ENGINE=INNODB DEFAULT CHARSET=UTF8;
 
@@ -73,3 +74,5 @@ CREATE TABLE `cse_user` (
   `password` varchar(32),
   PRIMARY KEY (`id`)
 )  ENGINE=INNODB DEFAULT CHARSET=UTF8;
+
+drop table cse_name;

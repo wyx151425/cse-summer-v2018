@@ -206,7 +206,7 @@ public class FileServiceImpl implements FileService {
                     material.setWeight(row.getCell(13).toString());
                 }
                 if (null != row.getCell(14)) {
-                    material.setSpareExp(row.getCell(14).toString());
+                    material.setSpareExp(row.getCell(14).toString().replace(".0", ""));
                 }
                 if (null != row.getCell(15)) {
                     material.setSpareSrc(row.getCell(15).toString());
@@ -555,7 +555,14 @@ public class FileServiceImpl implements FileService {
                 if (null != row.getCell(1)) {
                     material.setDrawingSize(row.getCell(1).toString());
                 }
-                material.setDrawingNo(row.getCell(2).toString() + row.getCell(3).toString());
+                if (null != row.getCell(2)) {
+                    if (null != row.getCell(3)) {
+                        material.setDrawingNo(row.getCell(2).toString() + row.getCell(3).toString());
+                    } else {
+                        material.setDrawingNo(row.getCell(2).toString());
+                    }
+                }
+
                 if (null != row.getCell(7)) {
                     material.setName(row.getCell(7).toString());
                 }
