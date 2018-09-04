@@ -74,5 +74,3 @@ CREATE TABLE `cse_user` (
   `password` varchar(32),
   PRIMARY KEY (`id`)
 )  ENGINE=INNODB DEFAULT CHARSET=UTF8;
-
-drop table cse_name;
