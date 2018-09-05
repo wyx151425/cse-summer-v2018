@@ -1,6 +1,5 @@
 package com.cse.summer.repository;
 
-import com.cse.summer.domain.Material;
 import com.cse.summer.domain.StructMater;
 import com.cse.summer.domain.Structure;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -67,23 +66,18 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
      *
      * @param machineName 机器名
      * @param materialNo  物料号
-     * @param version     版本号
-     * @param status      状态标识
-     * @return 查询到的部套
-     */
-    Structure findStructureByMachineNameAndMaterialNoAndVersionAndStatusGreaterThanEqual(
-            String machineName, String materialNo, Integer version, Integer status
-    );
-
-    /**
-     * 保存部套时使用，检查部套是否已经与物料关联
-     *
-     * @param machineName 机器名
-     * @param materialNo  物料号
      * @param status      状态标识
      * @return 查询到的部套
      */
     Structure findStructureByMachineNameAndMaterialNoAndStatusGreaterThanEqual(
             String machineName, String materialNo, Integer status
     );
+
+    /**
+     * 根据物料号查询关联的部套
+     *
+     * @param materialNo 物料号
+     * @return 关联的部套数据集合
+     */
+    List<Structure> findAllByMaterialNo(String materialNo);
 }

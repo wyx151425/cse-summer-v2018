@@ -213,6 +213,45 @@ $(document).ready(function () {
             }
         });
     });
+
+    $("#searchStrB").click(function () {
+        let search = $(this);
+        search.text("查询中...");
+        $.ajax({
+            url: "api/structures/search?materialNo=" + $("#materialNoI").val(),
+            dataType: "json", // 预期服务器返回的数据类型
+            type: "get", // 请求方式GET
+            contentType: "application/json", // 发送信息至服务器时的内容编码类型
+            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
+            // 请求成功后的回调函数。
+            success: function (data) {
+                if (200 === data.statusCode) {
+                    search.text("精确查询");
+                    list = data.data;
+                    let machineNameSel = $("#structureList");
+                    machineNameSel.empty();
+                    $.each(list, function (index, value) {
+                        let _html = '';
+                        _html += '<tr>' +
+                            '   <td>' + value.machineName + '</td>' +
+                            '   <td>' + value.version + '</td>';
+                        if (null !== value.amount) {
+                            _html += '   <td>' + value.amount + '</td>';
+                        }
+                        _html += '</tr>';
+                        machineNameSel.append(_html);
+                    });
+                } else if (7004 === data.statusCode) {
+                    location.reload();
+                }
+            },
+            // 请求出错时调用的函数
+            error: function () {
+                search.text("模糊查询");
+                alert("数据发送失败");
+            }
+        });
+    });
 });
 
 function toUpdateMachine(machineId, machineName, machineNo, machineType, cylinderAmount, shipNo, classificationSociety) {

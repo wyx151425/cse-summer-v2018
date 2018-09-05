@@ -41,7 +41,7 @@ public class SummerApplicationTests {
 //        user.setStatus(1);
 //        user.setUsername("admin");
 //        user.setName("管理员");
-//        user.setPassword("admin");
+//        user.setPassword("admin0");
 //        user.setRole(4);
 //        userRepository.save(user);
 //    }

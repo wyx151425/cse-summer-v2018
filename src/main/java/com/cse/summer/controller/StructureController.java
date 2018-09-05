@@ -6,6 +6,8 @@ import com.cse.summer.service.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @author 王振琦
  */
@@ -42,5 +44,11 @@ public class StructureController extends BaseFacade {
     public Response<Structure> actionConfirmStructure(@PathVariable("id") Integer id) {
         structureService.confirmStructure(id);
         return new Response<>();
+    }
+
+    @GetMapping(value= "structures/search")
+    public Response<List<Structure>> actionStructuresSearch(@RequestParam("materialNo") String materialNo) {
+        List<Structure> structureList = structureService.searchStructureListByAssociateMaterialNo(materialNo);
+        return new Response<>(structureList);
     }
 }

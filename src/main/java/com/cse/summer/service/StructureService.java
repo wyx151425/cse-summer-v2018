@@ -35,4 +35,12 @@ public interface StructureService {
      * @param id 部套ID
      */
     void confirmStructure(Integer id);
+
+    /**
+     * 根据物料号查询关联的部套
+     *
+     * @param materialNo 关联物料号
+     * @return 部套数据集合
+     */
+    List<Structure> searchStructureListByAssociateMaterialNo(String materialNo);
 }

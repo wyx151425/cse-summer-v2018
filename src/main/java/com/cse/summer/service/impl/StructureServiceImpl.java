@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author 王振琦
  */
@@ -74,5 +76,11 @@ public class StructureServiceImpl implements StructureService {
         Structure structure = structureRepository.getOne(id);
         structure.setStatus(2);
         structureRepository.save(structure);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
+    public List<Structure> searchStructureListByAssociateMaterialNo(String materialNo) {
+        return structureRepository.findAllByMaterialNo(materialNo);
     }
 }

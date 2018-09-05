@@ -38,6 +38,9 @@
     <div class="material-detail" style="margin-top: 10px">
         <div class="table-wrap">
             <button id="logout" class="btn btn-primary pull-right" style="margin-bottom: 20px">退出登录</button>
+            <button id="searchStr" class="btn btn-primary pull-right" style="margin-bottom: 20px; margin-right: 16px"
+                    data-toggle="modal" data-target="#searchStruct">部套关联
+            </button>
             <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
@@ -60,7 +63,8 @@
                     <td th:text="${machine.classificationSociety}"></td>
                     <td>
                         <a th:href="@{|/machine?machineId=${machine.id}|}" style="margin-right: 16px">查看</a>
-                        <a href="javascript:;" style="margin-right: 16px" data-toggle="modal" data-target="#machineEdit" th:if="${session.user.role == 2 || session.user.role == 4}"
+                        <a href="javascript:;" style="margin-right: 16px" data-toggle="modal" data-target="#machineEdit"
+                           th:if="${session.user.role == 2 || session.user.role == 4}"
                            th:onclick="|javascript:toUpdateMachine('${machine.id}', '${machine.name}', '${machine.machineNo}',
                            '${machine.type}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}');|">编辑</a>
                         <a href="javascript:;" style="margin-right: 16px" th:onclick="|javascript:toExportMachineBom('${machine.name}', '${machine.machineNo}',
@@ -253,6 +257,43 @@
             <div class="ipt-group">
                 <button id="pwdBtn" class="pwd-btn" type="button">修改</button>
             </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="searchStruct" tabindex="-1" role="dialog" aria-labelledby="searchStructLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="searchStructLabel">查询部套关联关系</h4>
+            </div>
+            <form id="searchStructForm">
+                <div class="modal-body">
+                    <label for="materialNoI" class="control-label col-lg-2 col-md-2">物料号</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <input id="materialNoI" type="text" class="form-control"/>
+                    </div>
+                    <label for="searchStrB" class="control-label col-lg-2 col-md-2"></label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <button id="searchStrB" type="button" class="btn btn-info pull-right">精准查询</button>
+                    </div>
+                    <label for="machineNameI" class="control-label col-lg-2 col-md-2">机器</label>
+                    <div class="form-group col-lg-10 col-md-10">
+                        <table id="machineNameI" class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <td class="col-md-4">机器名</td>
+                                <td class="col-md-4">版本</td>
+                                <td class="col-md-4">总数量</td>
+                            </tr>
+                            </thead>
+                            <tbody id="structureList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

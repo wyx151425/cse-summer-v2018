@@ -506,13 +506,16 @@ public class FileServiceImpl implements FileService {
             workbook, List<Material> materialList, List<Structure> structureList, List<Name> names) {
         // 建立维护层级关系的数组
         Material[] levelArray = new Material[12];
-        Sheet sheet = workbook.getSheetAt(1);
+        Sheet sheet = workbook.getSheet("PartList");
         int index = 0;
         String unImportMater = "";
         for (Row row : sheet) {
-            if (index < 1) {
+            if (index < 3) {
                 index++;
             } else {
+                if (null == row.getCell(4)) {
+                    break;
+                }
                 String materNo = row.getCell(4).toString();
                 String materVersion = row.getCell(5).toString();
                 String materialNo = materNo + materVersion;
