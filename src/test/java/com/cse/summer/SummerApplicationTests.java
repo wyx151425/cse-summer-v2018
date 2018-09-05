@@ -39,20 +39,11 @@ public class SummerApplicationTests {
 //        User user = new User();
 //        user.setObjectId(Generator.getObjectId());
 //        user.setStatus(1);
-//        user.setUsername("wangzhenqi");
-//        user.setName("王振琦");
-//        user.setPassword("123456");
-//        user.setRole(2);
+//        user.setUsername("admin");
+//        user.setName("管理员");
+//        user.setPassword("admin");
+//        user.setRole(4);
 //        userRepository.save(user);
-//
-//        User user2 = new User();
-//        user2.setObjectId(Generator.getObjectId());
-//        user2.setStatus(1);
-//        user2.setUsername("nancongjia");
-//        user2.setName("南琮嘉");
-//        user2.setPassword("123456");
-//        user2.setRole(3);
-//        userRepository.save(user2);
 //    }
 //
 //    @Test

@@ -42,13 +42,14 @@
     <main class="container">
         <div class="material-detail">
             <div class="table-wrap">
-                <div th:if="${session.user.role == 2}">
+                <div th:if="${session.user.role == 2 || session.user.role == 4}">
                     <button id="addDbButton" type="button" data-target="#addDbStructure" data-toggle="modal"
                             class="btn btn-primary pull-right"
                             style="margin-bottom: 20px">添加库中部套
                     </button>
                 </div>
-                <div th:if="${session.user.role == 3}">
+                <div th:if="${session.user.role == 4}" style="margin-bottom: 20px; margin-right: 16px; float: right"></div>
+                <div th:if="${session.user.role == 3 || session.user.role == 4}">
                     <button id="addNewVersion" type="button" data-target="#importNewVersionStructure"
                             data-toggle="modal"
                             class="btn btn-primary pull-right"
@@ -84,15 +85,15 @@
                         <td th:text="${structure.material.chinese}"></td>
                         <td th:text="${structure.amount}"></td>
                         <td th:if="${structure.status == 1}" style="background-color: #ffc000">
-                            <a href="javascript:;" th:if="${session.user.role == 2}"
+                            <a href="javascript:;" th:if="${session.user.role == 2 || session.user.role == 4}"
                                th:onclick="|javascript:publishStructure('${structure.id}', '${structure.structureNo}');|">
                                 <span th:if="${structure.status == 1}" data-target="#structurePublish"
                                       data-toggle="modal">设计</span></a>
-                            <span th:if="${session.user.role != 2 && structure.status == 1}">设计</span>
+                            <span th:if="${session.user.role != 2 && session.user.role != 4 && structure.status == 1}">设计</span>
                             <span th:if="${structure.status == 2}">发布</span>
                         </td>
                         <td th:if="${structure.status == 2}" style="background-color: #92d050">
-                            <a href="javascript:;" th:if="${session.user.role == 2}"
+                            <a href="javascript:;" th:if="${session.user.role == 2 || session.user.role == 4}"
                                th:onclick="|javascript:publishStructure('${structure.id}', '${structure.structureNo}');|">
                                 <span th:if="${structure.status == 1}" data-target="#structurePublish"
                                       data-toggle="modal">设计</span></a>
@@ -104,11 +105,11 @@
                                th:onclick="|javascript:structureExport('${structure.structureNo}', '${structure.materialNo}', '${structure.material.latestVersion}');|">
                                 <span data-target="#structureExport" data-toggle="modal">导出</span>
                             </a>
-                            <a href="javascript:;" style="margin-right: 16px" th:if="${session.user.role == 3}"
+                            <a href="javascript:;" style="margin-right: 16px" th:if="${session.user.role == 3 || session.user.role == 4}"
                                th:onclick="|javascript:deleteStructure('${structure.id}');|">删除</a>
                             <a href="javascript:;"
                                th:onclick="|javascript:versionList('${structure.structureNo}', '${structure.materialNo}', '${structure.material.latestVersion}');|"
-                               th:if="${session.user.role == 2 && structure.material.latestVersion > 0}">
+                               th:if="${(session.user.role == 2 || session.user.role == 4) && structure.material.latestVersion > 0}">
                                 <span data-target="#versionChoose" data-toggle="modal">修改版本</span>
                             </a>
                         </td>
