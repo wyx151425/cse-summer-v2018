@@ -1,10 +1,8 @@
 package com.cse.summer.controller;
 
 import com.cse.summer.domain.Machine;
-import com.cse.summer.domain.Material;
 import com.cse.summer.domain.Structure;
 import com.cse.summer.service.MachineService;
-import com.cse.summer.service.StructureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

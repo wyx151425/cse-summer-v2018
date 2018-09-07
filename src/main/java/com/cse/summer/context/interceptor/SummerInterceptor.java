@@ -1,10 +1,7 @@
 package com.cse.summer.context.interceptor;
 
-import com.cse.summer.domain.Response;
 import com.cse.summer.domain.User;
 import com.cse.summer.util.Constant;
-import com.cse.summer.util.StatusCode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
@@ -13,7 +10,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
 
 /**
  * 请求拦截器
