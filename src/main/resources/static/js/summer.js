@@ -60,12 +60,19 @@ $(document).ready(function () {
         $.ajaxFileUpload({
             url: 'api/files/import/structure/new',  // 用于文件上传的服务器端请求地址
             secureuri: false,  // 是否需要安全协议，一般设置为false
-            fileElementId: 'newStructureExcel',  // 文件上传域的ID
+            fileElementId: ['strFile81', 'strFile82', 'strFile83', 'strFile84', 'strFile85', 'strFile86', 'strFile87', 'strFile88', 'strFile89'],
             dataType: 'json',  // 返回值类型 一般设置为json
             data: {
                 machineName: $("#machineName8").val(),
-                structureNo: $("#structureNo8").val(),
-                amount: $("#amount8").val()
+                structureNo1: $("#structureNo81").val(), amount1: $("#amount81").val(),
+                structureNo2: $("#structureNo82").val(), amount2: $("#amount82").val(),
+                structureNo3: $("#structureNo83").val(), amount3: $("#amount83").val(),
+                structureNo4: $("#structureNo84").val(), amount4: $("#amount84").val(),
+                structureNo5: $("#structureNo85").val(), amount5: $("#amount85").val(),
+                structureNo6: $("#structureNo86").val(), amount6: $("#amount86").val(),
+                structureNo7: $("#structureNo87").val(), amount7: $("#amount87").val(),
+                structureNo8: $("#structureNo88").val(), amount8: $("#amount88").val(),
+                structureNo9: $("#structureNo89").val(), amount9: $("#amount89").val()
             },
             success: function (data) {
                 successCallback(data);
@@ -102,6 +109,8 @@ $(document).ready(function () {
         if (200 === data.statusCode) {
             $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
             location.reload();
+        } else if (602 === data.statusCode) {
+            $(".progress-prompt").text("上传文件缺少部套号或数量");
         } else if (7004 === data.statusCode) {
             location.reload();
         } else if (8001 === data.statusCode) {
@@ -116,6 +125,18 @@ $(document).ready(function () {
             $(".progress-prompt").text("库中不存在该部套，无法更新版本");
         } else if (10002 === data.statusCode) {
             $(".progress-prompt").text("存在层级为空的物料");
+        } else if (10003 === data.statusCode) {
+            $(".progress-prompt").text("顶层物料的物料号为空");
+        } else if (20001 === data.statusCode) {
+            $(".progress-prompt").text("某顶层物料的物料号为空，因此部分文件导入失败");
+        } else if (20002 === data.statusCode) {
+            $(".progress-prompt").text("缺少某部套的部套号或数量，因此部分文件导入失败");
+        } else if (20003 === data.statusCode) {
+            $(".progress-prompt").text("某部套已存在，因此部分文件导入失败");
+        } else if (20004 === data.statusCode) {
+            $(".progress-prompt").text("某部套存在空层级物料，因此部分文件导入失败");
+        } else if (20005 === data.statusCode) {
+            $(".progress-prompt").text("某部套输入部套号与文件内部套号不一致，因此部分文件导入失败");
         } else {
             $(".progress-prompt").text("系统错误");
         }

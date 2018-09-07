@@ -11,6 +11,7 @@ import com.cse.summer.service.FileService;
 import com.cse.summer.util.Generator;
 import com.cse.summer.util.StatusCode;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -622,13 +623,19 @@ public class FileServiceImpl implements FileService {
     @Transactional(rollbackFor = Exception.class)
     public void importNewStructureExcel(Structure structure, MultipartFile file) throws
             InvalidFormatException, IOException {
+        if (null == structure.getStructureNo() || "".equals(structure.getStructureNo()) || structure.getAmount() == null) {
+            throw new SummerException(StatusCode.MULTI_PARAM_DEFECT);
+        }
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Row structRow = workbook.getSheetAt(0).getRow(4);
         String materNo = structRow.getCell(3).toString();
+        if ("".equals(materNo)) {
+            throw new SummerException(StatusCode.MULTI_TOP_MATERIAL_NO_BLANK);
+        }
         // 根据物料号和专利方版本检查
         List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(materNo, 0);
         if (materials.size() > 0) {
-            throw new SummerException(StatusCode.STRUCTURE_EXIST);
+            throw new SummerException(StatusCode.MULTI_STRUCTURE_EXIST);
         } else {
             List<Material> materialList = new ArrayList<>(100);
             newStructureAnalysis(workbook.getSheetAt(0), structure, materialList, 0);
@@ -662,7 +669,7 @@ public class FileServiceImpl implements FileService {
                 // 解析物料层级
                 String levelStr = row.getCell(1).toString();
                 if ("".equals(levelStr)) {
-                    throw new SummerException(StatusCode.MATERIAL_LEVEL_BLANK);
+                    throw new SummerException(StatusCode.MULTI_MATERIAL_LEVEL_BLANK);
                 }
                 int level = (int) Double.parseDouble(levelStr);
                 material.setLevel(level);
@@ -672,7 +679,7 @@ public class FileServiceImpl implements FileService {
                     material.setAtNo(material.getMaterialNo());
                     String structNo = row.getCell(0).toString();
                     if (!structure.getStructureNo().equals(structNo)) {
-                        throw new SummerException(StatusCode.STRUCTURE_NO_ERROR);
+                        throw new SummerException(StatusCode.MULTI_STRUCTURE_NO_ERROR);
                     }
                 } else {
                     Material parentMat = levelArray[level - 1];
@@ -746,6 +753,9 @@ public class FileServiceImpl implements FileService {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Row structRow = workbook.getSheetAt(0).getRow(4);
         String materNo = structRow.getCell(3).toString();
+        if ("".equals(materNo)) {
+            throw new SummerException(StatusCode.TOP_MATERIAL_NO_BLANK);
+        }
 
         // 若能查询到旧部套则更新旧部套的最新版本号
         int latestVersion;
@@ -897,6 +907,13 @@ public class FileServiceImpl implements FileService {
         common.setBorderLeft(XSSFCellStyle.BORDER_THIN);
         common.setFont(font);
 
+        XSSFFont fontWhite = workbook.createFont();
+        fontWhite.setFontName("Arial");
+        fontWhite.setFontHeightInPoints((short) 8);
+        fontWhite.setColor(IndexedColors.WHITE.getIndex());
+        XSSFCellStyle white = workbook.createCellStyle();
+        white.setFont(fontWhite);
+
         XSSFSheet sheet;
         if (null == machine) {
             sheet = workbook.createSheet();
@@ -924,8 +941,11 @@ public class FileServiceImpl implements FileService {
         sheet.setColumnWidth(18, 101 * 32);
         sheet.setColumnWidth(19, 101 * 32);
 
+
+        XSSFRow row0;
+
         if (null == machine) {
-            XSSFRow row0 = sheet.createRow(i);
+            row0 = sheet.createRow(i);
             XSSFCell cell0 = row0.createCell(0);
             cell0.setCellValue("文件号");
             cell0.setCellStyle(blue);
@@ -996,7 +1016,7 @@ public class FileServiceImpl implements FileService {
             sheet.addMergedRegion(cra9);
         } else {
             sheet.protectSheet(Generator.getReadonlyPassword());
-            XSSFRow row0 = sheet.createRow(i);
+            row0 = sheet.createRow(i);
             XSSFCell cell00 = row0.createCell(0);
             cell00.setCellValue("机号");
             cell00.setCellStyle(blue);
@@ -1023,6 +1043,10 @@ public class FileServiceImpl implements FileService {
             cell07.setCellStyle(border);
             i++;
         }
+
+        XSSFCell cell0019 = row0.createCell(19);
+        cell0019.setCellValue("Tels54w9gA");
+        cell0019.setCellStyle(white);
 
         XSSFRow row1 = sheet.createRow(i);
 

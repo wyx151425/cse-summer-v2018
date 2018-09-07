@@ -289,3 +289,7 @@ main.container {
 .pwd-btn:hover, .pwd-btn:active {
     background-color: #204d74;
 }
+
+.multi tr td {
+    padding: 2px;
+}

@@ -48,7 +48,8 @@
                             style="margin-bottom: 20px">添加库中部套
                     </button>
                 </div>
-                <div th:if="${session.user.role == 4}" style="margin-bottom: 20px; margin-right: 16px; float: right"></div>
+                <div th:if="${session.user.role == 4}"
+                     style="margin-bottom: 20px; margin-right: 16px; float: right"></div>
                 <div th:if="${session.user.role == 3 || session.user.role == 4}">
                     <button id="addNewVersion" type="button" data-target="#importNewVersionStructure"
                             data-toggle="modal"
@@ -105,7 +106,8 @@
                                th:onclick="|javascript:structureExport('${structure.structureNo}', '${structure.materialNo}', '${structure.material.latestVersion}');|">
                                 <span data-target="#structureExport" data-toggle="modal">导出</span>
                             </a>
-                            <a href="javascript:;" style="margin-right: 16px" th:if="${session.user.role == 3 || session.user.role == 4}"
+                            <a href="javascript:;" style="margin-right: 16px"
+                               th:if="${session.user.role == 3 || session.user.role == 4}"
                                th:onclick="|javascript:deleteStructure('${structure.id}');|">删除</a>
                             <a href="javascript:;"
                                th:onclick="|javascript:versionList('${structure.structureNo}', '${structure.materialNo}', '${structure.material.latestVersion}');|"
@@ -248,7 +250,7 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="newStructureLabel">导入新部套</h4>
+                <h4 class="modal-title" id="newStructureLabel">导入新部套（最多可上传9个EXCEL文件）</h4>
             </div>
             <form id="newStructureExcelForm">
                 <div class="modal-body">
@@ -257,18 +259,62 @@
                         <input id="machineName8" type="text" class="form-control" th:value="${machine.name}"
                                readonly="readonly"/>
                     </div>
-                    <label for="structureNo8" class="control-label col-lg-2 col-md-2">部套号</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="structureNo8" type="text" class="form-control"/>
-                    </div>
-                    <label for="amount8" class="control-label col-lg-2 col-md-2">数量</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="amount8" type="text" class="form-control"/>
-                    </div>
-                    <label for="newStructureExcel" class="control-label col-lg-2 col-md-2">文件</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="newStructureExcel" class="form-control" name="newStructureExcel" type="file"/>
-                    </div>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <td class="col-lg-3 col-md-3">部套号</td>
+                            <td class="col-lg-3 col-md-3">总数量</td>
+                            <td class="col-lg-6 col-md-6">文件</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><input id="structureNo81" type="text" class="form-control"/></td>
+                            <td><input id="amount81" type="text" class="form-control"/></td>
+                            <td><input id="strFile81" class="form-control" type="file" name="strFile"/></td>
+                        </tr>
+                        <tr>
+                            <td><input id="structureNo82" type="text" class="form-control"/></td>
+                            <td><input id="amount82" type="text" class="form-control"/></td>
+                            <td><input id="strFile82" class="form-control" type="file" name="strFile"/></td>
+                        </tr>
+                        <tr>
+                            <td><input id="structureNo83" type="text" class="form-control"/></td>
+                            <td><input id="amount83" type="text" class="form-control"/></td>
+                            <td><input id="strFile83" class="form-control" type="file" name="strFile"/></td>
+                        </tr>
+                        <tr>
+                            <td><input id="structureNo84" type="text" class="form-control"/></td>
+                            <td><input id="amount84" type="text" class="form-control"/></td>
+                            <td><input id="strFile84" class="form-control" type="file" name="strFile"/></td>
+                        </tr>
+                        <tr>
+                            <td><input id="structureNo85" type="text" class="form-control"/></td>
+                            <td><input id="amount85" type="text" class="form-control"/></td>
+                            <td><input id="strFile85" class="form-control" type="file" name="strFile"/></td>
+                        </tr>
+                        <tr>
+                            <td><input id="structureNo86" type="text" class="form-control"/></td>
+                            <td><input id="amount86" type="text" class="form-control"/></td>
+                            <td><input id="strFile86" class="form-control" type="file" name="strFile"/></td>
+                        </tr>
+                        <tr>
+                            <td><input id="structureNo87" type="text" class="form-control"/></td>
+                            <td><input id="amount87" type="text" class="form-control"/></td>
+                            <td><input id="strFile87" class="form-control" type="file" name="strFile"/></td>
+                        </tr>
+                        <tr>
+                            <td><input id="structureNo88" type="text" class="form-control"/></td>
+                            <td><input id="amount88" type="text" class="form-control"/></td>
+                            <td><input id="strFile88" class="form-control" type="file" name="strFile"/></td>
+                        </tr>
+                        <tr>
+                            <td><input id="structureNo89" type="text" class="form-control"/></td>
+                            <td><input id="amount89" type="text" class="form-control"/></td>
+                            <td><input id="strFile89" class="form-control" type="file" name="strFile"/></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
                 <div class="modal-footer">
                     <button id="importNewStructureFile" type="button" class="btn btn-primary">导入</button>

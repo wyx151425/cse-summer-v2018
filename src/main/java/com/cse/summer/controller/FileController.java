@@ -1,22 +1,24 @@
 package com.cse.summer.controller;
 
 import com.cse.summer.context.exception.SummerException;
-import com.cse.summer.domain.Excel;
-import com.cse.summer.domain.Response;
-import com.cse.summer.domain.Structure;
+import com.cse.summer.domain.*;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.StatusCode;
 import com.cse.summer.util.Constant;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.util.List;
 
 /**
  * @author 王振琦
@@ -81,15 +83,19 @@ public class FileController extends BaseFacade {
     }
 
     @PostMapping(value = "files/import/structure/new")
-    public Response<Object> actionImportNewStructureExcel(
-            Structure structure,
-            @RequestParam("newStructureExcel") MultipartFile structureExcel
-    ) {
-        if (!Constant.DocType.XLSX.equals(structureExcel.getContentType())) {
-            throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
-        }
+    public Response<Object> actionImportNewStructureExcel(StructureList structureList, HttpServletRequest request) {
         try {
-            fileService.importNewStructureExcel(structure, structureExcel);
+            List<MultipartFile> fileList = ((MultipartHttpServletRequest) request).getFiles("strFile");
+            for (int index = 0; index < fileList.size(); index++) {
+                MultipartFile file = fileList.get(index);
+                if (!file.isEmpty()) {
+                    if (!Constant.DocType.XLSX.equals(file.getContentType())) {
+                        throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
+                    }
+                    Structure structure = structureList.getStructure(index);
+                    fileService.importNewStructureExcel(structure, file);
+                }
+            }
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
