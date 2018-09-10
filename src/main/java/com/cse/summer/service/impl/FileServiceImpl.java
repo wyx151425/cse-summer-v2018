@@ -206,7 +206,7 @@ public class FileServiceImpl implements FileService {
                     material.setWeight(row.getCell(13).toString());
                 }
                 if (null != row.getCell(14)) {
-                    material.setSpareExp(row.getCell(14).toString().replace(".0", ""));
+                    material.setSpareExp(row.getCell(14).toString().trim().replace(".0", ""));
                 }
                 if (null != row.getCell(15)) {
                     material.setSpareSrc(row.getCell(15).toString());
@@ -721,7 +721,7 @@ public class FileServiceImpl implements FileService {
                     material.setWeight(row.getCell(13).toString());
                 }
                 if (null != row.getCell(14)) {
-                    material.setSpareExp(row.getCell(14).toString().replace(".0", ""));
+                    material.setSpareExp(row.getCell(14).toString().trim().replace(".0", ""));
                 }
                 if (null != row.getCell(15)) {
                     material.setSpareSrc(row.getCell(15).toString());
@@ -813,7 +813,7 @@ public class FileServiceImpl implements FileService {
                     material.setAmount(parentAmount * material.getAbsoluteAmount());
                 }
             }
-            if (!"".equals(material.getSpareExp())) {
+            if (!"".equals(material.getSpareExp().trim())) {
                 int spare = spareAnalysis(cylinderAmount, material.getSpareExp());
                 material.setSpare(spare);
             }
@@ -1205,7 +1205,7 @@ public class FileServiceImpl implements FileService {
             tempCell13.setCellValue(material.getWeight());
             XSSFCell tempCell14 = tempRow.createCell(14);
             if (null == machine) {
-                if (!"".equals(material.getSpareExp())) {
+                if (!"".equals(material.getSpareExp().trim())) {
                     tempCell14.setCellValue(material.getSpareExp());
                 }
             } else {
