@@ -160,10 +160,11 @@ $(document).ready(function () {
     });
 
     $("#exportStructure").click(function () {
+        let machineName = $("#machineName5").val();
         let structureNo = $("#structureNo5").val();
         let materialNo = $("#materialNo5").val();
         let version = $("#version5").val();
-        let url = "api/files/export/structure?structureNo=" + structureNo + "&materialNo=" + materialNo + "&version=" + version;
+        let url = "api/files/export/structure?machineName=" + machineName + "&structureNo=" + structureNo + "&materialNo=" + materialNo + "&version=" + version;
         let link = $('<a href="' + url + '"></a>');
         link.get(0).click();
     });

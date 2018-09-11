@@ -287,6 +287,17 @@ function toUpdateMachine(machineId, machineName, machineNo, machineType, cylinde
     $("#machineEditConfirm").css("display", "none");
 }
 
+function toView(machineId, machineNo, machineType, machineCylinder, shipNo, cs) {
+    if (null == machineNo || null == machineType || null == machineCylinder || null == shipNo || null == cs
+        || "" === machineNo || "" === machineType || "" === machineCylinder || "" === shipNo || "" === cs) {
+        alert("请完善机器信息");
+    } else {
+        let url = "machine?machineId=" + machineId;
+        let link = $('<a href="' + url + '"></a>');
+        link.get(0).click();
+    }
+}
+
 function toExportMachineBom(machineName, machineNo, machineType, machineCylinder, shipNo, cs, status) {
     if (null == machineNo || null == machineType || null == machineCylinder || null == shipNo || null == cs
         || "" === machineNo || "" === machineType || "" === machineCylinder || "" === shipNo || "" === cs) {

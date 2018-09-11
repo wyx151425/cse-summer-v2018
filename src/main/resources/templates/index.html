@@ -62,7 +62,9 @@
                     <td th:text="${machine.shipNo}"></td>
                     <td th:text="${machine.classificationSociety}"></td>
                     <td>
-                        <a th:href="@{|/machine?machineId=${machine.id}|}" style="margin-right: 16px">查看</a>
+                        <a href="javascript:;" style="margin-right: 16px"
+                           th:onclick="|javascript:toView('${machine.id}', '${machine.machineNo}',
+                           '${machine.type}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}')|">查看</a>
                         <a href="javascript:;" style="margin-right: 16px" data-toggle="modal" data-target="#machineEdit"
                            th:if="${session.user.role == 2 || session.user.role == 4}"
                            th:onclick="|javascript:toUpdateMachine('${machine.id}', '${machine.name}', '${machine.machineNo}',
@@ -215,7 +217,12 @@
                     </div>
                     <label for="type" class="control-label col-lg-2 col-md-2">机型</label>
                     <div class="form-group col-lg-10 col-md-10">
-                        <input id="type" class="form-control" type="text"/>
+                        <select id="type" class="form-control">
+                            <option value="MAN">MAN</option>
+                            <option value="WinGD">WinGD</option>
+                            <option value="J-ENG">J-ENG</option>
+                            <option value="CSE">CSE</option>
+                        </select>
                     </div>
                     <label for="cylinderAmount" class="control-label col-lg-2 col-md-2">缸数</label>
                     <div class="form-group col-lg-10 col-md-10">

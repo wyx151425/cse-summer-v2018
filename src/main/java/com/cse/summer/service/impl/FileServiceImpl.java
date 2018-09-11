@@ -793,7 +793,7 @@ public class FileServiceImpl implements FileService {
             amountAndSpareHandler(materials, machine.getCylinderAmount(), structure);
             materialList.addAll(materials);
         }
-        XSSFWorkbook workbook = buildExcelWorkbook(materialList, machine);
+        XSSFWorkbook workbook = buildExcelWorkbook(materialList, machine, 1);
         return new Excel(machineName + ".xlsx", workbook);
     }
 
@@ -828,12 +828,14 @@ public class FileServiceImpl implements FileService {
             material.setStructureNo(structure.getStructureNo());
         }
 
-        XSSFWorkbook workbook = buildExcelWorkbook(materialList, null);
+        Machine machine = machineRepository.findMachineByName(structure.getMachineName());
+
+        XSSFWorkbook workbook = buildExcelWorkbook(materialList, machine, 0);
         String name = structure.getStructureNo() + "_" + structure.getMaterialNo() + "_" + structure.getVersion() + ".xlsx";
         return new Excel(name, workbook);
     }
 
-    private XSSFWorkbook buildExcelWorkbook(List<Material> materialList, Machine machine) {
+    private XSSFWorkbook buildExcelWorkbook(List<Material> materialList, Machine machine, int type) {
         int i = 0;
         XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -914,13 +916,13 @@ public class FileServiceImpl implements FileService {
         white.setFont(fontWhite);
 
         XSSFSheet sheet;
-        if (null == machine) {
+        if (0 == type) {
             sheet = workbook.createSheet();
         } else {
             sheet = workbook.createSheet("整机BOM表");
         }
         sheet.setColumnWidth(0, 77 * 32);
-        sheet.setColumnWidth(1, 101 *32);
+        sheet.setColumnWidth(1, 101 * 32);
         sheet.setColumnWidth(2, 37 * 32);
         sheet.setColumnWidth(3, 117 * 32);
         sheet.setColumnWidth(4, 117 * 32);
@@ -943,7 +945,7 @@ public class FileServiceImpl implements FileService {
 
         XSSFRow row0;
 
-        if (null == machine) {
+        if (0 == type) {
             row0 = sheet.createRow(i);
             XSSFCell cell0 = row0.createCell(0);
             cell0.setCellValue("文件号");
@@ -1044,7 +1046,11 @@ public class FileServiceImpl implements FileService {
         }
 
         XSSFCell cell0019 = row0.createCell(19);
-        cell0019.setCellValue("Tels54w9gA");
+        if ("MAN".equals(machine.getType())) {
+            cell0019.setCellValue("MAN");
+        } else {
+            cell0019.setCellValue("Tels54w9gA");
+        }
         cell0019.setCellStyle(white);
 
         XSSFRow row1 = sheet.createRow(i);
@@ -1204,7 +1210,7 @@ public class FileServiceImpl implements FileService {
             XSSFCell tempCell13 = tempRow.createCell(13);
             tempCell13.setCellValue(material.getWeight());
             XSSFCell tempCell14 = tempRow.createCell(14);
-            if (null == machine) {
+            if (0 == type) {
                 if (!"".equals(material.getSpareExp().trim())) {
                     tempCell14.setCellValue(material.getSpareExp());
                 }
