@@ -158,6 +158,7 @@ $(document).ready(function () {
                 id: $("#id").val(),
                 machineNo: $("#machineNo").val(),
                 type: $("#type").val(),
+                patent: $("#patent").val(),
                 cylinderAmount: $("#cylinderAmount").val(),
                 shipNo: $("#shipNo").val(),
                 classificationSociety: $("#classificationSociety").val()
@@ -275,11 +276,12 @@ $(document).ready(function () {
     });
 });
 
-function toUpdateMachine(machineId, machineName, machineNo, machineType, cylinderAmount, shipNo, classificationSociety) {
+function toUpdateMachine(machineId, machineName, machineNo, machineType, patent, cylinderAmount, shipNo, classificationSociety) {
     $("#id").val(machineId);
     $("#name").val(machineName);
     $("#machineNo").val(machineNo);
     $("#type").val(machineType);
+    $("#patent").val(patent);
     $("#cylinderAmount").val(cylinderAmount);
     $("#shipNo").val(shipNo);
     $("#classificationSociety").val(classificationSociety);
@@ -287,8 +289,8 @@ function toUpdateMachine(machineId, machineName, machineNo, machineType, cylinde
     $("#machineEditConfirm").css("display", "none");
 }
 
-function toView(machineId, machineNo, machineType, machineCylinder, shipNo, cs) {
-    if (null == machineNo || null == machineType || null == machineCylinder || null == shipNo || null == cs
+function toView(machineId, machineNo, machineType, patent, machineCylinder, shipNo, cs) {
+    if (null == machineNo || null == machineType || null == machineCylinder || null == shipNo || null == cs || null == patent || "" === patent
         || "" === machineNo || "" === machineType || "" === machineCylinder || "" === shipNo || "" === cs) {
         alert("请完善机器信息");
     } else {
@@ -298,8 +300,8 @@ function toView(machineId, machineNo, machineType, machineCylinder, shipNo, cs) 
     }
 }
 
-function toExportMachineBom(machineName, machineNo, machineType, machineCylinder, shipNo, cs, status) {
-    if (null == machineNo || null == machineType || null == machineCylinder || null == shipNo || null == cs
+function toExportMachineBom(machineName, machineNo, machineType, patent, machineCylinder, shipNo, cs, status) {
+    if (null == machineNo || null == machineType || null == machineCylinder || null == shipNo || null == cs || null == patent || "" === patent
         || "" === machineNo || "" === machineType || "" === machineCylinder || "" === shipNo || "" === cs) {
         alert("请完善机器信息");
     } else {

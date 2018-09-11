@@ -70,6 +70,7 @@ public class FileServiceImpl implements FileService {
         machine.setObjectId(Generator.getObjectId());
         machine.setStatus(1);
         machine.setName(machineName);
+        machine.setPatent("MAN");
         machine.setMachineNo("");
         machine.setType("");
         machine.setCylinderAmount(0);
@@ -1046,7 +1047,7 @@ public class FileServiceImpl implements FileService {
         }
 
         XSSFCell cell0019 = row0.createCell(19);
-        if ("MAN".equals(machine.getType())) {
+        if ("MAN".equals(machine.getPatent())) {
             cell0019.setCellValue("MAN");
         } else {
             cell0019.setCellValue("Tels54w9gA");

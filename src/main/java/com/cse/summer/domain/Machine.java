@@ -11,6 +11,7 @@ import java.util.List;
 @Table(name = "cse_machine")
 public class Machine extends Entity {
     private String name;
+    private String patent;
     private String machineNo;
     private String shipNo;
     private String type;
@@ -29,6 +30,14 @@ public class Machine extends Entity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPatent() {
+        return patent;
+    }
+
+    public void setPatent(String patent) {
+        this.patent = patent;
     }
 
     public String getMachineNo() {
