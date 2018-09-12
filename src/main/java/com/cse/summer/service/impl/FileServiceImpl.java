@@ -731,7 +731,7 @@ public class FileServiceImpl implements FileService {
                     material.setDesignNote(row.getCell(16).toString());
                 }
                 if (null != row.getCell(17)) {
-                    material.setSpareSrc(row.getCell(17).toString());
+                    material.setPaintProtect(row.getCell(17).toString());
                 }
                 if (null != row.getCell(18)) {
                     material.setModifyNote(row.getCell(18).toString());
@@ -965,15 +965,15 @@ public class FileServiceImpl implements FileService {
             cell4.setCellStyle(blue);
             XSSFCell cell5 = row0.createCell(5);
             cell5.setCellStyle(border);
-            XSSFCell cell6 = row0.createCell(6);
+            XSSFCell cell6 = row0.createCell(7);
             cell6.setCellValue("校对");
             cell6.setCellStyle(blue);
-            XSSFCell cell7 = row0.createCell(7);
+            XSSFCell cell7 = row0.createCell(8);
             cell7.setCellStyle(border);
-            XSSFCell cell8 = row0.createCell(8);
+            XSSFCell cell8 = row0.createCell(9);
             cell8.setCellValue("审核");
             cell8.setCellStyle(blue);
-            XSSFCell cell9 = row0.createCell(9);
+            XSSFCell cell9 = row0.createCell(10);
             cell9.setCellStyle(border);
             i++;
 
@@ -993,27 +993,27 @@ public class FileServiceImpl implements FileService {
             sheet.addMergedRegion(cra4);
 
             cell5.setCellStyle(center);
-            CellRangeAddress cra5 = new CellRangeAddress(0, 1, 5, 5);
+            CellRangeAddress cra5 = new CellRangeAddress(0, 1, 5, 6);
             setBorderForMergeCell(CellStyle.BORDER_THIN, cra5, sheet, workbook);
             sheet.addMergedRegion(cra5);
 
             cell6.setCellStyle(centerBlue);
-            CellRangeAddress cra6 = new CellRangeAddress(0, 1, 6, 6);
+            CellRangeAddress cra6 = new CellRangeAddress(0, 1, 7, 7);
             setBorderForMergeCell(CellStyle.BORDER_THIN, cra6, sheet, workbook);
             sheet.addMergedRegion(cra6);
 
             cell7.setCellStyle(center);
-            CellRangeAddress cra7 = new CellRangeAddress(0, 1, 7, 7);
+            CellRangeAddress cra7 = new CellRangeAddress(0, 1, 8, 8);
             setBorderForMergeCell(CellStyle.BORDER_THIN, cra7, sheet, workbook);
             sheet.addMergedRegion(cra7);
 
             cell8.setCellStyle(centerBlue);
-            CellRangeAddress cra8 = new CellRangeAddress(0, 1, 8, 8);
+            CellRangeAddress cra8 = new CellRangeAddress(0, 1, 9, 9);
             setBorderForMergeCell(CellStyle.BORDER_THIN, cra8, sheet, workbook);
             sheet.addMergedRegion(cra8);
 
             cell9.setCellStyle(center);
-            CellRangeAddress cra9 = new CellRangeAddress(0, 1, 9, 9);
+            CellRangeAddress cra9 = new CellRangeAddress(0, 1, 10, 12);
             setBorderForMergeCell(CellStyle.BORDER_THIN, cra9, sheet, workbook);
             sheet.addMergedRegion(cra9);
         } else {
