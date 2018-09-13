@@ -115,7 +115,7 @@ public class FileServiceImpl implements FileService {
     @Transactional(rollbackFor = Exception.class)
     public void importCSEBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
-        Sheet sheet = workbook.getSheet("整机BOM表");
+        Sheet sheet = workbook.getSheet("整机BOM");
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
 
@@ -920,7 +920,7 @@ public class FileServiceImpl implements FileService {
         if (0 == type) {
             sheet = workbook.createSheet();
         } else {
-            sheet = workbook.createSheet("整机BOM表");
+            sheet = workbook.createSheet("整机BOM");
         }
         sheet.setColumnWidth(0, 77 * 32);
         sheet.setColumnWidth(1, 101 * 32);

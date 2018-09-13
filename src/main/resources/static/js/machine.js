@@ -347,7 +347,7 @@ function structureExport(structureNo, materialNo, latestVersion) {
     $("#materialNo5").attr("value", materialNo);
     let select = $("#version5");
     select.empty();
-    for (let index = 0; index <= latestVersion; index++) {
+    for (let index = latestVersion; index >= 0; index--) {
         select.append('<option value="' + index + '">' + index + '</option>');
     }
 }
