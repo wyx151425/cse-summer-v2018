@@ -1037,10 +1037,15 @@ public class FileServiceImpl implements FileService {
             XSSFCell cell05 = row0.createCell(5);
             cell05.setCellValue(machine.getShipNo());
             cell05.setCellStyle(border);
-            XSSFCell cell06 = row0.createCell(6);
+
+            CellRangeAddress cra5 = new CellRangeAddress(0, 0, 5, 6);
+            setBorderForMergeCell(CellStyle.BORDER_THIN, cra5, sheet, workbook);
+            sheet.addMergedRegion(cra5);
+
+            XSSFCell cell06 = row0.createCell(7);
             cell06.setCellValue("船级社");
             cell06.setCellStyle(blue);
-            XSSFCell cell07 = row0.createCell(7);
+            XSSFCell cell07 = row0.createCell(8);
             cell07.setCellValue(machine.getClassificationSociety());
             cell07.setCellStyle(border);
             i++;
@@ -1106,6 +1111,12 @@ public class FileServiceImpl implements FileService {
         setBorderForMergeCell(CellStyle.BORDER_THIN, cra16, sheet, workbook);
         sheet.addMergedRegion(cra16);
         i++;
+
+        if (1 == type) {
+            sheet.createFreezePane(20,3,20,3);
+        } else {
+            sheet.createFreezePane(20,4,20,4);
+        }
 
         XSSFRow row = sheet.createRow(i);
         XSSFCell cell20 = row.createCell(0);
@@ -1176,7 +1187,18 @@ public class FileServiceImpl implements FileService {
             if (0 == level) {
                 tempCell2.setCellValue(material.getStructureNo());
             } else {
-                tempCell2.setCellValue(material.getPositionNo());
+                if (material.getPositionNo().contains(".0")) {
+                    String pos = material.getPositionNo().replace(".0", "");
+                    if (1 == pos.length()) {
+                        tempCell2.setCellValue("00" + pos);
+                    } else if (2 == pos.length()) {
+                        tempCell2.setCellValue("0" + pos);
+                    } else if (3 == pos.length()) {
+                        tempCell2.setCellValue(pos);
+                    }
+                } else {
+                    tempCell2.setCellValue(material.getPositionNo());
+                }
             }
 
             XSSFCell tempCell3 = tempRow.createCell(3);
