@@ -166,6 +166,7 @@ $(document).ready(function () {
         let version = $("#version5").val();
         let url = "api/files/export/structure?machineName=" + machineName + "&structureNo=" + structureNo + "&materialNo=" + materialNo + "&version=" + version;
         let link = $('<a href="' + url + '"></a>');
+        $("#closeStrExport").click();
         link.get(0).click();
     });
 

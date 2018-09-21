@@ -12,6 +12,7 @@ import com.cse.summer.util.Generator;
 import com.cse.summer.util.StatusCode;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.poifs.crypt.HashAlgorithm;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.RegionUtil;
@@ -230,7 +231,11 @@ public class FileServiceImpl implements FileService {
                     if (null == row.getCell(10) || "".equals(row.getCell(10).toString())) {
                         material.setAbsoluteAmount(0);
                     } else {
-                        material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(10).toString()));
+                        if ("*".equals(row.getCell(10).toString())) {
+                            material.setAbsoluteAmount(0);
+                        } else {
+                            material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(10).toString()));
+                        }
                     }
                 }
                 materialList.add(material);
@@ -292,8 +297,7 @@ public class FileServiceImpl implements FileService {
      *                      先判断部套是否存在，如果部套存在那么该物料一定存在，如果部套不存在，才判断物料是否存在
      */
     @SuppressWarnings("unchecked")
-    private void xmlRecursiveTraversal(Element
-                                               element, List<Material> materialList, List<Structure> structureList,
+    private void xmlRecursiveTraversal(Element element, List<Material> materialList, List<Structure> structureList,
                                        String parentId, String machineName, int parentLevel, String atNo, List<Name> names) {
         if ("designSpec".equals(element.getName())) {
             logger.info("装置号id: " + element.attributeValue("id"));
@@ -332,7 +336,7 @@ public class FileServiceImpl implements FileService {
                     material.setLatestVersion(0);
                     material.setMaterialNo(materialNo);
                     material.setName(element.element("name").getText());
-                    String chineseName = findChineseName(element.element("name").getText(), names);
+                    String chineseName = findChineseName(element.element("name").getText().toUpperCase(), names);
                     material.setChinese(chineseName);
                     material.setPage(revision.element("noOfPages").getText());
                     material.setWeight(revision.element("mass").getText());
@@ -361,7 +365,7 @@ public class FileServiceImpl implements FileService {
 
             material.setMaterialNo(materialNo);
             material.setName(element.element("name").getText());
-            String chineseName = findChineseName(element.element("name").getText(), names);
+            String chineseName = findChineseName(element.element("name").getText().toUpperCase(), names);
             material.setChinese(chineseName);
 
             if (null != revision.element("mass")) {
@@ -407,7 +411,7 @@ public class FileServiceImpl implements FileService {
 
             material.setMaterialNo(materialNo);
             material.setName(element.element("name").getText());
-            String chineseName = findChineseName(element.element("name").getText(), names);
+            String chineseName = findChineseName(element.element("name").getText().toUpperCase(), names);
             material.setChinese(chineseName);
 
             if (null != revision.element("mass")) {
@@ -611,7 +615,7 @@ public class FileServiceImpl implements FileService {
                 }
 
                 if (!unImportMater.equals(material.getAtNo())) {
-                    String chineseName = findChineseName(row.getCell(7).toString(), names);
+                    String chineseName = findChineseName(row.getCell(7).toString().toUpperCase(), names);
                     material.setChinese(chineseName);
                     materialList.add(material);
                 }
@@ -621,8 +625,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importNewStructureExcel(Structure structure, MultipartFile file) throws
-            InvalidFormatException, IOException {
+    public void importNewStructureExcel(Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
         if (null == structure.getStructureNo() || "".equals(structure.getStructureNo()) || structure.getAmount() == null) {
             throw new SummerException(StatusCode.MULTI_PARAM_DEFECT);
         }
