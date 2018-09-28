@@ -153,6 +153,7 @@ public class FileServiceImpl implements FileService {
                 int level = (int) Double.parseDouble(levelStr);
                 String materialNo = row.getCell(3).toString();
                 int latestVersion = 0;
+
                 if (0 == level) {
                     // 如果通过该部套顶层物料的物料号和专利方版本查询到库中存在部套，则为库中的部套升级最新版本
                     List<Material> materials = materialRepository.findAllByAtNo(materialNo);
@@ -163,16 +164,17 @@ public class FileServiceImpl implements FileService {
                             materials.get(i).setLatestVersion(latestVersion);
                         }
                         materialRepository.saveAll(materials);
+                    } else {
+                        // 保存该部套
+                        Structure structure = createNewStructure(machineName);
+                        structure.setStructureNo(row.getCell(0).toString());
+                        structure.setMaterialNo(materialNo);
+                        structure.setVersion(latestVersion);
+                        if (null != row.getCell(11) && !"".equals(row.getCell(11).toString())) {
+                            structure.setAmount((int) Double.parseDouble(row.getCell(11).toString()));
+                        }
+                        structureList.add(structure);
                     }
-                    // 保存该部套
-                    Structure structure = createNewStructure(machineName);
-                    structure.setStructureNo(row.getCell(0).toString());
-                    structure.setMaterialNo(materialNo);
-                    structure.setVersion(latestVersion);
-                    if (null != row.getCell(11) && !"".equals(row.getCell(11).toString())) {
-                        structure.setAmount((int) Double.parseDouble(row.getCell(11).toString()));
-                    }
-                    structureList.add(structure);
                 }
                 Material material = createNewMaterial();
                 material.setVersion(latestVersion);
