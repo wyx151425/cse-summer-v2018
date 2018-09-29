@@ -106,9 +106,9 @@
                                th:onclick="|javascript:structureExport('${structure.structureNo}', '${structure.materialNo}', '${structure.material.latestVersion}');|">
                                 <span data-target="#structureExport" data-toggle="modal">导出</span>
                             </a>
-                            <a href="javascript:;" style="margin-right: 16px"
+                            <a href="javascript:;" style="margin-right: 16px" data-target="#deleteStr" data-toggle="modal"
                                th:if="${session.user.role == 3 || session.user.role == 4}"
-                               th:onclick="|javascript:deleteStructure('${structure.id}');|">删除</a>
+                               th:onclick="|javascript:deleteStructure('${structure.id}', '${structure.structureNo}');|">删除</a>
                             <a href="javascript:;"
                                th:onclick="|javascript:versionList('${structure.structureNo}', '${structure.materialNo}', '${structure.material.latestVersion}');|"
                                th:if="${(session.user.role == 2 || session.user.role == 4) && structure.material.latestVersion > 0}">
@@ -474,6 +474,30 @@
                 <div class="modal-footer">
                     <button id="publishBtn" type="button" class="btn btn-primary">发布</button>
                     <button id="publishCancel" type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteStr" tabindex="-1" role="dialog" aria-labelledby="deleteStrLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="deleteStrLabel">发布部套</h4>
+            </div>
+            <form id="deleteStrForm">
+                <div class="modal-body">
+                    <div id="deleteStrConfirm">
+                        <div class="modal-body">
+                            <p id="deleteStrProgress" class="progress-prompt">你确定要删除<span id="strNoName"></span>的部套吗？</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="deleteStrBtn" type="button" class="btn btn-primary">删除</button>
+                    <button id="deleteStrCancel" type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </form>
         </div>

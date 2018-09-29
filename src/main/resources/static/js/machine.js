@@ -301,34 +301,44 @@ $(document).ready(function () {
             }
         });
     });
+
+    $("#deleteStrBtn").click(function () {
+        let deleteStrBtn = $(this);
+        deleteStrBtn.text("正在删除...");
+        $.ajax({
+            url: "api/structures",
+            dataType: "json", // 预期服务器返回的数据类型
+            type: "delete", // 请求方式DELETE
+            contentType: "application/json", // 发送信息至服务器时的内容编码类型
+            // 发送到服务器的数据。
+            data: JSON.stringify({
+                id: structure.id
+            }),
+            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
+            // 请求成功后的回调函数。
+            success: function (data) {
+                if (200 === data.statusCode) {
+                    location.reload();
+                } else if (7004 === data.statusCode) {
+                    location.reload();
+                } else {
+                    alert("系统错误");
+                }
+            },
+            // 请求出错时调用的函数
+            error: function () {
+                alert("数据发送失败");
+            }
+        });
+    });
 });
 
-function deleteStructure(id) {
-    $.ajax({
-        url: "api/structures",
-        dataType: "json", // 预期服务器返回的数据类型
-        type: "delete", // 请求方式DELETE
-        contentType: "application/json", // 发送信息至服务器时的内容编码类型
-        // 发送到服务器的数据。
-        data: JSON.stringify({
-            id: id
-        }),
-        async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
-        // 请求成功后的回调函数。
-        success: function (data) {
-            if (200 === data.statusCode) {
-                location.reload();
-            } else if (7004 === data.statusCode) {
-                location.reload();
-            } else {
-                alert("系统错误");
-            }
-        },
-        // 请求出错时调用的函数
-        error: function () {
-            alert("数据发送失败");
-        }
-    });
+let structure = {id: 0, structureNo: ""};
+
+function deleteStructure(id, structureNo) {
+    structure.id = id;
+    structure.structureNo = structureNo;
+    $("#strNoName").text(structureNo);
 }
 
 function versionList(structureNo, materialNo, latestVersion) {

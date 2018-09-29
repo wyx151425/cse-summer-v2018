@@ -10,6 +10,7 @@ import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.Generator;
 import com.cse.summer.util.StatusCode;
+import jdk.net.SocketFlow;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.poifs.crypt.HashAlgorithm;
@@ -230,13 +231,13 @@ public class FileServiceImpl implements FileService {
                 if (0 == level) {
                     material.setAbsoluteAmount(1);
                 } else {
-                    if (null == row.getCell(10) || "".equals(row.getCell(10).toString())) {
-                        material.setAbsoluteAmount(0);
+                    if (null == row.getCell(10) || "".equals(row.getCell(10).toString().trim())) {
+                        throw new SummerException(StatusCode.MATERIAL_AMOUNT_NULL);
                     } else {
                         if ("*".equals(row.getCell(10).toString())) {
                             material.setAbsoluteAmount(0);
                         } else {
-                            material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(10).toString()));
+                            material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(10).toString().trim().replace(".0", "")));
                         }
                     }
                 }
@@ -717,8 +718,10 @@ public class FileServiceImpl implements FileService {
                 if (null != row.getCell(9)) {
                     material.setStandard(row.getCell(9).toString());
                 }
-                if (null != row.getCell(10)) {
-                    material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(10).toString()));
+                if (null == row.getCell(10) || "".equals(row.getCell(10).toString().trim())) {
+                    throw new SummerException(StatusCode.MATERIAL_AMOUNT_NULL);
+                } else {
+                    material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(10).toString().trim()));
                 }
                 if (null != row.getCell(12)) {
                     material.setSource(row.getCell(12).toString());

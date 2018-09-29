@@ -127,6 +127,8 @@ $(document).ready(function () {
             $(".progress-prompt").text("存在层级为空的物料");
         } else if (10003 === data.statusCode) {
             $(".progress-prompt").text("顶层物料的物料号为空");
+        } else if (10004 === data.statusCode) {
+            $(".progress-prompt").text("存在层数量为空的物料");
         } else if (20001 === data.statusCode) {
             $(".progress-prompt").text("某顶层物料的物料号为空，因此部分文件导入失败");
         } else if (20002 === data.statusCode) {

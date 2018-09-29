@@ -24,6 +24,7 @@ public class StatusCode {
     public static final int MATERIAL_NO_EXIST = 10001;
     public static final int MATERIAL_LEVEL_BLANK = 10002;
     public static final int TOP_MATERIAL_NO_BLANK = 10003;
+    public static final int MATERIAL_AMOUNT_NULL = 10004;
 
     /**
      * 用于多文件上传
