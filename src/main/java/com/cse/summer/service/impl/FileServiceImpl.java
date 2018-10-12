@@ -633,6 +633,22 @@ public class FileServiceImpl implements FileService {
             throw new SummerException(StatusCode.MULTI_PARAM_DEFECT);
         }
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
+
+        // 解析首行 获取编校审数据
+        Row topRow = workbook.getSheetAt(0).getRow(0);
+        String organizer = "";
+        if (null != topRow.getCell(5)) {
+            organizer = topRow.getCell(5).toString();
+        }
+        String proofreader = "";
+        if (null != topRow.getCell(8)) {
+            proofreader = topRow.getCell(8).toString();
+        }
+        String auditor = "";
+        if (null != topRow.getCell(10)) {
+            auditor = topRow.getCell(10).toString();
+        }
+
         Row structRow = workbook.getSheetAt(0).getRow(4);
         String materNo = structRow.getCell(3).toString();
         if ("".equals(materNo)) {
@@ -645,6 +661,11 @@ public class FileServiceImpl implements FileService {
         } else {
             List<Material> materialList = new ArrayList<>(100);
             newStructureAnalysis(workbook.getSheetAt(0), structure, materialList, 0);
+
+            materialList.get(0).setOrganizer(organizer);
+            materialList.get(0).setProofreader(proofreader);
+            materialList.get(0).setAuditor(auditor);
+
             materialRepository.saveAll(materialList);
 
             structure.setObjectId(Generator.getObjectId());
@@ -759,6 +780,22 @@ public class FileServiceImpl implements FileService {
             IOException, InvalidFormatException {
         // 开始解析新版本数据
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
+
+        // 解析首行 获取编校审数据
+        Row topRow = workbook.getSheetAt(0).getRow(0);
+        String organizer = "";
+        if (null != topRow.getCell(5)) {
+            organizer = topRow.getCell(5).toString();
+        }
+        String proofreader = "";
+        if (null != topRow.getCell(8)) {
+            proofreader = topRow.getCell(8).toString();
+        }
+        String auditor = "";
+        if (null != topRow.getCell(10)) {
+            auditor = topRow.getCell(10).toString();
+        }
+
         Row structRow = workbook.getSheetAt(0).getRow(4);
         String materNo = structRow.getCell(3).toString();
         if ("".equals(materNo)) {
@@ -783,6 +820,11 @@ public class FileServiceImpl implements FileService {
         List<Material> materialList = new ArrayList<>(100);
         Sheet sheet = workbook.getSheetAt(0);
         newStructureAnalysis(sheet, structure, materialList, latestVersion);
+
+        materialList.get(0).setOrganizer(organizer);
+        materialList.get(0).setProofreader(proofreader);
+        materialList.get(0).setAuditor(auditor);
+
         materialRepository.saveAll(materialList);
     }
 
@@ -951,7 +993,6 @@ public class FileServiceImpl implements FileService {
         sheet.setColumnWidth(18, 101 * 32);
         sheet.setColumnWidth(19, 101 * 32);
 
-
         XSSFRow row0;
 
         if (0 == type) {
@@ -972,16 +1013,31 @@ public class FileServiceImpl implements FileService {
             cell4.setCellValue("编制");
             cell4.setCellStyle(blue);
             XSSFCell cell5 = row0.createCell(5);
+            if (null != materialList.get(0).getOrganizer()) {
+                cell5.setCellValue(materialList.get(0).getOrganizer());
+            } else {
+                cell5.setCellValue("");
+            }
             cell5.setCellStyle(border);
             XSSFCell cell6 = row0.createCell(7);
             cell6.setCellValue("校对");
             cell6.setCellStyle(blue);
             XSSFCell cell7 = row0.createCell(8);
+            if (null != materialList.get(0).getProofreader()) {
+                cell7.setCellValue(materialList.get(0).getProofreader());
+            } else {
+                cell7.setCellValue("");
+            }
             cell7.setCellStyle(border);
             XSSFCell cell8 = row0.createCell(9);
             cell8.setCellValue("审核");
             cell8.setCellStyle(blue);
             XSSFCell cell9 = row0.createCell(10);
+            if (null != materialList.get(0).getAuditor()) {
+                cell9.setCellValue(materialList.get(0).getAuditor());
+            } else {
+                cell9.setCellValue("");
+            }
             cell9.setCellStyle(border);
             i++;
 
@@ -1121,9 +1177,9 @@ public class FileServiceImpl implements FileService {
         i++;
 
         if (1 == type) {
-            sheet.createFreezePane(20,3,20,3);
+            sheet.createFreezePane(20, 3, 20, 3);
         } else {
-            sheet.createFreezePane(20,4,20,4);
+            sheet.createFreezePane(20, 4, 20, 4);
         }
 
         XSSFRow row = sheet.createRow(i);

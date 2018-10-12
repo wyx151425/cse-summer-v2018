@@ -128,6 +128,19 @@ public class Material extends Entity implements Serializable {
      */
     private Integer childCount;
 
+    /**
+     * 编制者
+     */
+    private String organizer;
+    /**
+     * 校对者
+     */
+    private String proofreader;
+    /**
+     * 审核者
+     */
+    private String auditor;
+
     public Material() {
     }
 
@@ -353,5 +366,29 @@ public class Material extends Entity implements Serializable {
 
     public void setChildCount(Integer childCount) {
         this.childCount = childCount;
+    }
+
+    public String getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(String organizer) {
+        this.organizer = organizer;
+    }
+
+    public String getProofreader() {
+        return proofreader;
+    }
+
+    public void setProofreader(String proofreader) {
+        this.proofreader = proofreader;
+    }
+
+    public String getAuditor() {
+        return auditor;
+    }
+
+    public void setAuditor(String auditor) {
+        this.auditor = auditor;
     }
 }
