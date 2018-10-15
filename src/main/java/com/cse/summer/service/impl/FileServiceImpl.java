@@ -121,20 +121,23 @@ public class FileServiceImpl implements FileService {
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
 
-        cseBOMExcelProcess(machineName, sheet, materialList, structureList);
-
+        boolean machineMark = false;
         // 检查机器是否存在
         Machine targetMachine = machineRepository.findMachineByName(machineName);
         if (null == targetMachine) {
             Machine machine = createNewMachine(machineName);
             machineRepository.save(machine);
+        } else {
+            machineMark = true;
         }
+
+        cseBOMExcelProcess(machineName, sheet, materialList, structureList, machineMark);
 
         structureRepository.saveAll(structureList);
         materialRepository.saveAll(materialList);
     }
 
-    private void cseBOMExcelProcess(String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList) {
+    private void cseBOMExcelProcess(String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList, boolean machineMark) {
         // 用于维护部套层级的数组
         Material[] levelArr = new Material[12];
         // Workbook行索引
@@ -165,16 +168,17 @@ public class FileServiceImpl implements FileService {
                             materials.get(i).setLatestVersion(latestVersion);
                         }
                         materialRepository.saveAll(materials);
-                    } else {
-                        // 保存该部套
-                        Structure structure = createNewStructure(machineName);
-                        structure.setStructureNo(row.getCell(0).toString());
-                        structure.setMaterialNo(materialNo);
-                        structure.setVersion(latestVersion);
-                        if (null != row.getCell(11) && !"".equals(row.getCell(11).toString())) {
-                            structure.setAmount((int) Double.parseDouble(row.getCell(11).toString()));
+                        if (!machineMark) {
+                            // 保存该部套
+                            Structure structure = createNewStructure(machineName);
+                            structure.setStructureNo(row.getCell(0).toString());
+                            structure.setMaterialNo(materialNo);
+                            structure.setVersion(latestVersion);
+                            if (null != row.getCell(11) && !"".equals(row.getCell(11).toString())) {
+                                structure.setAmount((int) Double.parseDouble(row.getCell(11).toString()));
+                            }
+                            structureList.add(structure);
                         }
-                        structureList.add(structure);
                     }
                 }
                 Material material = createNewMaterial();
