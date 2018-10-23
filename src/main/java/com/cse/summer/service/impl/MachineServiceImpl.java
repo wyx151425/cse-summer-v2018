@@ -48,7 +48,7 @@ public class MachineServiceImpl implements MachineService {
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List<Machine> findMachineList() {
-        return machineRepository.findAll();
+        return machineRepository.findAllByStatus(1);
     }
 
     @Override

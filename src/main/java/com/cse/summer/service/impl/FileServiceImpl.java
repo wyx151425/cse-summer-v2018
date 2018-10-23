@@ -10,10 +10,8 @@ import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.Generator;
 import com.cse.summer.util.StatusCode;
-import jdk.net.SocketFlow;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.poifs.crypt.HashAlgorithm;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.RegionUtil;
@@ -31,9 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author 王振琦
@@ -115,38 +111,40 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importCSEBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException {
+    public Map<String, Boolean> importCSEBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheet("整机BOM");
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
 
-        boolean machineMark = false;
         // 检查机器是否存在
-        Machine targetMachine = machineRepository.findMachineByName(machineName);
+        Machine targetMachine = machineRepository.findMachineByNameAndStatus(machineName, 1);
         if (null == targetMachine) {
             Machine machine = createNewMachine(machineName);
             machineRepository.save(machine);
-        } else {
-            machineMark = true;
         }
 
-        cseBOMExcelProcess(machineName, sheet, materialList, structureList, machineMark);
+        Map<String, Boolean> map = cseBOMExcelProcess(machineName, sheet, materialList, structureList);
 
         structureRepository.saveAll(structureList);
         materialRepository.saveAll(materialList);
+
+        return map;
     }
 
-    private void cseBOMExcelProcess(String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList, boolean machineMark) {
+    private Map<String, Boolean> cseBOMExcelProcess(String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList) {
         // 用于维护部套层级的数组
         Material[] levelArr = new Material[12];
+        Map<String, Boolean> map = new LinkedHashMap<>();
         // Workbook行索引
         int index = 0;
+        String unImportMater = "";
         for (Row row : sheet) {
             // 前三行数据为机器信息及字段的批注，所以不予解析
             if (index < 3) {
                 index++;
             } else {
+
                 if (null == row.getCell(3)) {
                     break;
                 }
@@ -159,26 +157,41 @@ public class FileServiceImpl implements FileService {
                 int latestVersion = 0;
 
                 if (0 == level) {
-                    // 如果通过该部套顶层物料的物料号和专利方版本查询到库中存在部套，则为库中的部套升级最新版本
+                    boolean isExist = false;
+                    unImportMater = "";
+                    /**
+                     * 判断物料是否导入，部套是否关联的逻辑如下：
+                     * 1. 从库中检查物料是否存在，如果存在，则获得最新版本，为部套设置关联最新版本的物料，
+                     * 并且标记不导入部套的顶层物料号；不存在，则最新版本为0，为部套设置物料版本为0。
+                     * 2. 如果机器存在，则检查该部套是否与该部套的顶层物料关联，如果已关联，则不保存部套，
+                     * 如果未关联，才把部套保存近部套库；如果机器不存在，则建立关联关系。
+                     */
                     List<Material> materials = materialRepository.findAllByAtNo(materialNo);
                     if (materials.size() > 0) {
-                        int oldLatestVersion = materials.get(0).getLatestVersion();
-                        latestVersion = oldLatestVersion + 1;
-                        for (int i = 0; i < materials.size(); i++) {
-                            materials.get(i).setLatestVersion(latestVersion);
+                        latestVersion = materials.get(0).getLatestVersion();
+                        unImportMater = materialNo;
+                        isExist = true;
+                    }
+
+                    Structure structure = createNewStructure(machineName);
+                    structure.setStructureNo(row.getCell(0).toString());
+                    Structure structure1 = structureRepository.findStructureByMachineNameAndMaterialNoAndStatusGreaterThanEqual(machineName, materialNo, 1);
+                    if (null == structure1) {
+                        structure.setVersion(latestVersion);
+                        structure.setMaterialNo(materialNo);
+                        if (null != row.getCell(11) && !"".equals(row.getCell(11).toString())) {
+                            structure.setAmount((int) Double.parseDouble(row.getCell(11).toString()));
                         }
-                        materialRepository.saveAll(materials);
-                        if (!machineMark) {
-                            // 保存该部套
-                            Structure structure = createNewStructure(machineName);
-                            structure.setStructureNo(row.getCell(0).toString());
-                            structure.setMaterialNo(materialNo);
-                            structure.setVersion(latestVersion);
-                            if (null != row.getCell(11) && !"".equals(row.getCell(11).toString())) {
-                                structure.setAmount((int) Double.parseDouble(row.getCell(11).toString()));
-                            }
-                            structureList.add(structure);
-                        }
+                        structureList.add(structure);
+                    }
+
+                    /**
+                     * 1 标识部套存在
+                     */
+                    if (isExist) {
+                        map.put(structure.getStructureNo(), false);
+                    } else {
+                        map.put(structure.getStructureNo(), true);
                     }
                 }
                 Material material = createNewMaterial();
@@ -245,7 +258,6 @@ public class FileServiceImpl implements FileService {
                         }
                     }
                 }
-                materialList.add(material);
 
                 if (0 == level) {
                     // 最上层节点时不设置父节点
@@ -263,8 +275,13 @@ public class FileServiceImpl implements FileService {
                     // 将该节点覆盖数组中相同层级的上一个节点
                     levelArr[level] = material;
                 }
+
+                if (!material.getAtNo().equals(unImportMater)) {
+                    materialList.add(material);
+                }
             }
         }
+        return map;
     }
 
     @Override
@@ -280,7 +297,7 @@ public class FileServiceImpl implements FileService {
 
         xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, null, names);
 
-        Machine targetMachine = machineRepository.findMachineByName(machineName);
+        Machine targetMachine = machineRepository.findMachineByNameAndStatus(machineName, 1);
         if (null == targetMachine) {
             Machine machine = createNewMachine(machineName);
             machineRepository.save(machine);
@@ -504,7 +521,7 @@ public class FileServiceImpl implements FileService {
 
         winGDExcelProcess(machineName, workbook, materialList, structureList, names);
 
-        Machine targetMachine = machineRepository.findMachineByName(machineName);
+        Machine targetMachine = machineRepository.findMachineByNameAndStatus(machineName, 1);
         if (null == targetMachine) {
             Machine machine = createNewMachine(machineName);
             machineRepository.save(machine);
@@ -835,7 +852,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public Excel exportMachineExcel(String machineName, Integer status) {
-        Machine machine = machineRepository.findMachineByName(machineName);
+        Machine machine = machineRepository.findMachineByNameAndStatus(machineName, 1);
         List<Structure> structureList;
         if (0 == status) {
             structureList = structureRepository.findAllByMachineNameAndStatusGreaterThanEqualOrderByStructureNo(machineName, 1);
@@ -883,7 +900,7 @@ public class FileServiceImpl implements FileService {
             material.setStructureNo(structure.getStructureNo());
         }
 
-        Machine machine = machineRepository.findMachineByName(structure.getMachineName());
+        Machine machine = machineRepository.findMachineByNameAndStatus(structure.getMachineName(), 1);
 
         XSSFWorkbook workbook = buildExcelWorkbook(materialList, machine, 0);
         String name = structure.getStructureNo() + "_" + structure.getMaterialNo() + "_" + structure.getVersion() + ".xlsx";

@@ -8,6 +8,7 @@ import com.cse.summer.domain.StructureList;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.Constant;
 import com.cse.summer.util.StatusCode;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author 王振琦
@@ -44,12 +46,13 @@ public class FileController extends BaseFacade {
         if (!Constant.DocType.XLSX.equals(cseBom.getContentType())) {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
+        Map<String, Boolean> map;
         try {
-            fileService.importCSEBOM(machineName, cseBom);
+            map = fileService.importCSEBOM(machineName, cseBom);
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
-        return new Response<>();
+        return new Response<>(map);
     }
 
     @PostMapping(value = "files/import/xml")

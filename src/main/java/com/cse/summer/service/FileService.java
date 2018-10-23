@@ -8,6 +8,7 @@ import org.dom4j.DocumentException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * 文件导入导出业务逻辑类
@@ -20,10 +21,11 @@ public interface FileService {
      *
      * @param machineName 机器名
      * @param file        CSE BOM文件
+     * @return 导入结果标识
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    void importCSEBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
+    Map<String, Boolean> importCSEBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入并解析MAN XML文件

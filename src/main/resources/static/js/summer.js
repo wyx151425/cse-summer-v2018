@@ -1,5 +1,10 @@
 $(document).ready(function () {
     $("#CSEBOMImport").click(function () {
+        let machineName = $("#machineName3").val();
+        if ("" === machineName) {
+            alert("请输入机器名");
+            return;
+        }
         $("#CSEBOMForm").css("display", "none");
         $("#CSEBOMConfirm").css("display", "block");
         $.ajaxFileUpload({
@@ -7,9 +12,30 @@ $(document).ready(function () {
             secureuri: false,  // 是否需要安全协议，一般设置为false
             fileElementId: 'csebom',  // 文件上传域的ID
             dataType: 'json',  // 返回值类型 一般设置为json
-            data: {machineName: $("#machineName3").val()},
+            data: {machineName: machineName},
             success: function (data) {
-                successCallback(data);
+                if (200 === data.statusCode) {
+                    let importResult = $("#importResult");
+                    for (var val in data.data) {
+                        let flag = data.data[val];
+                        let str;
+                        if (flag) {
+                            str = "导入成功";
+                        } else {
+                            str = "使用库中部套（未导入）";
+                        }
+                        importResult.append(
+                            '<tr>' +
+                                '<td>' + val + '</td>' +
+                                '<td>' + str + '</td>' +
+                            '</tr>'
+                        );
+                    }
+                    $(".progress-prompt").text("导入成功，刷新页面查看更新");
+                    $("#CSEBOMResult").css("display", "block");
+                } else {
+                    successCallback(data);
+                }
             },
             error: function () {
                 $(".progress-prompt").text("系统错误");
@@ -18,6 +44,11 @@ $(document).ready(function () {
     });
 
     $("#xmlImport").click(function () {
+        let machineName = $("#machineName1").val();
+        if ("" === machineName) {
+            alert("请输入机器名");
+            return;
+        }
         $("#manXmlForm").css("display", "none");
         $("#manXmlConfirm").css("display", "block");
         $.ajaxFileUpload({
@@ -25,7 +56,7 @@ $(document).ready(function () {
             secureuri: false,  // 是否需要安全协议，一般设置为false
             fileElementId: 'manXml',  // 文件上传域的ID
             dataType: 'json',  // 返回值类型 一般设置为json
-            data: {machineName: $("#machineName1").val()},
+            data: {machineName: machineName},
             success: function (data) {
                 successCallback(data);
             },
@@ -36,6 +67,11 @@ $(document).ready(function () {
     });
 
     $("#excelImport").click(function () {
+        let machineName = $("#machineName2").val();
+        if ("" === machineName) {
+            alert("请输入机器名");
+            return;
+        }
         $("#winGDExcelForm").css("display", "none");
         $("#winGDExcelConfirm").css("display", "block");
         $.ajaxFileUpload({
@@ -43,7 +79,7 @@ $(document).ready(function () {
             secureuri: false,  // 是否需要安全协议，一般设置为false
             fileElementId: 'winGDExcel',  // 文件上传域的ID
             dataType: 'json',  // 返回值类型 一般设置为json
-            data: {machineName: $("#machineName2").val()},
+            data: {machineName: machineName},
             success: function (data) {
                 successCallback(data);
             },
