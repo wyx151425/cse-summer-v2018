@@ -18,4 +18,9 @@ public interface UserService {
      * @param user 用户对象
      */
     void updatePassword(User user);
+
+    /**
+     * 清空数据库中的数据
+     */
+    void clearData();
 }

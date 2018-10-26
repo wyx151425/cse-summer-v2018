@@ -24,6 +24,7 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" th:href="@{/index}">CSE DMS</a>
+            <!--<a class="navbar-brand" th:href="@{/index}" style="color: #ff0000">CSE DMS 测试系统</a>-->
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
@@ -40,6 +41,9 @@
             <button id="logout" class="btn btn-primary pull-right" style="margin-bottom: 20px">退出登录</button>
             <button id="searchStr" class="btn btn-primary pull-right" style="margin-bottom: 20px; margin-right: 16px"
                     data-toggle="modal" data-target="#searchStruct">部套关联
+            </button>
+            <button id="clearData" class="btn btn-primary pull-right" style="margin-bottom: 20px; margin-right: 16px"
+                    data-toggle="modal" data-target="#clearDataModal" th:if="${4 == session.user.role}">清空数据
             </button>
             <table class="table table-bordered table-hover">
                 <thead>
@@ -317,6 +321,33 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="clearDataModal" tabindex="-1" role="dialog" aria-labelledby="clearDataLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="clearDataLabel">清理数据</h4>
+            </div>
+            <form id="clearDataForm">
+                <div id="clearPrompt" class="modal-body">
+                    <p id="thisPrompt" class="progress-prompt">您确定要清空数据库中全部数据吗？</p>
+                </div>
+                <div id="clearPromptProgress" class="progress-prompt" style="display: none;margin: 16px 0;">
+                    <div class="loader loader-1">
+                        <div class="loader-outter"></div>
+                        <div class="loader-inner"></div>
+                    </div>
+                    正在清理...
+                </div>
+                <div id="clearPromptFooter" class="modal-footer">
+                    <button id="clearConfirm" type="button" class="btn btn-primary">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </form>
         </div>

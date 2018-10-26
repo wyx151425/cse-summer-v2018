@@ -312,6 +312,40 @@ $(document).ready(function () {
             }
         });
     });
+
+    $("#clearConfirm").click(function () {
+        let clearPrompt = $("#clearPrompt");
+        let clearPromptProgress = $("#clearPromptProgress");
+        let clearPromptFooter = $("#clearPromptFooter");
+        clearPrompt.css("display", "none");
+        clearPromptProgress.css("display", "block");
+        clearPromptFooter.css("display", "none");
+        $.ajax({
+            url: "api/data/clear",
+            dataType: "json", // 预期服务器返回的数据类型
+            type: "post", // 请求方式GET
+            contentType: "application/json", // 发送信息至服务器时的内容编码类型
+            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
+            // 请求成功后的回调函数。
+            success: function (data) {
+                if (200 === data.statusCode) {
+                    location.reload();
+                } else {
+                    clearPrompt.css("display", "block");
+                    clearPromptProgress.css("display", "none");
+                    clearPromptFooter.css("display", "block");
+                    $("#thisPrompt").text("清理失败");
+                }
+            },
+            // 请求出错时调用的函数
+            error: function () {
+                clearPrompt.css("display", "block");
+                clearPromptProgress.css("display", "none");
+                clearPromptFooter.css("display", "block");
+                $("#thisPrompt").text("清理失败");
+            }
+        });
+    });
 });
 
 function toUpdateMachine(machineId, machineName, machineNo, machineType, patent, cylinderAmount, shipNo, classificationSociety) {

@@ -1,7 +1,11 @@
 package com.cse.summer.service.impl;
 
 import com.cse.summer.context.exception.SummerException;
+import com.cse.summer.domain.Structure;
 import com.cse.summer.domain.User;
+import com.cse.summer.repository.MachineRepository;
+import com.cse.summer.repository.MaterialRepository;
+import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.repository.UserRepository;
 import com.cse.summer.service.UserService;
 import com.cse.summer.util.StatusCode;
@@ -16,10 +20,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final MachineRepository machineRepository;
+    private final StructureRepository structureRepository;
+    private final MaterialRepository materialRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, MachineRepository machineRepository, StructureRepository structureRepository, MaterialRepository materialRepository) {
         this.userRepository = userRepository;
+        this.machineRepository = machineRepository;
+        this.structureRepository = structureRepository;
+        this.materialRepository = materialRepository;
     }
 
     @Override
@@ -45,5 +55,13 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public void updatePassword(User user) {
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void clearData() {
+        materialRepository.deleteAll();
+        structureRepository.deleteAll();
+        machineRepository.deleteAll();
     }
 }

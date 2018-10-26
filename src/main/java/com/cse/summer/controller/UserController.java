@@ -1,8 +1,11 @@
 package com.cse.summer.controller;
 
+import com.cse.summer.context.exception.SummerException;
 import com.cse.summer.domain.Response;
 import com.cse.summer.domain.User;
 import com.cse.summer.service.UserService;
+import com.cse.summer.util.Constant;
+import com.cse.summer.util.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +41,17 @@ public class UserController extends BaseFacade {
         User user = getSessionUser();
         user.setPassword(reqUser.getPassword());
         userService.updatePassword(user);
+        return new Response<>();
+    }
+
+    @PostMapping(value = "data/clear")
+    public Response<Object> actionClearData() {
+        User user = getSessionUser();
+        if (4 != user.getRole()) {
+            throw new SummerException(StatusCode.SYSTEM_ERROR);
+        } else {
+            userService.clearData();
+        }
         return new Response<>();
     }
 }

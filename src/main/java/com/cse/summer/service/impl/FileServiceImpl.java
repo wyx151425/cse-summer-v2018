@@ -228,7 +228,12 @@ public class FileServiceImpl implements FileService {
                     material.setWeight(row.getCell(13).toString());
                 }
                 if (null != row.getCell(14)) {
-                    material.setSpareExp(row.getCell(14).toString().trim().replace(".0", ""));
+                    String spareExp = row.getCell(14).toString().trim();
+                    if (spareExp.endsWith(".0")) {
+                        material.setSpareExp(spareExp.replace(".0", ""));
+                    } else {
+                        material.setSpareExp(spareExp);
+                    }
                 }
                 if (null != row.getCell(15)) {
                     material.setSpareSrc(row.getCell(15).toString());
@@ -772,7 +777,12 @@ public class FileServiceImpl implements FileService {
                     material.setWeight(row.getCell(13).toString());
                 }
                 if (null != row.getCell(14)) {
-                    material.setSpareExp(row.getCell(14).toString().trim().replace(".0", ""));
+                    String spareExp = row.getCell(14).toString().trim();
+                    if (spareExp.endsWith(".0")) {
+                        material.setSpareExp(spareExp.replace(".0", ""));
+                    } else {
+                        material.setSpareExp(spareExp);
+                    }
                 }
                 if (null != row.getCell(15)) {
                     material.setSpareSrc(row.getCell(15).toString());
@@ -1272,7 +1282,7 @@ public class FileServiceImpl implements FileService {
             if (0 == level) {
                 tempCell2.setCellValue(material.getStructureNo());
             } else {
-                if (material.getPositionNo().contains(".0")) {
+                if (material.getPositionNo().endsWith(".0")) {
                     String pos = material.getPositionNo().replace(".0", "");
                     if (1 == pos.length()) {
                         tempCell2.setCellValue("00" + pos);
