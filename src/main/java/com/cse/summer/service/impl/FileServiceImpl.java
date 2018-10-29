@@ -10,6 +10,7 @@ import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.Generator;
 import com.cse.summer.util.StatusCode;
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
@@ -113,7 +114,19 @@ public class FileServiceImpl implements FileService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Boolean> importCSEBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
+
         Sheet sheet = workbook.getSheet("整机BOM");
+
+        CellStyle textStyle = workbook.createCellStyle();
+        DataFormat format = workbook.createDataFormat();
+        textStyle.setDataFormat(format.getFormat("@"));
+        for (Row row : sheet) {
+            for (Cell cell : row) {
+                cell.setCellStyle(textStyle);
+                cell.setCellType(XSSFCell.CELL_TYPE_STRING);
+            }
+        }
+
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
 
@@ -139,6 +152,7 @@ public class FileServiceImpl implements FileService {
         // Workbook行索引
         int index = 0;
         String unImportMater = "";
+
         for (Row row : sheet) {
             // 前三行数据为机器信息及字段的批注，所以不予解析
             if (index < 3) {
@@ -256,10 +270,19 @@ public class FileServiceImpl implements FileService {
                     if (null == row.getCell(10) || "".equals(row.getCell(10).toString().trim())) {
                         throw new SummerException(StatusCode.MATERIAL_AMOUNT_NULL);
                     } else {
-                        if ("*".equals(row.getCell(10).toString())) {
+                        if ("*".equals(row.getCell(10).toString().trim())) {
                             material.setAbsoluteAmount(0);
                         } else {
-                            material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(10).toString().trim().replace(".0", "")));
+                            String amount = row.getCell(10).toString().trim();
+                            if (amount.endsWith(".0")) {
+                                material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(10).toString().trim().replace(".0", "")));
+                            } else {
+                                if (amount.contains("0.")) {
+                                    material.setAbsoluteAmount(1);
+                                } else {
+                                    material.setAbsoluteAmount(Integer.valueOf(amount));
+                                }
+                            }
                         }
                     }
                 }
@@ -686,7 +709,18 @@ public class FileServiceImpl implements FileService {
             throw new SummerException(StatusCode.MULTI_STRUCTURE_EXIST);
         } else {
             List<Material> materialList = new ArrayList<>(100);
-            newStructureAnalysis(workbook.getSheetAt(0), structure, materialList, 0);
+            Sheet sheet = workbook.getSheetAt(0);
+            CellStyle textStyle = workbook.createCellStyle();
+            DataFormat format = workbook.createDataFormat();
+            textStyle.setDataFormat(format.getFormat("@"));
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    cell.setCellStyle(textStyle);
+                    cell.setCellType(XSSFCell.CELL_TYPE_STRING);
+                }
+            }
+
+            newStructureAnalysis(sheet, structure, materialList, 0);
 
             materialList.get(0).setOrganizer(organizer);
             materialList.get(0).setProofreader(proofreader);
@@ -768,7 +802,16 @@ public class FileServiceImpl implements FileService {
                 if (null == row.getCell(10) || "".equals(row.getCell(10).toString().trim())) {
                     throw new SummerException(StatusCode.MATERIAL_AMOUNT_NULL);
                 } else {
-                    material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(10).toString().trim()));
+                    String amount = row.getCell(10).toString().trim();
+                    if (amount.endsWith(".0")) {
+                        material.setAbsoluteAmount((int) Double.parseDouble(row.getCell(10).toString().trim().replace(".0", "")));
+                    } else {
+                        if (amount.contains("0.")) {
+                            material.setAbsoluteAmount(1);
+                        } else {
+                            material.setAbsoluteAmount(Integer.valueOf(amount));
+                        }
+                    }
                 }
                 if (null != row.getCell(12)) {
                     material.setSource(row.getCell(12).toString());
@@ -850,6 +893,17 @@ public class FileServiceImpl implements FileService {
 
         List<Material> materialList = new ArrayList<>(100);
         Sheet sheet = workbook.getSheetAt(0);
+
+        CellStyle textStyle = workbook.createCellStyle();
+        DataFormat format = workbook.createDataFormat();
+        textStyle.setDataFormat(format.getFormat("@"));
+        for (Row row : sheet) {
+            for (Cell cell : row) {
+                cell.setCellStyle(textStyle);
+                cell.setCellType(XSSFCell.CELL_TYPE_STRING);
+            }
+        }
+
         newStructureAnalysis(sheet, structure, materialList, latestVersion);
 
         materialList.get(0).setOrganizer(organizer);
@@ -881,18 +935,31 @@ public class FileServiceImpl implements FileService {
 
     private void amountAndSpareHandler(List<Material> materialList, int cylinderAmount, Structure structure) {
         Material[] materArray = new Material[12];
+        Material amountNotNullMater = null;
         for (int index = 0; index < materialList.size(); index++) {
             Material material = materialList.get(index);
             material.setStructureNo(structure.getStructureNo());
+            if (1 == material.getLevel() && !"000".equals(material.getPositionNo())) {
+                amountNotNullMater = material;
+            }
             materArray[material.getLevel()] = material;
             if (0 == material.getLevel()) {
                 material.setAmount(structure.getAmount());
                 material.setAbsoluteAmount(structure.getAmount());
             }
             if (0 != material.getLevel() && null != materArray[material.getLevel() - 1].getAmount()) {
-                Integer parentAmount = materArray[material.getLevel() - 1].getAmount();
-                if (null != material.getAbsoluteAmount()) {
-                    material.setAmount(parentAmount * material.getAbsoluteAmount());
+                Material parent = materArray[material.getLevel() - 1];
+                if (1 == parent.getLevel() && "000".equals(parent.getPositionNo()) && 0 == parent.getAmount()
+                        && null != amountNotNullMater && amountNotNullMater.getStructureNo().equals(material.getStructureNo())) {
+                    Integer parentAmount = amountNotNullMater.getAmount();
+                    if (null != material.getAbsoluteAmount()) {
+                        material.setAmount(parentAmount * material.getAbsoluteAmount());
+                    }
+                } else {
+                    Integer parentAmount = parent.getAmount();
+                    if (null != material.getAbsoluteAmount()) {
+                        material.setAmount(parentAmount * material.getAbsoluteAmount());
+                    }
                 }
             }
             if (!"".equals(material.getSpareExp().trim())) {
