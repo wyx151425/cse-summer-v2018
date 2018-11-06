@@ -425,7 +425,13 @@ public class FileServiceImpl implements FileService {
             }
             if (null != revision.element("quantity")) {
                 // 可能存在数量为1.00的形式，所以字符串先转为double再转为int
-                material.setAbsoluteAmount((int) Double.parseDouble(revision.element("quantity").getText()));
+                if ("".equals(revision.element("quantity").getText())) {
+                    material.setAbsoluteAmount(0);
+                } else {
+                    material.setAbsoluteAmount((int) Double.parseDouble(revision.element("quantity").getText()));
+                }
+            } else {
+                material.setAbsoluteAmount(0);
             }
             if (null != revision.element("drawingSize")) {
                 material.setDrawingSize(revision.element("drawingSize").getText());
@@ -470,7 +476,13 @@ public class FileServiceImpl implements FileService {
                 material.setWeight(revision.element("mass").getText());
             }
             if (null != revision.element("quantity")) {
-                material.setAbsoluteAmount((int) Double.parseDouble(revision.element("quantity").getText()));
+                if ("".equals(revision.element("quantity").getText())) {
+                    material.setAbsoluteAmount(0);
+                } else {
+                    material.setAbsoluteAmount((int) Double.parseDouble(revision.element("quantity").getText()));
+                }
+            } else {
+                material.setAbsoluteAmount(0);
             }
             if (null != revision.element("drawingSize")) {
                 material.setDrawingSize(revision.element("drawingSize").getText());

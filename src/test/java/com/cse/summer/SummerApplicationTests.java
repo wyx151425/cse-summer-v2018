@@ -122,4 +122,34 @@ public class SummerApplicationTests {
 //            e.printStackTrace();
 //        }
 //    }
+//
+//    @Test
+//    public void addUsers() {
+//        List<User> users = new ArrayList<>();
+//        User user1 = new User();
+//        user1.setObjectId(Generator.getObjectId());
+//        user1.setStatus(1);
+//        user1.setName("丁玮");
+//        user1.setUsername("dingwei");
+//        user1.setPassword("123456");
+//        user1.setRole(1);
+//        users.add(user1);
+//        User user2 = new User();
+//        user2.setObjectId(Generator.getObjectId());
+//        user2.setStatus(1);
+//        user2.setName("熊丽君");
+//        user2.setUsername("xionglijun");
+//        user2.setPassword("123456");
+//        user2.setRole(1);
+//        users.add(user2);
+//        User user3 = new User();
+//        user3.setObjectId(Generator.getObjectId());
+//        user3.setStatus(1);
+//        user3.setName("乔霈轶");
+//        user3.setUsername("qiaopeiyi");
+//        user3.setPassword("123456");
+//        user3.setRole(1);
+//        users.add(user3);
+//        userRepository.saveAll(users);
+//    }
 }
