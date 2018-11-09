@@ -64,17 +64,16 @@ public class SummerApplicationTests {
 //                } else {
 //                    Name name = new Name();
 //                    name.setObjectId(Generator.getObjectId());
-//                    if (null != row.getCell(0)) {
+//                    if (null != row.getCell(0) && null != row.getCell(0).toString() && !"".equals(row.getCell(0).toString().trim())) {
 //                        name.setEnglish(row.getCell(0).toString());
-//                    } else {
-//                        name.setEnglish("");
+//
+//                        if (null != row.getCell(1)) {
+//                            name.setChinese(row.getCell(1).toString());
+//                        } else {
+//                            name.setChinese("");
+//                        }
+//                        names.add(name);
 //                    }
-//                    if (null != row.getCell(1)) {
-//                        name.setChinese(row.getCell(1).toString());
-//                    } else {
-//                        name.setChinese("");
-//                    }
-//                    names.add(name);
 //                }
 //            }
 //            nameRepository.saveAll(names);

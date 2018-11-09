@@ -97,10 +97,10 @@ public class FileServiceImpl implements FileService {
         material.setDrawingSize("");
         material.setName("");
         material.setChinese("");
-        material.setMaterial("*");
-        material.setStandard("*");
+        material.setMaterial("");
+        material.setStandard("");
         material.setWeight("");
-        material.setSource("*");
+        material.setSource("");
         material.setSpareExp("");
         material.setSpareSrc("");
         material.setDesignNote("");
@@ -360,46 +360,98 @@ public class FileServiceImpl implements FileService {
                 xmlRecursiveTraversal(module, materialList, structureList, null, machineName, parentLevel, null, names);
             }
         } else if ("module".equals(element.getName())) {
-            Element revision = element.element("revision");
-            String structNoM = revision.element("structureNo").getText();
-            String materNoM = element.attributeValue("id");
-            String revisionM = revision.attributeValue("revision");
-            String materialNo = materNoM + "." + revisionM;
-            // 判断部套是否存在，不存在的情况下才需要保存该部套信息
-            Structure targetStruct = structureRepository.findExistStructure(machineName, structNoM, materialNo);
-            // 如果部套不存在，则保存部套，并判断库中是否有部套对应的物料，物料存在则重用库中物料，不存在则新建物料
-            // 如果部套已经存在，那么物料一定也存在了，那么该部套对应的物料所有的子节点都不需要遍历了
-            if (null == targetStruct) {
-                targetStruct = createNewStructure(machineName);
-                targetStruct.setStructureNo(structNoM);
-                targetStruct.setMaterialNo(materialNo);
-                targetStruct.setVersion(0);
+            int level = parentLevel + 1;
+            if (0 == level) {
+                Element revision = element.element("revision");
+                String structNoM = revision.element("structureNo").getText();
+                String materNoM = element.attributeValue("id");
+                String revisionM = revision.attributeValue("revision");
+                String materialNo = materNoM + "." + revisionM;
+                // 判断部套是否存在，不存在的情况下才需要保存该部套信息
+                Structure targetStruct = structureRepository.findExistStructure(machineName, structNoM, materialNo);
+                // 如果部套不存在，则保存部套，并判断库中是否有部套对应的物料，物料存在则重用库中物料，不存在则新建物料
+                // 如果部套已经存在，那么物料一定也存在了，那么该部套对应的物料所有的子节点都不需要遍历了
+                if (null == targetStruct) {
+                    targetStruct = createNewStructure(machineName);
+                    targetStruct.setStructureNo(structNoM);
+                    targetStruct.setMaterialNo(materialNo);
+                    targetStruct.setVersion(0);
 
-                // 判断待保存的物料是否存在
-                List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(materialNo, 0);
-                // 集合大于0表示物料存在
-                if (0 == materials.size()) {
-                    // 如果物料不存在，则需要保存物料的数据，并遍历物料的所有子节点
-                    Material material = createNewMaterial();
-                    material.setAtNo(materialNo);
-                    int level = parentLevel + 1;
-                    material.setLevel(level);
-                    material.setVersion(0);
-                    material.setLatestVersion(0);
-                    material.setMaterialNo(materialNo);
-                    material.setName(element.element("name").getText());
-                    String chineseName = findChineseName(element.element("name").getText().toUpperCase(), names);
-                    material.setChinese(chineseName);
-                    material.setPage(revision.element("noOfPages").getText());
-                    material.setWeight(revision.element("mass").getText());
-                    material.setAbsoluteAmount(1);
-                    materialList.add(material);
-                    Element parts = revision.element("partList");
-                    int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, materialNo, names);
-                    material.setChildCount(childCount);
+                    // 判断待保存的物料是否存在
+                    List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(materialNo, 0);
+                    // 集合大于0表示物料存在
+                    if (0 == materials.size()) {
+                        // 如果物料不存在，则需要保存物料的数据，并遍历物料的所有子节点
+                        Material material = createNewMaterial();
+                        material.setAtNo(materialNo);
+                        material.setLevel(level);
+                        material.setVersion(0);
+                        material.setLatestVersion(0);
+                        material.setMaterialNo(materialNo);
+                        material.setName(element.element("name").getText());
+                        String chineseName = findChineseName(element.element("name").getText().toUpperCase(), names);
+                        material.setChinese(chineseName);
+                        material.setPage(revision.element("noOfPages").getText());
+                        material.setWeight(revision.element("mass").getText());
+                        material.setAbsoluteAmount(1);
+                        materialList.add(material);
+                        Element parts = revision.element("partList");
+                        int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, materialNo, names);
+                        material.setChildCount(childCount);
+                    }
+                    targetStruct.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
+                    structureList.add(targetStruct);
                 }
-                targetStruct.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
-                structureList.add(targetStruct);
+            } else {
+                Material material = createNewMaterial();
+                material.setAtNo(atNo);
+                material.setLevel(level);
+                material.setVersion(0);
+                material.setLatestVersion(0);
+                material.setParentId(parentId);
+
+                String materNoM = element.attributeValue("id");
+                Element revision = element.element("revision");
+                String revisionM = revision.attributeValue("revision");
+                String materialNo = materNoM + "." + revisionM;
+
+                material.setMaterialNo(materialNo);
+                material.setName(element.element("name").getText());
+                String chineseName = findChineseName(element.element("name").getText().toUpperCase(), names);
+                material.setChinese(chineseName);
+
+                if (null != revision.element("mass")) {
+                    material.setWeight(revision.element("mass").getText());
+                }
+                if (null != revision.element("quantity")) {
+                    // 可能存在数量为1.00的形式，所以字符串先转为double再转为int
+                    if ("".equals(revision.element("quantity").getText())) {
+                        material.setAbsoluteAmount(0);
+                    } else {
+                        material.setAbsoluteAmount((int) Double.parseDouble(revision.element("quantity").getText()));
+                    }
+                } else {
+                    material.setAbsoluteAmount(0);
+                }
+                if (null != revision.element("drawingSize")) {
+                    material.setDrawingSize(revision.element("drawingSize").getText());
+                }
+                if (null != revision.element("material")) {
+                    material.setMaterial(revision.element("material").getText());
+                }
+                if (null != revision.element("posNo")) {
+                    material.setPositionNo(revision.element("posNo").getText().substring(1));
+                } else {
+                    material.setPositionNo("000");
+                }
+                if (null != revision.element("sequenceNo")) {
+                    material.setSequenceNo(revision.element("sequenceNo").getText());
+                }
+                materialList.add(material);
+                Element parts = revision.element("partList");
+                int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, atNo, names);
+
+                material.setChildCount(childCount);
             }
         } else if ("part".equals(element.getName())) {
             Material material = createNewMaterial();
@@ -519,11 +571,15 @@ public class FileServiceImpl implements FileService {
         int childCount = 0;
         if (null != parts) {
             List<Element> otherParts = new ArrayList<>();
+            List<Element> module = parts.elements("module");
             List<Element> partList = parts.elements("part");
             List<Element> standardParts = parts.elements("standardPart");
             List<Element> documents = parts.elements("document");
             List<Element> supDrawings = parts.elements("supDrawing");
             List<Element> licData = parts.elements("licData");
+            if (module.size() > 0) {
+                otherParts.addAll(module);
+            }
             if (partList.size() > 0) {
                 otherParts.addAll(partList);
             }
