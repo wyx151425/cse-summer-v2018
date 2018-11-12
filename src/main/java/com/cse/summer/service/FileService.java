@@ -1,6 +1,7 @@
 package com.cse.summer.service;
 
 import com.cse.summer.domain.Excel;
+import com.cse.summer.domain.ImportResult;
 import com.cse.summer.domain.Structure;
 import com.cse.summer.domain.User;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -8,6 +9,7 @@ import org.dom4j.DocumentException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,27 +27,29 @@ public interface FileService {
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    Map<String, Boolean> importCSEBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
+    List<ImportResult> importCSEMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入并解析MAN XML文件
      *
      * @param machineName 机器名
      * @param file        MAN XML文件
+     * @return 导入结果标识
      * @throws DocumentException 文档处理异常
      * @throws IOException       输入输出异常
      */
-    void importMANXml(String machineName, MultipartFile file) throws DocumentException, IOException;
+    List<ImportResult> importMANMachineBOM(String machineName, MultipartFile file) throws DocumentException, IOException;
 
     /**
      * 导入并解析WinGD Excel文件
      *
      * @param machineName 机器名
      * @param file        WinGD Excel文件
+     * @return 导入结果标识
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    void importWinGDExcel(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
+    List<ImportResult> importWinGDMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入新部套
@@ -55,7 +59,7 @@ public interface FileService {
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    void importNewStructureExcel(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
+    void importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入新版本部套的BOM文件
@@ -65,7 +69,7 @@ public interface FileService {
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    void importNewVersionStructureExcel(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
+    void importNewVersionStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导出机器的完整BOM文件
@@ -73,7 +77,7 @@ public interface FileService {
      * @param machineName 机器名
      * @return Excel文件
      */
-    Excel exportMachineExcel(String machineName, Integer status);
+    Excel exportMachineBOM(String machineName, Integer status);
 
     /**
      * 导出机器指定版本的部套的BOM文件
@@ -81,5 +85,5 @@ public interface FileService {
      * @param structure 部套对象
      * @return Excel文件
      */
-    Excel exportStructureExcel(User user, Structure structure);
+    Excel exportStructureBOM(User user, Structure structure);
 }

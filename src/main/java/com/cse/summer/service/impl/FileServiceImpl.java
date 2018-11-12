@@ -10,7 +10,6 @@ import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.Generator;
 import com.cse.summer.util.StatusCode;
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
@@ -112,7 +111,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Boolean> importCSEBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException {
+    public List<ImportResult> importCSEMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
 
         Sheet sheet = workbook.getSheet("整机BOM");
@@ -137,18 +136,18 @@ public class FileServiceImpl implements FileService {
             machineRepository.save(machine);
         }
 
-        Map<String, Boolean> map = cseBOMExcelProcess(machineName, sheet, materialList, structureList);
+        List<ImportResult> resultList = handleCSEMachineBOM(machineName, sheet, materialList, structureList);
 
         structureRepository.saveAll(structureList);
         materialRepository.saveAll(materialList);
 
-        return map;
+        return resultList;
     }
 
-    private Map<String, Boolean> cseBOMExcelProcess(String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList) {
+    private List<ImportResult> handleCSEMachineBOM(String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList) {
         // 用于维护部套层级的数组
         Material[] levelArr = new Material[12];
-        Map<String, Boolean> map = new LinkedHashMap<>();
+        List<ImportResult> resultList = new ArrayList<>();
         // Workbook行索引
         int index = 0;
         String unImportMater = "";
@@ -202,11 +201,13 @@ public class FileServiceImpl implements FileService {
                     /**
                      * 1 标识部套存在
                      */
+                    ImportResult result;
                     if (isExist) {
-                        map.put(structure.getStructureNo(), false);
+                        result = new ImportResult(structure.getStructureNo(), false);
                     } else {
-                        map.put(structure.getStructureNo(), true);
+                        result = new ImportResult(structure.getStructureNo(), true);
                     }
+                    resultList.add(result);
                 }
                 Material material = createNewMaterial();
                 material.setVersion(latestVersion);
@@ -309,12 +310,12 @@ public class FileServiceImpl implements FileService {
                 }
             }
         }
-        return map;
+        return resultList;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importMANXml(String machineName, MultipartFile file) throws DocumentException, IOException {
+    public List<ImportResult> importMANMachineBOM(String machineName, MultipartFile file) throws DocumentException, IOException {
         SAXReader reader = new SAXReader();
         Document doc = reader.read(file.getInputStream());
         Element root = doc.getRootElement();
@@ -323,7 +324,8 @@ public class FileServiceImpl implements FileService {
 
         List<Name> names = nameRepository.findAll();
 
-        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, null, names);
+        List<ImportResult> resultList = new ArrayList<>();
+        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, null, names, resultList);
 
         Machine targetMachine = machineRepository.findMachineByNameAndStatus(machineName, 1);
         if (null == targetMachine) {
@@ -333,6 +335,8 @@ public class FileServiceImpl implements FileService {
 
         materialRepository.saveAll(materialList);
         structureRepository.saveAll(structureList);
+
+        return resultList;
     }
 
     /**
@@ -350,18 +354,19 @@ public class FileServiceImpl implements FileService {
      */
     @SuppressWarnings("unchecked")
     private void xmlRecursiveTraversal(Element element, List<Material> materialList, List<Structure> structureList,
-                                       String parentId, String machineName, int parentLevel, String atNo, List<Name> names) {
+                                       String parentId, String machineName, int parentLevel, String atNo, List<Name> names, List<ImportResult> resultList) {
         if ("designSpec".equals(element.getName())) {
             logger.info("装置号id: " + element.attributeValue("id"));
             Element revision = element.element("revision");
             Element modules = revision.element("moduleList");
             List<Element> moduleList = modules.elements("module");
             for (Element module : moduleList) {
-                xmlRecursiveTraversal(module, materialList, structureList, null, machineName, parentLevel, null, names);
+                xmlRecursiveTraversal(module, materialList, structureList, null, machineName, parentLevel, null, names, resultList);
             }
         } else if ("module".equals(element.getName())) {
             int level = parentLevel + 1;
             if (0 == level) {
+                ImportResult importResult;
                 Element revision = element.element("revision");
                 String structNoM = revision.element("structureNo").getText();
                 String materNoM = element.attributeValue("id");
@@ -375,7 +380,6 @@ public class FileServiceImpl implements FileService {
                     targetStruct = createNewStructure(machineName);
                     targetStruct.setStructureNo(structNoM);
                     targetStruct.setMaterialNo(materialNo);
-                    targetStruct.setVersion(0);
 
                     // 判断待保存的物料是否存在
                     List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(materialNo, 0);
@@ -398,10 +402,19 @@ public class FileServiceImpl implements FileService {
                         Element parts = revision.element("partList");
                         int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, materialNo, names);
                         material.setChildCount(childCount);
+                        importResult = new ImportResult(structNoM, true);
+
+                        targetStruct.setVersion(0);
+                    } else {
+                        targetStruct.setVersion(materials.get(0).getLatestVersion());
+                        importResult = new ImportResult(structNoM, false);
                     }
                     targetStruct.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
                     structureList.add(targetStruct);
+                } else {
+                    importResult = new ImportResult(structNoM, false);
                 }
+                resultList.add(importResult);
             } else {
                 Material material = createNewMaterial();
                 material.setAtNo(atNo);
@@ -600,7 +613,7 @@ public class FileServiceImpl implements FileService {
             otherParts.sort(Comparator.comparing(o -> o.element("revision").element("sequenceNo").getText()));
 
             for (Element element : otherParts) {
-                xmlRecursiveTraversal(element, materialList, null, parentId, machineName, parentLevel, atNo, names);
+                xmlRecursiveTraversal(element, materialList, null, parentId, machineName, parentLevel, atNo, names, null);
             }
         }
         return childCount;
@@ -608,14 +621,14 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importWinGDExcel(String machineName, MultipartFile file) throws IOException, InvalidFormatException {
+    public List<ImportResult> importWinGDMachineBOM(String machineName, MultipartFile file) throws IOException, InvalidFormatException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
 
         List<Name> names = nameRepository.findAll();
 
-        winGDExcelProcess(machineName, workbook, materialList, structureList, names);
+        List<ImportResult> resultList = winGDExcelProcess(machineName, workbook, materialList, structureList, names);
 
         Machine targetMachine = machineRepository.findMachineByNameAndStatus(machineName, 1);
         if (null == targetMachine) {
@@ -625,10 +638,13 @@ public class FileServiceImpl implements FileService {
 
         structureRepository.saveAll(structureList);
         materialRepository.saveAll(materialList);
+
+        return resultList;
     }
 
-    private void winGDExcelProcess(String machineName, Workbook
+    private List<ImportResult> winGDExcelProcess(String machineName, Workbook
             workbook, List<Material> materialList, List<Structure> structureList, List<Name> names) {
+        List<ImportResult> resultList = new ArrayList<>();
         // 建立维护层级关系的数组
         Material[] levelArray = new Material[12];
         Sheet sheet = workbook.getSheet("PartList");
@@ -647,6 +663,7 @@ public class FileServiceImpl implements FileService {
                 // 获取该节点层级，从0开始
                 int level = row.getCell(0).toString().length() / 3 - 1;
                 if (0 == level) {
+                    boolean isExist = false;
                     // 设为空，防止多个部套，部套名相同但物料号不同的情况
                     unImportMater = "";
                     String structNo = row.getCell(8).toString();
@@ -664,13 +681,29 @@ public class FileServiceImpl implements FileService {
                         if (materials.size() > 0) {
                             // 当物料存在时，不需要再导入
                             unImportMater = materialNo;
+                            isExist = true;
+
+                            targetStruct.setVersion(materials.get(0).getLatestVersion());
+                        } else {
+                            targetStruct.setVersion(0);
                         }
-                        targetStruct.setVersion(0);
+
                         structureList.add(targetStruct);
                     } else {
                         // 当该部套存在时，该部套存在的物料也已经存在，所以不需要导入
                         unImportMater = materialNo;
                     }
+
+                    /**
+                     * 1 标识部套存在
+                     */
+                    ImportResult result;
+                    if (isExist) {
+                        result = new ImportResult(structNo, false);
+                    } else {
+                        result = new ImportResult(structNo, true);
+                    }
+                    resultList.add(result);
                 }
 
                 // 此处，即使部套已经存在也还需要遍历表，因为此处不是树级结构
@@ -741,11 +774,13 @@ public class FileServiceImpl implements FileService {
                 }
             }
         }
+
+        return resultList;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importNewStructureExcel(Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
+    public void importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
         if (null == structure.getStructureNo() || "".equals(structure.getStructureNo()) || structure.getAmount() == null) {
             throw new SummerException(StatusCode.MULTI_PARAM_DEFECT);
         }
@@ -918,7 +953,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importNewVersionStructureExcel(Structure structure, MultipartFile file) throws
+    public void importNewVersionStructureBOM(Structure structure, MultipartFile file) throws
             IOException, InvalidFormatException {
         // 开始解析新版本数据
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
@@ -983,7 +1018,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public Excel exportMachineExcel(String machineName, Integer status) {
+    public Excel exportMachineBOM(String machineName, Integer status) {
         Machine machine = machineRepository.findMachineByNameAndStatus(machineName, 1);
         List<Structure> structureList;
         if (0 == status) {
@@ -1039,7 +1074,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public Excel exportStructureExcel(User user, Structure structure) {
+    public Excel exportStructureBOM(User user, Structure structure) {
         List<Material> materialList = materialRepository.findAllByAtNoAndVersion(structure.getMaterialNo(), structure.getVersion());
         for (Material material : materialList) {
             material.setStructureNo(structure.getStructureNo());

@@ -14,28 +14,8 @@ $(document).ready(function () {
             dataType: 'json',  // 返回值类型 一般设置为json
             data: {machineName: machineName},
             success: function (data) {
-                if (200 === data.statusCode) {
-                    let importResult = $("#importResult");
-                    for (var val in data.data) {
-                        let flag = data.data[val];
-                        let str;
-                        if (flag) {
-                            str = "导入成功";
-                        } else {
-                            str = "使用库中部套（未导入）";
-                        }
-                        importResult.append(
-                            '<tr>' +
-                                '<td>' + val + '</td>' +
-                                '<td>' + str + '</td>' +
-                            '</tr>'
-                        );
-                    }
-                    $(".progress-prompt").text("导入成功，刷新页面查看更新");
-                    $("#CSEBOMResult").css("display", "block");
-                } else {
-                    successCallback(data);
-                }
+                $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
+                location.reload();
             },
             error: function () {
                 $(".progress-prompt").text("系统错误");
@@ -58,7 +38,8 @@ $(document).ready(function () {
             dataType: 'json',  // 返回值类型 一般设置为json
             data: {machineName: machineName},
             success: function (data) {
-                successCallback(data);
+                $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
+                location.reload();
             },
             error: function () {
                 $(".progress-prompt").text("系统错误");
@@ -81,7 +62,8 @@ $(document).ready(function () {
             dataType: 'json',  // 返回值类型 一般设置为json
             data: {machineName: machineName},
             success: function (data) {
-                successCallback(data);
+                $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
+                location.reload();
             },
             error: function () {
                 $(".progress-prompt").text("系统错误");
