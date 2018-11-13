@@ -45,7 +45,7 @@ public class FileController extends BaseFacade {
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
-        outputImportResult(resultList);
+        outputImportResult(machineName, resultList);
     }
 
     @PostMapping(value = "files/import/xml")
@@ -62,7 +62,7 @@ public class FileController extends BaseFacade {
         } catch (DocumentException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
-        outputImportResult(resultList);
+        outputImportResult(machineName, resultList);
     }
 
     @PostMapping(value = "files/import/excel")
@@ -79,23 +79,23 @@ public class FileController extends BaseFacade {
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
-        outputImportResult(resultList);
+        outputImportResult(machineName, resultList);
     }
 
-    private void outputImportResult(List<ImportResult> resultList) {
+    private void outputImportResult(String machineName, List<ImportResult> resultList) {
         try {
             StringBuilder strBuilder = new StringBuilder();
             for (ImportResult result : resultList) {
                 String structureNo = result.getStructureNo();
                 strBuilder.append(structureNo);
-                strBuilder.append(" ");
+                strBuilder.append("  ");
                 String resultStr = result.getResult() ? "导入成功" : "使用库中部套";
                 strBuilder.append(resultStr);
                 strBuilder.append("\r\n");
             }
             getResponse().reset();
             getResponse().setHeader("content-disposition", "attachment;filename="
-                    + URLEncoder.encode("导入结果.txt", "UTF-8"));
+                    + URLEncoder.encode(machineName + "导入.txt", "UTF-8"));
             getResponse().setContentType(Constant.DocType.XLSX_UTF8);
             OutputStream out = getResponse().getOutputStream();
             BufferedOutputStream buffer = new BufferedOutputStream(out);
