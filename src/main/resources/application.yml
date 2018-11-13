@@ -1,4 +1,6 @@
 spring:
+  jmx:
+    enabled: false
   servlet:
     multipart:
       max-file-size: 50Mb
