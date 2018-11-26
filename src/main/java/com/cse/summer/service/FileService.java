@@ -59,7 +59,7 @@ public interface FileService {
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    void importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
+    ImportResult importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入新版本部套的BOM文件

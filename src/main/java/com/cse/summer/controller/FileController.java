@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,7 +46,7 @@ public class FileController extends BaseFacade {
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
-        outputImportResult(machineName, resultList);
+        outputImportResult(machineName, resultList, false);
     }
 
     @PostMapping(value = "files/import/xml")
@@ -62,7 +63,7 @@ public class FileController extends BaseFacade {
         } catch (DocumentException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
-        outputImportResult(machineName, resultList);
+        outputImportResult(machineName, resultList, false);
     }
 
     @PostMapping(value = "files/import/excel")
@@ -79,23 +80,33 @@ public class FileController extends BaseFacade {
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }
-        outputImportResult(machineName, resultList);
+        outputImportResult(machineName, resultList, false);
     }
 
-    private void outputImportResult(String machineName, List<ImportResult> resultList) {
+    private void outputImportResult(String machineName, List<ImportResult> resultList, boolean isStructure) {
         try {
             StringBuilder strBuilder = new StringBuilder();
             for (ImportResult result : resultList) {
                 String structureNo = result.getStructureNo();
                 strBuilder.append(structureNo);
                 strBuilder.append("  ");
-                String resultStr = result.getResult() ? "导入成功" : "使用库中部套";
+                String resultStr;
+                if (!isStructure) {
+                    resultStr = result.getResult() ? "导入成功" : "使用库中部套";
+                } else {
+                    resultStr = result.getResult() ? "导入成功" : "导入失败";
+                }
                 strBuilder.append(resultStr);
                 strBuilder.append("\r\n");
             }
             getResponse().reset();
-            getResponse().setHeader("content-disposition", "attachment;filename="
-                    + URLEncoder.encode(machineName + "导入.txt", "UTF-8"));
+            if (!isStructure) {
+                getResponse().setHeader("content-disposition", "attachment;filename="
+                        + URLEncoder.encode(machineName + "导入.txt", "UTF-8"));
+            } else {
+                getResponse().setHeader("content-disposition", "attachment;filename="
+                        + URLEncoder.encode("导入.txt", "UTF-8"));
+            }
             getResponse().setContentType(Constant.DocType.XLSX_UTF8);
             OutputStream out = getResponse().getOutputStream();
             BufferedOutputStream buffer = new BufferedOutputStream(out);
@@ -110,6 +121,7 @@ public class FileController extends BaseFacade {
     @PostMapping(value = "files/import/structure/new")
     public Response<Object> actionImportNewStructureExcel(StructureList structureList, HttpServletRequest request) {
         try {
+            List<ImportResult> resultList = new ArrayList<>();
             List<MultipartFile> fileList = ((MultipartHttpServletRequest) request).getFiles("strFile");
             for (int index = 0; index < fileList.size(); index++) {
                 MultipartFile file = fileList.get(index);
@@ -118,9 +130,11 @@ public class FileController extends BaseFacade {
                         throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
                     }
                     Structure structure = structureList.getStructure(index);
-                    fileService.importNewStructureBOM(structure, file);
+                    ImportResult importResult = fileService.importNewStructureBOM(structure, file);
+                    resultList.add(importResult);
                 }
             }
+            outputImportResult(null, resultList, true);
         } catch (InvalidFormatException | IOException e) {
             throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
         }

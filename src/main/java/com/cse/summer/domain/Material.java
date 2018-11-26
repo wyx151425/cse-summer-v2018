@@ -95,14 +95,6 @@ public class Material extends Entity implements Serializable {
     private String erpParent;
 
     /**
-     * 排序号
-     */
-    private String sequenceNo;
-    /**
-     * 页数
-     */
-    private String page;
-    /**
      * 备件表达式
      */
     private String spareExp;
@@ -302,22 +294,6 @@ public class Material extends Entity implements Serializable {
 
     public void setErpParent(String erpParent) {
         this.erpParent = erpParent;
-    }
-
-    public String getSequenceNo() {
-        return sequenceNo;
-    }
-
-    public void setSequenceNo(String sequenceNo) {
-        this.sequenceNo = sequenceNo;
-    }
-
-    public String getPage() {
-        return page;
-    }
-
-    public void setPage(String page) {
-        this.page = page;
     }
 
     public String getSpareExp() {

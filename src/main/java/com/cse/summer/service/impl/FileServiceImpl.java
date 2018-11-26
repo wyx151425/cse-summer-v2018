@@ -395,7 +395,6 @@ public class FileServiceImpl implements FileService {
                         material.setName(element.element("name").getText());
                         String chineseName = findChineseName(element.element("name").getText().toUpperCase(), names);
                         material.setChinese(chineseName);
-                        material.setPage(revision.element("noOfPages").getText());
                         material.setWeight(revision.element("mass").getText());
                         material.setAbsoluteAmount(1);
                         materialList.add(material);
@@ -457,9 +456,6 @@ public class FileServiceImpl implements FileService {
                 } else {
                     material.setPositionNo("000");
                 }
-                if (null != revision.element("sequenceNo")) {
-                    material.setSequenceNo(revision.element("sequenceNo").getText());
-                }
                 materialList.add(material);
                 Element parts = revision.element("partList");
                 int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, atNo, names);
@@ -509,9 +505,6 @@ public class FileServiceImpl implements FileService {
             } else {
                 material.setPositionNo("000");
             }
-            if (null != revision.element("sequenceNo")) {
-                material.setSequenceNo(revision.element("sequenceNo").getText());
-            }
             materialList.add(material);
             Element parts = revision.element("partList");
             int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, atNo, names);
@@ -559,9 +552,6 @@ public class FileServiceImpl implements FileService {
                 material.setPositionNo(revision.element("posNo").getText().substring(1));
             } else {
                 material.setPositionNo("000");
-            }
-            if (null != revision.element("sequenceNo")) {
-                material.setSequenceNo(revision.element("sequenceNo").getText());
             }
             material.setChildCount(0);
             materialList.add(material);
@@ -780,9 +770,10 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
+    public ImportResult importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
         if (null == structure.getStructureNo() || "".equals(structure.getStructureNo()) || structure.getAmount() == null) {
-            throw new SummerException(StatusCode.MULTI_PARAM_DEFECT);
+//            throw new SummerException(StatusCode.MULTI_PARAM_DEFECT);
+            return new ImportResult(structure.getStructureNo(), false);
         }
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
 
@@ -804,12 +795,14 @@ public class FileServiceImpl implements FileService {
         Row structRow = workbook.getSheetAt(0).getRow(4);
         String materNo = structRow.getCell(3).toString();
         if ("".equals(materNo)) {
-            throw new SummerException(StatusCode.MULTI_TOP_MATERIAL_NO_BLANK);
+//            throw new SummerException(StatusCode.MULTI_TOP_MATERIAL_NO_BLANK);
+            return new ImportResult(structure.getStructureNo(), false);
         }
         // 根据物料号和专利方版本检查
         List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(materNo, 0);
         if (materials.size() > 0) {
-            throw new SummerException(StatusCode.MULTI_STRUCTURE_EXIST);
+//            throw new SummerException(StatusCode.MULTI_STRUCTURE_EXIST);
+            return new ImportResult(structure.getStructureNo(), false);
         } else {
             List<Material> materialList = new ArrayList<>(100);
             Sheet sheet = workbook.getSheetAt(0);
@@ -836,6 +829,7 @@ public class FileServiceImpl implements FileService {
             structure.setMaterialNo(materNo);
             structure.setVersion(0);
             structureRepository.save(structure);
+            return new ImportResult(structure.getStructureNo(), true);
         }
     }
 
