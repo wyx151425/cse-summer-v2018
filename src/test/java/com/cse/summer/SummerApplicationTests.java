@@ -42,10 +42,10 @@ public class SummerApplicationTests {
 //        User user = new User();
 //        user.setObjectId(Generator.getObjectId());
 //        user.setStatus(1);
-//        user.setUsername("admin");
-//        user.setName("管理员");
-//        user.setPassword("admin0");
-//        user.setRole(4);
+//        user.setUsername("sumengmeng");
+//        user.setName("苏猛猛");
+//        user.setPassword("123456");
+//        user.setRole(2);
 //        userRepository.save(user);
 //    }
 //
