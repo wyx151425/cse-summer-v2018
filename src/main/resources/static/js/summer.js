@@ -1,74 +1,56 @@
 $(document).ready(function () {
-    $("#CSEBOMImport").click(function () {
+    $("#CSEBOMImport2").click(function () {
         let machineName = $("#machineName3").val();
-        if ("" === machineName) {
+        if (undefined === machineName || null == machineName || "" === machineName) {
             alert("请输入机器名");
             return;
         }
-        $("#CSEBOMForm").css("display", "none");
-        $("#CSEBOMConfirm").css("display", "block");
-        $.ajaxFileUpload({
-            url: 'api/files/import/cse',  // 用于文件上传的服务器端请求地址
-            secureuri: false,  // 是否需要安全协议，一般设置为false
-            fileElementId: 'csebom',  // 文件上传域的ID
-            dataType: 'json',  // 返回值类型 一般设置为json
-            data: {machineName: machineName},
-            success: function (data) {
-                $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
-                location.reload();
-            },
-            error: function () {
-                $(".progress-prompt").text("系统错误");
-            }
-        });
+        cseBomImportAction(machineName);
     });
 
-    $("#xmlImport").click(function () {
+    $("#CSEBOMImport1").click(function () {
+        let machineName = $("#machineName33").val();
+        if (undefined === machineName || null == machineName || "" === machineName || "请选择" === machineName) {
+            alert("请选择机器");
+            return;
+        }
+        cseBomImportAction(machineName);
+    });
+
+    $("#xmlImport2").click(function () {
         let machineName = $("#machineName1").val();
-        if ("" === machineName) {
+        if (undefined === machineName || null == machineName || "" === machineName) {
             alert("请输入机器名");
             return;
         }
-        $("#manXmlForm").css("display", "none");
-        $("#manXmlConfirm").css("display", "block");
-        $.ajaxFileUpload({
-            url: 'api/files/import/xml',  // 用于文件上传的服务器端请求地址
-            secureuri: false,  // 是否需要安全协议，一般设置为false
-            fileElementId: 'manXml',  // 文件上传域的ID
-            dataType: 'json',  // 返回值类型 一般设置为json
-            data: {machineName: machineName},
-            success: function (data) {
-                $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
-                location.reload();
-            },
-            error: function () {
-                $(".progress-prompt").text("系统错误");
-            }
-        });
+        manBomImportAction(machineName);
     });
 
-    $("#excelImport").click(function () {
+    $("#xmlImport1").click(function () {
+        let machineName = $("#machineName11").val();
+        if (undefined === machineName || null == machineName || "" === machineName || "请选择" === machineName) {
+            alert("请选择机器");
+            return;
+        }
+        manBomImportAction(machineName);
+    });
+
+    $("#excelImport2").click(function () {
         let machineName = $("#machineName2").val();
-        if ("" === machineName) {
+        if (undefined === machineName || null == machineName || "" === machineName) {
             alert("请输入机器名");
             return;
         }
-        $("#winGDExcelForm").css("display", "none");
-        $("#winGDExcelConfirm").css("display", "block");
-        $.ajaxFileUpload({
-            url: 'api/files/import/excel',  // 用于文件上传的服务器端请求地址
-            secureuri: false,  // 是否需要安全协议，一般设置为false
-            fileElementId: 'winGDExcel',  // 文件上传域的ID
-            dataType: 'json',  // 返回值类型 一般设置为json
-            data: {machineName: machineName},
-            success: function (data) {
-                $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
-                location.reload();
-            },
-            error: function () {
-                $(".progress-prompt").text("系统错误");
-            }
-        });
+        winGDBomImportAction(machineName);
+    });
+
+    $("#excelImport1").click(function () {
+        let machineName = $("#machineName22").val();
+        if (undefined === machineName || null == machineName || "" === machineName || "请选择" === machineName) {
+            alert("请选择机器");
+            return;
+        }
+        winGDBomImportAction(machineName);
     });
 
     $("#importNewStructureFile").click(function () {
@@ -363,4 +345,61 @@ function toExportMachineBom(machineName, machineNo, machineType, patent, machine
         let link = $('<a href="' + url + '"></a>');
         link.get(0).click();
     }
+}
+
+function cseBomImportAction(machineName) {
+    $("#CSEBOMForm").css("display", "none");
+    $("#CSEBOMConfirm").css("display", "block");
+    $.ajaxFileUpload({
+        url: 'api/files/import/cse',  // 用于文件上传的服务器端请求地址
+        secureuri: false,  // 是否需要安全协议，一般设置为false
+        fileElementId: 'csebom',  // 文件上传域的ID
+        dataType: 'json',  // 返回值类型 一般设置为json
+        data: {machineName: machineName},
+        success: function (data) {
+            $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
+            location.reload();
+        },
+        error: function () {
+            $(".progress-prompt").text("系统错误");
+        }
+    });
+}
+
+function manBomImportAction(machineName) {
+    $("#manXmlForm").css("display", "none");
+    $("#manXmlConfirm").css("display", "block");
+    $.ajaxFileUpload({
+        url: 'api/files/import/xml',  // 用于文件上传的服务器端请求地址
+        secureuri: false,  // 是否需要安全协议，一般设置为false
+        fileElementId: 'manXml',  // 文件上传域的ID
+        dataType: 'json',  // 返回值类型 一般设置为json
+        data: {machineName: machineName},
+        success: function (data) {
+            $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
+            location.reload();
+        },
+        error: function () {
+            $(".progress-prompt").text("系统错误");
+        }
+    });
+}
+
+function winGDBomImportAction(machineName) {
+    $("#winGDExcelForm").css("display", "none");
+    $("#winGDExcelConfirm").css("display", "block");
+    $.ajaxFileUpload({
+        url: 'api/files/import/excel',  // 用于文件上传的服务器端请求地址
+        secureuri: false,  // 是否需要安全协议，一般设置为false
+        fileElementId: 'winGDExcel',  // 文件上传域的ID
+        dataType: 'json',  // 返回值类型 一般设置为json
+        data: {machineName: machineName},
+        success: function (data) {
+            $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
+            location.reload();
+        },
+        error: function () {
+            $(".progress-prompt").text("系统错误");
+        }
+    });
 }
