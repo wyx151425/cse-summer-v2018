@@ -1014,6 +1014,21 @@ public class FileServiceImpl implements FileService {
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public Excel exportMachineBOM(String machineName, Integer status) {
         Machine machine = machineRepository.findMachineByNameAndStatus(machineName, 1);
+        String suffix = "";
+        switch (status) {
+            case 0:
+                suffix = "_整机BOM";
+                break;
+            case 1:
+                suffix = "_设计参考BOM";
+                break;
+            case 2:
+                suffix = "_发布BOM";
+                break;
+            default:
+                suffix = "_BOM";
+                break;
+        }
         List<Structure> structureList;
         if (0 == status) {
             structureList = structureRepository.findAllByMachineNameAndStatusGreaterThanEqualOrderByStructureNo(machineName, 1);
@@ -1027,7 +1042,7 @@ public class FileServiceImpl implements FileService {
             materialList.addAll(materials);
         }
         XSSFWorkbook workbook = buildExcelWorkbook(materialList, machine, 1);
-        return new Excel(machineName + ".xlsx", workbook);
+        return new Excel(machineName + "_" + machine.getType() + suffix + ".xlsx", workbook);
     }
 
     private void amountAndSpareHandler(List<Material> materialList, int cylinderAmount, Structure structure) {

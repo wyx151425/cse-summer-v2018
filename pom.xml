@@ -89,7 +89,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
-        <finalName>csedms</finalName>
+        <finalName>dmspro</finalName>
     </build>
 
 </project>
