@@ -117,6 +117,8 @@ $(document).ready(function () {
             $(".progress-prompt").text("文件格式错误");
         } else if (8002 === data.statusCode) {
             $(".progress-prompt").text("文件解析错误");
+        } else if (8003 === data.statusCode) {
+            $(".progress-prompt").text("存在多个Sheet，发生解析错误");
         } else if (9001 === data.statusCode) {
             $(".progress-prompt").text("部套已存在");
         } else if (9002 === data.statusCode) {
@@ -307,6 +309,46 @@ $(document).ready(function () {
                 clearPromptProgress.css("display", "none");
                 clearPromptFooter.css("display", "block");
                 $("#thisPrompt").text("清理失败");
+            }
+        });
+    });
+
+    $("#structureCheckBtn").click(function () {
+        $(this).text("正在检查");
+        $.ajaxFileUpload({
+            url: 'api/structures/check',  // 用于文件上传的服务器端请求地址
+            secureuri: false,  // 是否需要安全协议，一般设置为false
+            fileElementId: ['structureCheckFile'],
+            dataType: 'json',  // 返回值类型 一般设置为json
+            success: function (data) {
+                let statusCode = data.statusCode;
+                if (200 === statusCode) {
+                    let content = "";
+                    for (let index = 0; index < data.data.length; index++) {
+                        content += data.data[index].structureNo;
+                        content += " ";
+                        if (data.data[index].result) {
+                            content += "新部套，库中不存在";
+                        } else {
+                            content += "库中已存在";
+                        }
+                        content += "\r\n";
+                    }
+                    let a = document.createElement("a");
+                    let blob = new Blob([content], {"type": "application/octet-stream"});
+                    a.href = window.URL.createObjectURL(blob);
+                    a.download = "部套检查结果.txt";
+
+                    $("#structureCheckBtn").text("导入");
+                    $("#structureCheckFile").val(null);
+
+                    a.click();
+                } else {
+                    successCallback(data);
+                }
+            },
+            error: function () {
+                $(".progress-prompt").text("系统错误");
             }
         });
     });

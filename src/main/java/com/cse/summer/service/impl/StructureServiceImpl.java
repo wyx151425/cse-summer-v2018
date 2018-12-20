@@ -1,17 +1,25 @@
 package com.cse.summer.service.impl;
 
 import com.cse.summer.context.exception.SummerException;
+import com.cse.summer.domain.ImportResult;
 import com.cse.summer.domain.Material;
 import com.cse.summer.domain.Structure;
 import com.cse.summer.repository.MaterialRepository;
 import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.StructureService;
+import com.cse.summer.util.ExcelUtil;
 import com.cse.summer.util.Generator;
 import com.cse.summer.util.StatusCode;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -82,5 +90,29 @@ public class StructureServiceImpl implements StructureService {
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<Structure> searchStructureListByAssociateMaterialNo(String materialNo) {
         return structureRepository.findAllByMaterialNo(materialNo);
+    }
+
+    @Override
+    public List<ImportResult> checkStructureExistence(MultipartFile file) throws IOException, InvalidFormatException {
+        Sheet sheet = ExcelUtil.formatExcelBOM(file, "整机BOM");
+        int rowIndex = 0;
+        List<ImportResult> results = new ArrayList<>();
+        for (Row row : sheet) {
+            if (rowIndex < 3) {
+                rowIndex++;
+            } else {
+                if (0 == Integer.parseInt(row.getCell(1).toString().trim())) {
+                    String structureNo = row.getCell(0).toString().trim();
+                    String code = row.getCell(3).toString().trim();
+                    List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(code, 0);
+                    if (materials.size() > 0) {
+                        results.add(new ImportResult(structureNo + "(" + code +")", false));
+                    } else {
+                        results.add(new ImportResult(structureNo + "(" + code +")", true));
+                    }
+                }
+            }
+        }
+        return results;
     }
 }

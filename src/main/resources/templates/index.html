@@ -23,8 +23,8 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" th:href="@{/index}">CSE DMS</a>
-            <!--<a class="navbar-brand" th:href="@{/index}" style="color: #ff0000">CSE DMS 测试系统</a>-->
+            <!--<a class="navbar-brand" th:href="@{/index}">CSE DMS</a>-->
+            <a class="navbar-brand" th:href="@{/index}" style="color: #ff0000">CSE DMS 测试系统</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
@@ -41,6 +41,9 @@
             <button id="logout" class="btn btn-primary pull-right" style="margin-bottom: 20px">退出登录</button>
             <button id="searchStr" class="btn btn-primary pull-right" style="margin-bottom: 20px; margin-right: 16px"
                     data-toggle="modal" data-target="#searchStruct">部套关联
+            </button>
+            <button id="strCheckBtn" class="btn btn-primary pull-right" style="margin-bottom: 20px; margin-right: 16px"
+                    data-toggle="modal" data-target="#structureCheck">部套检查
             </button>
             <button id="clearData" class="btn btn-primary pull-right" style="margin-bottom: 20px; margin-right: 16px"
                     data-toggle="modal" data-target="#clearDataModal" th:if="${4 == session.user.role}">清空数据
@@ -98,15 +101,20 @@
             </div>
             <form id="CSEBOMForm">
                 <div class="modal-body">
-                    <label for="machineName3" class="control-label col-lg-2 col-md-2" th:if="${3 == session.user.role || 4 == session.user.role}">机器</label>
-                    <div class="form-group col-lg-10 col-md-10" th:if="${3 == session.user.role || 4 == session.user.role}">
+                    <label for="machineName3" class="control-label col-lg-2 col-md-2"
+                           th:if="${3 == session.user.role || 4 == session.user.role}">机器</label>
+                    <div class="form-group col-lg-10 col-md-10"
+                         th:if="${3 == session.user.role || 4 == session.user.role}">
                         <input id="machineName3" class="form-control" type="text"/>
                     </div>
-                    <label for="machineName33" class="control-label col-lg-2 col-md-2" th:if="${1 == session.user.role || 2 == session.user.role}">机器</label>
-                    <div class="form-group col-lg-10 col-md-10" th:if="${1 == session.user.role || 2 == session.user.role}">
+                    <label for="machineName33" class="control-label col-lg-2 col-md-2"
+                           th:if="${1 == session.user.role || 2 == session.user.role}">机器</label>
+                    <div class="form-group col-lg-10 col-md-10"
+                         th:if="${1 == session.user.role || 2 == session.user.role}">
                         <select id="machineName33" class="form-control">
                             <option selected disabled>请选择</option>
-                            <option th:each="machine, machineStat : ${machineList}" th:value="${machine.name}" th:text="${machine.name}"></option>
+                            <option th:each="machine, machineStat : ${machineList}" th:value="${machine.name}"
+                                    th:text="${machine.name}"></option>
                         </select>
                     </div>
                     <label for="csebom" class="control-label col-lg-2 col-md-2">文件</label>
@@ -115,8 +123,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="CSEBOMImport1" type="button" class="btn btn-primary" th:if="${1 == session.user.role || 2 == session.user.role}">导入</button>
-                    <button id="CSEBOMImport2" type="button" class="btn btn-primary" th:if="${3 == session.user.role || 4 == session.user.role}">导入</button>
+                    <button id="CSEBOMImport1" type="button" class="btn btn-primary"
+                            th:if="${1 == session.user.role || 2 == session.user.role}">导入
+                    </button>
+                    <button id="CSEBOMImport2" type="button" class="btn btn-primary"
+                            th:if="${3 == session.user.role || 4 == session.user.role}">导入
+                    </button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </form>
@@ -156,15 +168,20 @@
             </div>
             <form id="manXmlForm">
                 <div class="modal-body">
-                    <label for="machineName1" class="control-label col-lg-2 col-md-2" th:if="${3 == session.user.role || 4 == session.user.role}">机器</label>
-                    <div class="form-group col-lg-10 col-md-10" th:if="${3 == session.user.role || 4 == session.user.role}">
+                    <label for="machineName1" class="control-label col-lg-2 col-md-2"
+                           th:if="${3 == session.user.role || 4 == session.user.role}">机器</label>
+                    <div class="form-group col-lg-10 col-md-10"
+                         th:if="${3 == session.user.role || 4 == session.user.role}">
                         <input id="machineName1" class="form-control" type="text"/>
                     </div>
-                    <label for="machineName11" class="control-label col-lg-2 col-md-2" th:if="${1 == session.user.role || 2 == session.user.role}">机器</label>
-                    <div class="form-group col-lg-10 col-md-10" th:if="${1 == session.user.role || 2 == session.user.role}">
+                    <label for="machineName11" class="control-label col-lg-2 col-md-2"
+                           th:if="${1 == session.user.role || 2 == session.user.role}">机器</label>
+                    <div class="form-group col-lg-10 col-md-10"
+                         th:if="${1 == session.user.role || 2 == session.user.role}">
                         <select id="machineName11" class="form-control">
                             <option selected disabled>请选择</option>
-                            <option th:each="machine, machineStat : ${machineList}" th:value="${machine.name}" th:text="${machine.name}"></option>
+                            <option th:each="machine, machineStat : ${machineList}" th:value="${machine.name}"
+                                    th:text="${machine.name}"></option>
                         </select>
                     </div>
                     <label for="manXml" class="control-label col-lg-2 col-md-2">文件</label>
@@ -173,8 +190,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="xmlImport1" type="button" class="btn btn-primary" th:if="${1 == session.user.role || 2 == session.user.role}">导入</button>
-                    <button id="xmlImport2" type="button" class="btn btn-primary" th:if="${3 == session.user.role || 4 == session.user.role}">导入</button>
+                    <button id="xmlImport1" type="button" class="btn btn-primary"
+                            th:if="${1 == session.user.role || 2 == session.user.role}">导入
+                    </button>
+                    <button id="xmlImport2" type="button" class="btn btn-primary"
+                            th:if="${3 == session.user.role || 4 == session.user.role}">导入
+                    </button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </form>
@@ -202,15 +223,20 @@
             </div>
             <form id="winGDExcelForm">
                 <div class="modal-body">
-                    <label for="machineName2" class="control-label col-lg-2 col-md-2" th:if="${3 == session.user.role || 4 == session.user.role}">机器</label>
-                    <div class="form-group col-lg-10 col-md-10" th:if="${3 == session.user.role || 4 == session.user.role}">
+                    <label for="machineName2" class="control-label col-lg-2 col-md-2"
+                           th:if="${3 == session.user.role || 4 == session.user.role}">机器</label>
+                    <div class="form-group col-lg-10 col-md-10"
+                         th:if="${3 == session.user.role || 4 == session.user.role}">
                         <input id="machineName2" class="form-control" type="text" name="machineName"/>
                     </div>
-                    <label for="machineName22" class="control-label col-lg-2 col-md-2" th:if="${1 == session.user.role || 2 == session.user.role}">机器</label>
-                    <div class="form-group col-lg-10 col-md-10" th:if="${1 == session.user.role || 2 == session.user.role}">
+                    <label for="machineName22" class="control-label col-lg-2 col-md-2"
+                           th:if="${1 == session.user.role || 2 == session.user.role}">机器</label>
+                    <div class="form-group col-lg-10 col-md-10"
+                         th:if="${1 == session.user.role || 2 == session.user.role}">
                         <select id="machineName22" class="form-control">
                             <option selected disabled>请选择</option>
-                            <option th:each="machine, machineStat : ${machineList}" th:value="${machine.name}" th:text="${machine.name}"></option>
+                            <option th:each="machine, machineStat : ${machineList}" th:value="${machine.name}"
+                                    th:text="${machine.name}"></option>
                         </select>
                     </div>
                     <label for="winGDExcel" class="control-label col-lg-2 col-md-2">文件</label>
@@ -219,8 +245,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="excelImport1" type="button" class="btn btn-primary" th:if="${1 == session.user.role || 2 == session.user.role}">导入</button>
-                    <button id="excelImport2" type="button" class="btn btn-primary" th:if="${3 == session.user.role || 4 == session.user.role}">导入</button>
+                    <button id="excelImport1" type="button" class="btn btn-primary"
+                            th:if="${1 == session.user.role || 2 == session.user.role}">导入
+                    </button>
+                    <button id="excelImport2" type="button" class="btn btn-primary"
+                            th:if="${3 == session.user.role || 4 == session.user.role}">导入
+                    </button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </form>
@@ -374,6 +404,28 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="structureCheck" tabindex="-1" role="dialog" aria-labelledby="structureCheckLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="structureCheckLabel">检查部套</h4>
+            </div>
+            <div class="modal-body">
+                <label for="structureCheckFile" class="control-label col-lg-2 col-md-2">文件</label>
+                <div class="form-group col-lg-10 col-md-10">
+                    <input id="structureCheckFile" class="form-control" name="structureCheckFile" type="file"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="structureCheckBtn" type="button" class="btn btn-primary">导入
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
         </div>
     </div>
 </div>

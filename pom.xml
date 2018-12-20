@@ -5,7 +5,7 @@
 
     <groupId>com.cse</groupId>
     <artifactId>summer</artifactId>
-    <version>1.1.5-RELEASE</version>
+    <version>1.1.6-RELEASE</version>
     <packaging>war</packaging>
 
     <name>summer</name>
@@ -89,7 +89,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
-        <finalName>dmspro</finalName>
+        <finalName>dmsuat</finalName>
     </build>
 
 </project>

@@ -1,7 +1,11 @@
 package com.cse.summer.service;
 
+import com.cse.summer.domain.ImportResult;
 import com.cse.summer.domain.Structure;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -43,4 +47,11 @@ public interface StructureService {
      * @return 部套数据集合
      */
     List<Structure> searchStructureListByAssociateMaterialNo(String materialNo);
+
+    /**
+     * 检查部套是否存在
+     * @param file CSE BOM文件
+     * @return 检查结果
+     */
+    List<ImportResult> checkStructureExistence(MultipartFile file) throws IOException, InvalidFormatException;
 }

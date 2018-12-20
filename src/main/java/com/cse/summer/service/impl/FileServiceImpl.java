@@ -776,6 +776,9 @@ public class FileServiceImpl implements FileService {
             return new ImportResult(structure.getStructureNo(), false);
         }
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        if (workbook.getNumberOfSheets() > 1) {
+            throw new SummerException(StatusCode.SHEET_NOT_UNIQUE);
+        }
 
         // 解析首行 获取编校审数据
         Row topRow = workbook.getSheetAt(0).getRow(0);
@@ -951,6 +954,9 @@ public class FileServiceImpl implements FileService {
             IOException, InvalidFormatException {
         // 开始解析新版本数据
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        if (workbook.getNumberOfSheets() > 1) {
+            throw new SummerException(StatusCode.SHEET_NOT_UNIQUE);
+        }
 
         // 解析首行 获取编校审数据
         Row topRow = workbook.getSheetAt(0).getRow(0);
