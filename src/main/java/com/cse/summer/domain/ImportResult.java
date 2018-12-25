@@ -1,21 +1,37 @@
 package com.cse.summer.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 /**
  * @author WangZhenqi
  */
-public class ImportResult {
+@Entity
+@Table(name = "cse_import_result")
+public class ImportResult extends SummerEntity {
+    /**
+     * 机器名
+     */
+    private String machineName;
     /**
      * 部套号
      */
     private String structureNo;
     /**
-     * 导入结果标识
+     * 物料号
      */
-    private Boolean result;
+    private String materialNo;
+    /**
+     * 导入标记
+     */
+    private Boolean mark;
 
-    public ImportResult(String structureNo, Boolean result) {
-        this.structureNo = structureNo;
-        this.result = result;
+    public String getMachineName() {
+        return machineName;
+    }
+
+    public void setMachineName(String machineName) {
+        this.machineName = machineName;
     }
 
     public String getStructureNo() {
@@ -26,11 +42,19 @@ public class ImportResult {
         this.structureNo = structureNo;
     }
 
-    public Boolean getResult() {
-        return result;
+    public String getMaterialNo() {
+        return materialNo;
     }
 
-    public void setResult(Boolean result) {
-        this.result = result;
+    public void setMaterialNo(String materialNo) {
+        this.materialNo = materialNo;
+    }
+
+    public Boolean getMark() {
+        return mark;
+    }
+
+    public void setMark(Boolean mark) {
+        this.mark = mark;
     }
 }

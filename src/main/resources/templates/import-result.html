@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>设计BOM管理工具</title>
+    <link rel="shortcut icon" href="../images/CSE.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="../css/cse.css"/>
+</head>
+<body>
+<header class="header">
+    <div class="header-fixed">
+        <div class="container">
+            <img class="logo" src="../images/CSE.png" alt=""/>
+            <!--<div class="account">-->
+                <!--<span class="account-name">王振琦</span>-->
+                <!--<span class="icon icon-off"></span>-->
+            <!--</div>-->
+        </div>
+    </div>
+</header>
+<main id="main" class="container">
+    <div class="panel">
+        <div class="btn-list">
+            <a href="../index"><button class="btn pull-right" type="button">返回</button></a>
+        </div>
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>部套号</th>
+                <th>物料号</th>
+                <th>导入结果</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="result in resultList">
+                <td>{{result.structureNo}}</td>
+                <td>{{result.materialNo}}</td>
+                <td>{{result.mark}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<footer class="footer">
+    <span>&copy;2018 中国船舶重工集团柴油机有限公司</span>
+</footer>
+<div id="progress" class="progress-modal" v-if="isVisible">
+    <p class="progress">
+        <span class="icon icon-cog progress-bar rotate"></span>
+        <span>正在获取数据...</span>
+    </p>
+</div>
+<script src="../js/vue.min.js"></script>
+<script src="../js/axios.min.js"></script>
+<script>
+    let requestContext = "http://localhost:8080/";
+
+    function getUrlParam(url, name) {
+        let pattern = new RegExp("[?&]" + name + "\=([^&]+)", "g");
+        let matcher = pattern.exec(url);
+        let items = null;
+        if (null !== matcher) {
+            try {
+                items = decodeURIComponent(decodeURIComponent(matcher[1]));
+            } catch (e) {
+                try {
+                    items = decodeURIComponent(matcher[1]);
+                } catch (e) {
+                    items = matcher[1];
+                }
+            }
+        }
+        return items;
+    }
+
+    const progress = new Vue({
+        el: "#progress",
+        data: {
+            isVisible: true
+        },
+        methods: {
+            dismiss: function () {
+                this.isVisible = false;
+            }
+        }
+    });
+
+    const main = new Vue({
+        el: "#main",
+        data: {
+            resultList: []
+        },
+        methods: {
+            setResultList: function (resultList) {
+                this.resultList = resultList;
+            }
+        },
+        mounted: function () {
+            let url = window.location;
+            let machineName = getUrlParam(url, "machineName");
+            axios.get(requestContext + "api/machines/" + machineName + "/results")
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        main.setResultList(response.data.data);
+                        progress.dismiss();
+                    }
+                });
+        }
+    });
+</script>
+</body>
+</html>

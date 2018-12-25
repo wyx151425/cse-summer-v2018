@@ -7,7 +7,7 @@ import javax.persistence.Table;
  */
 @javax.persistence.Entity
 @Table(name = "cse_user")
-public class User extends Entity {
+public class User extends SummerEntity {
     private String username;
     private String name;
     private String password;

@@ -7,7 +7,7 @@ import javax.persistence.*;
  */
 @javax.persistence.Entity
 @Table(name = "cse_structure")
-public class Structure extends Entity {
+public class Structure extends SummerEntity {
     /**
      * 0-删除/1-设计/2-发布
      * private Integer status;

@@ -1,7 +1,7 @@
 package com.cse.summer.service;
 
 import com.cse.summer.domain.Excel;
-import com.cse.summer.domain.ImportResult;
+import com.cse.summer.domain.ImportResultResp;
 import com.cse.summer.domain.Structure;
 import com.cse.summer.domain.User;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 文件导入导出业务逻辑类
@@ -27,7 +26,7 @@ public interface FileService {
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    List<ImportResult> importCSEMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
+    List<ImportResultResp> importCSEMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入并解析MAN XML文件
@@ -38,7 +37,7 @@ public interface FileService {
      * @throws DocumentException 文档处理异常
      * @throws IOException       输入输出异常
      */
-    List<ImportResult> importMANMachineBOM(String machineName, MultipartFile file) throws DocumentException, IOException;
+    List<ImportResultResp> importMANMachineBOM(String machineName, MultipartFile file) throws DocumentException, IOException;
 
     /**
      * 导入并解析WinGD Excel文件
@@ -49,7 +48,7 @@ public interface FileService {
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    List<ImportResult> importWinGDMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
+    List<ImportResultResp> importWinGDMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入新部套
@@ -59,7 +58,7 @@ public interface FileService {
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    ImportResult importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
+    ImportResultResp importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入新版本部套的BOM文件

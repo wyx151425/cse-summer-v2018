@@ -82,8 +82,9 @@
                            '${machine.type}', '${machine.patent}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}', 0)|">导出整机BOM</a>
                         <a href="javascript:;" style="margin-right: 16px" th:onclick="|javascript:toExportMachineBom('${machine.name}', '${machine.machineNo}',
                            '${machine.type}', '${machine.patent}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}', 1)|">导出设计部套</a>
-                        <a href="javascript:;" th:onclick="|javascript:toExportMachineBom('${machine.name}', '${machine.machineNo}',
+                        <a href="javascript:;" style="margin-right: 16px" th:onclick="|javascript:toExportMachineBom('${machine.name}', '${machine.machineNo}',
                            '${machine.type}', '${machine.patent}', '${machine.cylinderAmount}', '${machine.shipNo}', '${machine.classificationSociety}', 2)|">导出发布部套</a>
+                        <a th:href="@{|/importResult?machineName=${machine.name}|}">导入记录</a>
                     </td>
                 </tr>
                 </tbody>
@@ -151,7 +152,7 @@
                         <th>导入结果</th>
                     </tr>
                     </thead>
-                    <tbody id="importResult">
+                    <tbody id="importResultResp">
                     </tbody>
                 </table>
             </div>

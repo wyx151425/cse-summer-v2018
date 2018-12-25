@@ -40,7 +40,7 @@ public class FileController extends BaseFacade {
         if (!Constant.DocType.XLSX.equals(cseBom.getContentType())) {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
-        List<ImportResult> resultList;
+        List<ImportResultResp> resultList;
         try {
             resultList = fileService.importCSEMachineBOM(machineName, cseBom);
         } catch (InvalidFormatException | IOException e) {
@@ -57,7 +57,7 @@ public class FileController extends BaseFacade {
         if (!Constant.DocType.XML.equals(manXml.getContentType())) {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
-        List<ImportResult> resultList;
+        List<ImportResultResp> resultList;
         try {
             resultList = fileService.importMANMachineBOM(machineName, manXml);
         } catch (DocumentException | IOException e) {
@@ -74,7 +74,7 @@ public class FileController extends BaseFacade {
         if (!Constant.DocType.XLSX.equals(winGDExcel.getContentType())) {
             throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
         }
-        List<ImportResult> resultList;
+        List<ImportResultResp> resultList;
         try {
             resultList = fileService.importWinGDMachineBOM(machineName, winGDExcel);
         } catch (InvalidFormatException | IOException e) {
@@ -83,10 +83,10 @@ public class FileController extends BaseFacade {
         outputImportResult(machineName, resultList, false);
     }
 
-    private void outputImportResult(String machineName, List<ImportResult> resultList, boolean isStructure) {
+    private void outputImportResult(String machineName, List<ImportResultResp> resultList, boolean isStructure) {
         try {
             StringBuilder strBuilder = new StringBuilder();
-            for (ImportResult result : resultList) {
+            for (ImportResultResp result : resultList) {
                 String structureNo = result.getStructureNo();
                 strBuilder.append(structureNo);
                 strBuilder.append("  ");
@@ -121,7 +121,7 @@ public class FileController extends BaseFacade {
     @PostMapping(value = "files/import/structure/new")
     public Response<Object> actionImportNewStructureExcel(StructureList structureList, HttpServletRequest request) {
         try {
-            List<ImportResult> resultList = new ArrayList<>();
+            List<ImportResultResp> resultList = new ArrayList<>();
             List<MultipartFile> fileList = ((MultipartHttpServletRequest) request).getFiles("strFile");
             for (int index = 0; index < fileList.size(); index++) {
                 MultipartFile file = fileList.get(index);
@@ -130,8 +130,8 @@ public class FileController extends BaseFacade {
                         throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
                     }
                     Structure structure = structureList.getStructure(index);
-                    ImportResult importResult = fileService.importNewStructureBOM(structure, file);
-                    resultList.add(importResult);
+                    ImportResultResp importResultResp = fileService.importNewStructureBOM(structure, file);
+                    resultList.add(importResultResp);
                 }
             }
             outputImportResult(null, resultList, true);

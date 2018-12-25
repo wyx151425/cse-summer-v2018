@@ -29,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -114,7 +113,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<ImportResult> importCSEMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException {
+    public List<ImportResultResp> importCSEMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
 
         Sheet sheet = workbook.getSheet("整机BOM");
@@ -139,7 +138,7 @@ public class FileServiceImpl implements FileService {
             machineRepository.save(machine);
         }
 
-        List<ImportResult> resultList = handleCSEMachineBOM(machineName, sheet, materialList, structureList);
+        List<ImportResultResp> resultList = handleCSEMachineBOM(machineName, sheet, materialList, structureList);
 
         structureRepository.saveAll(structureList);
         materialRepository.saveAll(materialList);
@@ -147,10 +146,10 @@ public class FileServiceImpl implements FileService {
         return resultList;
     }
 
-    private List<ImportResult> handleCSEMachineBOM(String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList) {
+    private List<ImportResultResp> handleCSEMachineBOM(String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList) {
         // 用于维护部套层级的数组
         Material[] levelArr = new Material[12];
-        List<ImportResult> resultList = new ArrayList<>();
+        List<ImportResultResp> resultList = new ArrayList<>();
         // Workbook行索引
         int index = 0;
         String unImportMater = "";
@@ -204,11 +203,11 @@ public class FileServiceImpl implements FileService {
                     /**
                      * 1 标识部套存在
                      */
-                    ImportResult result;
+                    ImportResultResp result;
                     if (isExist) {
-                        result = new ImportResult(structure.getStructureNo(), false);
+                        result = new ImportResultResp(structure.getStructureNo(), false);
                     } else {
-                        result = new ImportResult(structure.getStructureNo(), true);
+                        result = new ImportResultResp(structure.getStructureNo(), true);
                     }
                     resultList.add(result);
                 }
@@ -318,7 +317,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<ImportResult> importMANMachineBOM(String machineName, MultipartFile file) throws DocumentException, IOException {
+    public List<ImportResultResp> importMANMachineBOM(String machineName, MultipartFile file) throws DocumentException, IOException {
         SAXReader reader = new SAXReader();
         Document doc = reader.read(file.getInputStream());
         Element root = doc.getRootElement();
@@ -327,7 +326,7 @@ public class FileServiceImpl implements FileService {
 
         List<Name> names = nameRepository.findAll();
 
-        List<ImportResult> resultList = new ArrayList<>();
+        List<ImportResultResp> resultList = new ArrayList<>();
         xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, null, names, resultList);
 
         Machine targetMachine = machineRepository.findMachineByNameAndStatus(machineName, 1);
@@ -357,7 +356,7 @@ public class FileServiceImpl implements FileService {
      */
     @SuppressWarnings("unchecked")
     private void xmlRecursiveTraversal(Element element, List<Material> materialList, List<Structure> structureList,
-                                       String parentId, String machineName, int parentLevel, String atNo, List<Name> names, List<ImportResult> resultList) {
+                                       String parentId, String machineName, int parentLevel, String atNo, List<Name> names, List<ImportResultResp> resultList) {
         if ("designSpec".equals(element.getName())) {
             logger.info("装置号id: " + element.attributeValue("id"));
             Element revision = element.element("revision");
@@ -369,7 +368,7 @@ public class FileServiceImpl implements FileService {
         } else if ("module".equals(element.getName())) {
             int level = parentLevel + 1;
             if (0 == level) {
-                ImportResult importResult;
+                ImportResultResp importResultResp;
                 Element revision = element.element("revision");
                 String structNoM = revision.element("structureNo").getText();
                 String materNoM = element.attributeValue("id");
@@ -404,19 +403,19 @@ public class FileServiceImpl implements FileService {
                         Element parts = revision.element("partList");
                         int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, materialNo, names);
                         material.setChildCount(childCount);
-                        importResult = new ImportResult(structNoM, true);
+                        importResultResp = new ImportResultResp(structNoM, true);
 
                         targetStruct.setVersion(0);
                     } else {
                         targetStruct.setVersion(materials.get(0).getLatestVersion());
-                        importResult = new ImportResult(structNoM, false);
+                        importResultResp = new ImportResultResp(structNoM, false);
                     }
                     targetStruct.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
                     structureList.add(targetStruct);
                 } else {
-                    importResult = new ImportResult(structNoM, false);
+                    importResultResp = new ImportResultResp(structNoM, false);
                 }
-                resultList.add(importResult);
+                resultList.add(importResultResp);
             } else {
                 Material material = createNewMaterial();
                 material.setAtNo(atNo);
@@ -614,14 +613,14 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<ImportResult> importWinGDMachineBOM(String machineName, MultipartFile file) throws IOException, InvalidFormatException {
+    public List<ImportResultResp> importWinGDMachineBOM(String machineName, MultipartFile file) throws IOException, InvalidFormatException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
 
         List<Name> names = nameRepository.findAll();
 
-        List<ImportResult> resultList = winGDExcelProcess(machineName, workbook, materialList, structureList, names);
+        List<ImportResultResp> resultList = winGDExcelProcess(machineName, workbook, materialList, structureList, names);
 
         Machine targetMachine = machineRepository.findMachineByNameAndStatus(machineName, 1);
         if (null == targetMachine) {
@@ -635,9 +634,9 @@ public class FileServiceImpl implements FileService {
         return resultList;
     }
 
-    private List<ImportResult> winGDExcelProcess(String machineName, Workbook
+    private List<ImportResultResp> winGDExcelProcess(String machineName, Workbook
             workbook, List<Material> materialList, List<Structure> structureList, List<Name> names) {
-        List<ImportResult> resultList = new ArrayList<>();
+        List<ImportResultResp> resultList = new ArrayList<>();
         // 建立维护层级关系的数组
         Material[] levelArray = new Material[12];
         Sheet sheet = workbook.getSheet("PartList");
@@ -690,11 +689,11 @@ public class FileServiceImpl implements FileService {
                     /**
                      * 1 标识部套存在
                      */
-                    ImportResult result;
+                    ImportResultResp result;
                     if (isExist) {
-                        result = new ImportResult(structNo, false);
+                        result = new ImportResultResp(structNo, false);
                     } else {
-                        result = new ImportResult(structNo, true);
+                        result = new ImportResultResp(structNo, true);
                     }
                     resultList.add(result);
                 }
@@ -773,10 +772,10 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ImportResult importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
+    public ImportResultResp importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
         if (null == structure.getStructureNo() || "".equals(structure.getStructureNo()) || structure.getAmount() == null) {
 //            throw new SummerException(StatusCode.MULTI_PARAM_DEFECT);
-            return new ImportResult(structure.getStructureNo(), false);
+            return new ImportResultResp(structure.getStructureNo(), false);
         }
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         if (workbook.getNumberOfSheets() > 1) {
@@ -802,13 +801,13 @@ public class FileServiceImpl implements FileService {
         String materNo = structRow.getCell(3).toString();
         if ("".equals(materNo)) {
 //            throw new SummerException(StatusCode.MULTI_TOP_MATERIAL_NO_BLANK);
-            return new ImportResult(structure.getStructureNo(), false);
+            return new ImportResultResp(structure.getStructureNo(), false);
         }
         // 根据物料号和专利方版本检查
         List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(materNo, 0);
         if (materials.size() > 0) {
 //            throw new SummerException(StatusCode.MULTI_STRUCTURE_EXIST);
-            return new ImportResult(structure.getStructureNo(), false);
+            return new ImportResultResp(structure.getStructureNo(), false);
         } else {
             List<Material> materialList = new ArrayList<>(100);
             Sheet sheet = workbook.getSheetAt(0);
@@ -835,7 +834,7 @@ public class FileServiceImpl implements FileService {
             structure.setMaterialNo(materNo);
             structure.setVersion(0);
             structureRepository.save(structure);
-            return new ImportResult(structure.getStructureNo(), true);
+            return new ImportResultResp(structure.getStructureNo(), true);
         }
     }
 
@@ -1061,34 +1060,27 @@ public class FileServiceImpl implements FileService {
 
     private void amountAndSpareHandler(List<Material> materialList, int cylinderAmount, Structure structure) {
         Material[] materArray = new Material[12];
-        Material amountNotNullMater = null;
 
-        for(int index = 0; index < materialList.size(); ++index) {
-            Material material = materialList.get(index);
+        for (Material material : materialList) {
             material.setStructureNo(structure.getStructureNo());
-            if (1 == material.getLevel() && null != material.getAbsoluteAmount() && 0 != material.getAbsoluteAmount()) {
-                amountNotNullMater = material;
-            }
 
-            materArray[material.getLevel()] = material;
             if (0 == material.getLevel()) {
                 material.setAmount(structure.getAmount());
                 material.setAbsoluteAmount(structure.getAmount());
             }
 
-            if (0 != material.getLevel() && null != materArray[material.getLevel() - 1].getAmount()) {
-                Material parent = materArray[material.getLevel() - 1];
-                Integer parentAmount;
-                if (1 == parent.getLevel() && 0 == parent.getAmount() && null != amountNotNullMater && amountNotNullMater.getStructureNo().equals(material.getStructureNo())) {
-                    parentAmount = amountNotNullMater.getAmount();
+            if (null != material.getAbsoluteAmount() && 0 != material.getAbsoluteAmount()) {
+                materArray[material.getLevel()] = material;
+            }
+
+            if (0 != material.getLevel()) {
+                if (null != materArray[material.getLevel() - 1]) {
+                    Material parent = materArray[material.getLevel() - 1];
                     if (null != material.getAbsoluteAmount()) {
-                        material.setAmount(parentAmount * material.getAbsoluteAmount());
+                        material.setAmount(parent.getAmount() * material.getAbsoluteAmount());
                     }
                 } else {
-                    parentAmount = parent.getAmount();
-                    if (null != material.getAbsoluteAmount()) {
-                        material.setAmount(parentAmount * material.getAbsoluteAmount());
-                    }
+                    material.setAmount(0);
                 }
             }
 

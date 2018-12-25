@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 @javax.persistence.Entity
 @Table(name = "cse_material")
-public class Material extends Entity implements Serializable {
+public class Material extends SummerEntity implements Serializable {
     /**
      * 部套号
      */

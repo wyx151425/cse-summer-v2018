@@ -9,7 +9,7 @@ import java.util.List;
  */
 @javax.persistence.Entity
 @Table(name = "cse_machine")
-public class Machine extends Entity {
+public class Machine extends SummerEntity {
     private String name;
     private String patent;
     private String machineNo;

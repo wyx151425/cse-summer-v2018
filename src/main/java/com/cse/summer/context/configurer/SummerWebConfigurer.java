@@ -22,7 +22,8 @@ public class SummerWebConfigurer implements WebMvcConfigurer {
                 .addPathPatterns("")
                 .addPathPatterns("/")
                 .addPathPatterns("/index")
-                .addPathPatterns("/machine");
+                .addPathPatterns("/machine")
+                .addPathPatterns("/importResult");
     }
 
     @Override

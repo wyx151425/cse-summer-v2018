@@ -51,4 +51,9 @@ public class RouteController {
         mv.setViewName("machine");
         return mv;
     }
+
+    @RequestMapping(value = "importResult")
+    public String routeImportResultPage() {
+        return "import-result";
+    }
 }

@@ -5,6 +5,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 应用逻辑父类
@@ -12,7 +13,7 @@ import java.io.Serializable;
  * @author 王振琦
  */
 @MappedSuperclass
-public class Entity implements Serializable {
+public class SummerEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -21,8 +22,10 @@ public class Entity implements Serializable {
     private Integer id;
     private String objectId;
     private Integer status;
+    private LocalDateTime createAt;
+    private LocalDateTime updateAt;
 
-    public Entity() {
+    public SummerEntity() {
     }
 
     public Integer getId() {
@@ -47,5 +50,21 @@ public class Entity implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public LocalDateTime getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(LocalDateTime createAt) {
+        this.createAt = createAt;
+    }
+
+    public LocalDateTime getUpdateAt() {
+        return updateAt;
+    }
+
+    public void setUpdateAt(LocalDateTime updateAt) {
+        this.updateAt = updateAt;
     }
 }
