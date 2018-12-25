@@ -29,6 +29,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -1048,43 +1051,53 @@ public class FileServiceImpl implements FileService {
             materialList.addAll(materials);
         }
         XSSFWorkbook workbook = buildExcelWorkbook(materialList, machine, 1);
-        return new Excel(machineName + "_" + machine.getType() + suffix + ".xlsx", workbook);
+
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatters = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm");
+        String dayStr = now.format(formatters);
+
+        return new Excel(machineName + "_" + machine.getType() + suffix + "_" + dayStr + ".xlsx", workbook);
     }
 
     private void amountAndSpareHandler(List<Material> materialList, int cylinderAmount, Structure structure) {
         Material[] materArray = new Material[12];
         Material amountNotNullMater = null;
-        for (int index = 0; index < materialList.size(); index++) {
+
+        for(int index = 0; index < materialList.size(); ++index) {
             Material material = materialList.get(index);
             material.setStructureNo(structure.getStructureNo());
-            if (1 == material.getLevel() && !"000".equals(material.getPositionNo())) {
+            if (1 == material.getLevel() && null != material.getAbsoluteAmount() && 0 != material.getAbsoluteAmount()) {
                 amountNotNullMater = material;
             }
+
             materArray[material.getLevel()] = material;
             if (0 == material.getLevel()) {
                 material.setAmount(structure.getAmount());
                 material.setAbsoluteAmount(structure.getAmount());
             }
+
             if (0 != material.getLevel() && null != materArray[material.getLevel() - 1].getAmount()) {
                 Material parent = materArray[material.getLevel() - 1];
-                if (1 == parent.getLevel() && "000".equals(parent.getPositionNo()) && 0 == parent.getAmount()
-                        && null != amountNotNullMater && amountNotNullMater.getStructureNo().equals(material.getStructureNo())) {
-                    Integer parentAmount = amountNotNullMater.getAmount();
+                Integer parentAmount;
+                if (1 == parent.getLevel() && 0 == parent.getAmount() && null != amountNotNullMater && amountNotNullMater.getStructureNo().equals(material.getStructureNo())) {
+                    parentAmount = amountNotNullMater.getAmount();
                     if (null != material.getAbsoluteAmount()) {
                         material.setAmount(parentAmount * material.getAbsoluteAmount());
                     }
                 } else {
-                    Integer parentAmount = parent.getAmount();
+                    parentAmount = parent.getAmount();
                     if (null != material.getAbsoluteAmount()) {
                         material.setAmount(parentAmount * material.getAbsoluteAmount());
                     }
                 }
             }
+
             if (!"".equals(material.getSpareExp().trim())) {
                 int spare = spareAnalysis(cylinderAmount, material.getSpareExp());
                 material.setSpare(spare);
             }
         }
+
     }
 
     @Override
