@@ -28,6 +28,13 @@ public class SummerEntity implements Serializable {
     public SummerEntity() {
     }
 
+    public SummerEntity(String objectId, Integer status, LocalDateTime createAt, LocalDateTime updateAt) {
+        this.objectId = objectId;
+        this.status = status;
+        this.createAt = createAt;
+        this.updateAt = updateAt;
+    }
+
     public Integer getId() {
         return id;
     }

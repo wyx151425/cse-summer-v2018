@@ -3,7 +3,7 @@ package com.cse.summer.domain;
 /**
  * @author WangZhenqi
  */
-public class ImportResultResp {
+public class AnalyzeResult {
     /**
      * 部套号
      */
@@ -13,7 +13,7 @@ public class ImportResultResp {
      */
     private Boolean result;
 
-    public ImportResultResp(String structureNo, Boolean result) {
+    public AnalyzeResult(String structureNo, Boolean result) {
         this.structureNo = structureNo;
         this.result = result;
     }

@@ -1,7 +1,7 @@
 package com.cse.summer.controller;
 
 import com.cse.summer.context.exception.SummerException;
-import com.cse.summer.domain.ImportResultResp;
+import com.cse.summer.domain.AnalyzeResult;
 import com.cse.summer.domain.Response;
 import com.cse.summer.domain.Structure;
 import com.cse.summer.service.StructureService;
@@ -59,9 +59,9 @@ public class StructureController extends BaseFacade {
     }
 
     @PostMapping(value = "structures/check")
-    public Response<List<ImportResultResp>> actionStructureCheck(@RequestParam("structureCheckFile") MultipartFile file) {
+    public Response<List<AnalyzeResult>> actionStructureCheck(@RequestParam("structureCheckFile") MultipartFile file) {
         try {
-            List<ImportResultResp> results = structureService.checkStructureExistence(file);
+            List<AnalyzeResult> results = structureService.checkStructureExistence(file);
             return new Response<>(results);
         } catch (IOException | InvalidFormatException e) {
             throw new SummerException(e, StatusCode.SYSTEM_ERROR);

@@ -1,7 +1,10 @@
 package com.cse.summer.domain;
 
+import com.cse.summer.util.Generator;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 
 /**
  * @author WangZhenqi
@@ -25,6 +28,17 @@ public class ImportResult extends SummerEntity {
      * 导入标记
      */
     private Boolean mark;
+
+    public ImportResult() {
+    }
+
+    public ImportResult(String machineName, String structureNo, String materialNo, Boolean mark) {
+        super(Generator.getObjectId(), 1, LocalDateTime.now(), LocalDateTime.now());
+        this.machineName = machineName;
+        this.structureNo = structureNo;
+        this.materialNo = materialNo;
+        this.mark = mark;
+    }
 
     public String getMachineName() {
         return machineName;

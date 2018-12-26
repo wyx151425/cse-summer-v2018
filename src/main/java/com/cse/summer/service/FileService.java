@@ -1,7 +1,7 @@
 package com.cse.summer.service;
 
+import com.cse.summer.domain.AnalyzeResult;
 import com.cse.summer.domain.Excel;
-import com.cse.summer.domain.ImportResultResp;
 import com.cse.summer.domain.Structure;
 import com.cse.summer.domain.User;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -26,7 +26,7 @@ public interface FileService {
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    List<ImportResultResp> importCSEMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
+    List<AnalyzeResult> importCSEMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入并解析MAN XML文件
@@ -37,7 +37,7 @@ public interface FileService {
      * @throws DocumentException 文档处理异常
      * @throws IOException       输入输出异常
      */
-    List<ImportResultResp> importMANMachineBOM(String machineName, MultipartFile file) throws DocumentException, IOException;
+    List<AnalyzeResult> importMANMachineBOM(String machineName, MultipartFile file) throws DocumentException, IOException;
 
     /**
      * 导入并解析WinGD Excel文件
@@ -48,7 +48,7 @@ public interface FileService {
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    List<ImportResultResp> importWinGDMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
+    List<AnalyzeResult> importWinGDMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入新部套
@@ -58,7 +58,7 @@ public interface FileService {
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
-    ImportResultResp importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
+    AnalyzeResult importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
      * 导入新版本部套的BOM文件

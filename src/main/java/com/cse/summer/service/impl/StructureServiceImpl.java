@@ -1,7 +1,7 @@
 package com.cse.summer.service.impl;
 
 import com.cse.summer.context.exception.SummerException;
-import com.cse.summer.domain.ImportResultResp;
+import com.cse.summer.domain.AnalyzeResult;
 import com.cse.summer.domain.Material;
 import com.cse.summer.domain.Structure;
 import com.cse.summer.repository.MaterialRepository;
@@ -93,10 +93,10 @@ public class StructureServiceImpl implements StructureService {
     }
 
     @Override
-    public List<ImportResultResp> checkStructureExistence(MultipartFile file) throws IOException, InvalidFormatException {
+    public List<AnalyzeResult> checkStructureExistence(MultipartFile file) throws IOException, InvalidFormatException {
         Sheet sheet = ExcelUtil.formatExcelBOM(file, "整机BOM");
         int rowIndex = 0;
-        List<ImportResultResp> results = new ArrayList<>();
+        List<AnalyzeResult> results = new ArrayList<>();
         for (Row row : sheet) {
             if (rowIndex < 3) {
                 rowIndex++;
@@ -106,9 +106,9 @@ public class StructureServiceImpl implements StructureService {
                     String code = row.getCell(3).toString().trim();
                     List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(code, 0);
                     if (materials.size() > 0) {
-                        results.add(new ImportResultResp(structureNo + "(" + code +")", false));
+                        results.add(new AnalyzeResult(structureNo + "(" + code +")", false));
                     } else {
-                        results.add(new ImportResultResp(structureNo + "(" + code +")", true));
+                        results.add(new AnalyzeResult(structureNo + "(" + code +")", true));
                     }
                 }
             }

@@ -3,10 +3,7 @@ package com.cse.summer.service.impl;
 import com.cse.summer.context.exception.SummerException;
 import com.cse.summer.domain.*;
 import com.cse.summer.domain.Name;
-import com.cse.summer.repository.MachineRepository;
-import com.cse.summer.repository.MaterialRepository;
-import com.cse.summer.repository.NameRepository;
-import com.cse.summer.repository.StructureRepository;
+import com.cse.summer.repository.*;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.Generator;
 import com.cse.summer.util.StatusCode;
@@ -23,6 +20,7 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,13 +43,15 @@ public class FileServiceImpl implements FileService {
     private final MaterialRepository materialRepository;
     private final StructureRepository structureRepository;
     private final NameRepository nameRepository;
+    private final ResultRepository resultRepository;
 
     @Autowired
-    public FileServiceImpl(MachineRepository machineRepository, MaterialRepository materialRepository, StructureRepository structureRepository, NameRepository nameRepository) {
+    public FileServiceImpl(MachineRepository machineRepository, MaterialRepository materialRepository, StructureRepository structureRepository, NameRepository nameRepository, ResultRepository resultRepository) {
         this.machineRepository = machineRepository;
         this.materialRepository = materialRepository;
         this.structureRepository = structureRepository;
         this.nameRepository = nameRepository;
+        this.resultRepository = resultRepository;
     }
 
     // 从数据库中英文名称参照表中查找中文名称
@@ -69,6 +69,9 @@ public class FileServiceImpl implements FileService {
         Machine machine = new Machine();
         machine.setObjectId(Generator.getObjectId());
         machine.setStatus(1);
+        LocalDateTime dateTime = LocalDateTime.now();
+        machine.setCreateAt(dateTime);
+        machine.setUpdateAt(dateTime);
         machine.setName(machineName);
         machine.setPatent("MAN");
         machine.setMachineNo("");
@@ -83,6 +86,9 @@ public class FileServiceImpl implements FileService {
         Structure structure = new Structure();
         structure.setObjectId(Generator.getObjectId());
         structure.setStatus(1);
+        LocalDateTime dateTime = LocalDateTime.now();
+        structure.setCreateAt(dateTime);
+        structure.setUpdateAt(dateTime);
         structure.setMachineName(machineName);
         return structure;
     }
@@ -91,6 +97,9 @@ public class FileServiceImpl implements FileService {
         Material material = new Material();
         material.setObjectId(Generator.getObjectId());
         material.setStatus(1);
+        LocalDateTime dateTime = LocalDateTime.now();
+        material.setCreateAt(dateTime);
+        material.setUpdateAt(dateTime);
         material.setLevel(-1);
         material.setPositionNo("");
         material.setMaterialNo("");
@@ -113,7 +122,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<ImportResultResp> importCSEMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException {
+    public List<AnalyzeResult> importCSEMachineBOM(String machineName, MultipartFile file) throws InvalidFormatException, IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
 
         Sheet sheet = workbook.getSheet("整机BOM");
@@ -138,7 +147,7 @@ public class FileServiceImpl implements FileService {
             machineRepository.save(machine);
         }
 
-        List<ImportResultResp> resultList = handleCSEMachineBOM(machineName, sheet, materialList, structureList);
+        List<AnalyzeResult> resultList = handleCSEMachineBOM(machineName, sheet, materialList, structureList);
 
         structureRepository.saveAll(structureList);
         materialRepository.saveAll(materialList);
@@ -146,10 +155,11 @@ public class FileServiceImpl implements FileService {
         return resultList;
     }
 
-    private List<ImportResultResp> handleCSEMachineBOM(String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList) {
+    private List<AnalyzeResult> handleCSEMachineBOM(String machineName, Sheet sheet, List<Material> materialList, List<Structure> structureList) {
         // 用于维护部套层级的数组
         Material[] levelArr = new Material[12];
-        List<ImportResultResp> resultList = new ArrayList<>();
+        List<AnalyzeResult> resultList = new ArrayList<>();
+        List<ImportResult> importResults = new ArrayList<>();
         // Workbook行索引
         int index = 0;
         String unImportMater = "";
@@ -203,11 +213,13 @@ public class FileServiceImpl implements FileService {
                     /**
                      * 1 标识部套存在
                      */
-                    ImportResultResp result;
+                    AnalyzeResult result;
                     if (isExist) {
-                        result = new ImportResultResp(structure.getStructureNo(), false);
+                        result = new AnalyzeResult(structure.getStructureNo(), false);
+                        importResults.add(new ImportResult(machineName, structure.getStructureNo(), materialNo, false));
                     } else {
-                        result = new ImportResultResp(structure.getStructureNo(), true);
+                        result = new AnalyzeResult(structure.getStructureNo(), true);
+                        importResults.add(new ImportResult(machineName, structure.getStructureNo(), materialNo, true));
                     }
                     resultList.add(result);
                 }
@@ -312,12 +324,13 @@ public class FileServiceImpl implements FileService {
                 }
             }
         }
+        resultRepository.saveAll(importResults);
         return resultList;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<ImportResultResp> importMANMachineBOM(String machineName, MultipartFile file) throws DocumentException, IOException {
+    public List<AnalyzeResult> importMANMachineBOM(String machineName, MultipartFile file) throws DocumentException, IOException {
         SAXReader reader = new SAXReader();
         Document doc = reader.read(file.getInputStream());
         Element root = doc.getRootElement();
@@ -326,8 +339,9 @@ public class FileServiceImpl implements FileService {
 
         List<Name> names = nameRepository.findAll();
 
-        List<ImportResultResp> resultList = new ArrayList<>();
-        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, null, names, resultList);
+        List<AnalyzeResult> resultList = new ArrayList<>();
+        List<ImportResult> importResults = new ArrayList<>();
+        xmlRecursiveTraversal(root.element("designSpec"), materialList, structureList, null, machineName, -1, null, names, resultList, importResults);
 
         Machine targetMachine = machineRepository.findMachineByNameAndStatus(machineName, 1);
         if (null == targetMachine) {
@@ -337,6 +351,7 @@ public class FileServiceImpl implements FileService {
 
         materialRepository.saveAll(materialList);
         structureRepository.saveAll(structureList);
+        resultRepository.saveAll(importResults);
 
         return resultList;
     }
@@ -356,19 +371,20 @@ public class FileServiceImpl implements FileService {
      */
     @SuppressWarnings("unchecked")
     private void xmlRecursiveTraversal(Element element, List<Material> materialList, List<Structure> structureList,
-                                       String parentId, String machineName, int parentLevel, String atNo, List<Name> names, List<ImportResultResp> resultList) {
+                                       String parentId, String machineName, int parentLevel, String atNo, List<Name> names, List<AnalyzeResult> resultList, List<ImportResult> importResults) {
         if ("designSpec".equals(element.getName())) {
             logger.info("装置号id: " + element.attributeValue("id"));
             Element revision = element.element("revision");
             Element modules = revision.element("moduleList");
             List<Element> moduleList = modules.elements("module");
             for (Element module : moduleList) {
-                xmlRecursiveTraversal(module, materialList, structureList, null, machineName, parentLevel, null, names, resultList);
+                xmlRecursiveTraversal(module, materialList, structureList, null, machineName, parentLevel, null, names, resultList, importResults);
             }
         } else if ("module".equals(element.getName())) {
             int level = parentLevel + 1;
             if (0 == level) {
-                ImportResultResp importResultResp;
+                AnalyzeResult analyzeResult;
+                ImportResult importResult;
                 Element revision = element.element("revision");
                 String structNoM = revision.element("structureNo").getText();
                 String materNoM = element.attributeValue("id");
@@ -403,19 +419,22 @@ public class FileServiceImpl implements FileService {
                         Element parts = revision.element("partList");
                         int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, materialNo, names);
                         material.setChildCount(childCount);
-                        importResultResp = new ImportResultResp(structNoM, true);
-
+                        analyzeResult = new AnalyzeResult(structNoM, true);
+                        importResult = new ImportResult(machineName, structNoM, materialNo, true);
                         targetStruct.setVersion(0);
                     } else {
                         targetStruct.setVersion(materials.get(0).getLatestVersion());
-                        importResultResp = new ImportResultResp(structNoM, false);
+                        analyzeResult = new AnalyzeResult(structNoM, false);
+                        importResult = new ImportResult(machineName, structNoM, materialNo, false);
                     }
                     targetStruct.setAmount((int) Double.parseDouble(revision.element("quantity").getText()));
                     structureList.add(targetStruct);
                 } else {
-                    importResultResp = new ImportResultResp(structNoM, false);
+                    analyzeResult = new AnalyzeResult(structNoM, false);
+                    importResult = new ImportResult(machineName, structNoM, materialNo, false);
                 }
-                resultList.add(importResultResp);
+                importResults.add(importResult);
+                resultList.add(analyzeResult);
             } else {
                 Material material = createNewMaterial();
                 material.setAtNo(atNo);
@@ -605,7 +624,7 @@ public class FileServiceImpl implements FileService {
             otherParts.sort(Comparator.comparing(o -> o.element("revision").element("sequenceNo").getText()));
 
             for (Element element : otherParts) {
-                xmlRecursiveTraversal(element, materialList, null, parentId, machineName, parentLevel, atNo, names, null);
+                xmlRecursiveTraversal(element, materialList, null, parentId, machineName, parentLevel, atNo, names, null, null);
             }
         }
         return childCount;
@@ -613,14 +632,15 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<ImportResultResp> importWinGDMachineBOM(String machineName, MultipartFile file) throws IOException, InvalidFormatException {
+    public List<AnalyzeResult> importWinGDMachineBOM(String machineName, MultipartFile file) throws IOException, InvalidFormatException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         List<Material> materialList = new ArrayList<>(1000);
         List<Structure> structureList = new ArrayList<>(100);
 
         List<Name> names = nameRepository.findAll();
 
-        List<ImportResultResp> resultList = winGDExcelProcess(machineName, workbook, materialList, structureList, names);
+        List<ImportResult> importResults = new ArrayList<>();
+        List<AnalyzeResult> resultList = winGDExcelProcess(machineName, workbook, materialList, structureList, names, importResults);
 
         Machine targetMachine = machineRepository.findMachineByNameAndStatus(machineName, 1);
         if (null == targetMachine) {
@@ -630,13 +650,14 @@ public class FileServiceImpl implements FileService {
 
         structureRepository.saveAll(structureList);
         materialRepository.saveAll(materialList);
+        resultRepository.saveAll(importResults);
 
         return resultList;
     }
 
-    private List<ImportResultResp> winGDExcelProcess(String machineName, Workbook
-            workbook, List<Material> materialList, List<Structure> structureList, List<Name> names) {
-        List<ImportResultResp> resultList = new ArrayList<>();
+    private List<AnalyzeResult> winGDExcelProcess(String machineName, Workbook
+            workbook, List<Material> materialList, List<Structure> structureList, List<Name> names, List<ImportResult> importResults) {
+        List<AnalyzeResult> resultList = new ArrayList<>();
         // 建立维护层级关系的数组
         Material[] levelArray = new Material[12];
         Sheet sheet = workbook.getSheet("PartList");
@@ -689,11 +710,13 @@ public class FileServiceImpl implements FileService {
                     /**
                      * 1 标识部套存在
                      */
-                    ImportResultResp result;
+                    AnalyzeResult result;
                     if (isExist) {
-                        result = new ImportResultResp(structNo, false);
+                        result = new AnalyzeResult(structNo, false);
+                        importResults.add(new ImportResult(machineName, structNo, materialNo, false));
                     } else {
-                        result = new ImportResultResp(structNo, true);
+                        result = new AnalyzeResult(structNo, true);
+                        importResults.add(new ImportResult(machineName, structNo, materialNo, true));
                     }
                     resultList.add(result);
                 }
@@ -772,10 +795,10 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ImportResultResp importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
+    public AnalyzeResult importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
         if (null == structure.getStructureNo() || "".equals(structure.getStructureNo()) || structure.getAmount() == null) {
 //            throw new SummerException(StatusCode.MULTI_PARAM_DEFECT);
-            return new ImportResultResp(structure.getStructureNo(), false);
+            return new AnalyzeResult(structure.getStructureNo(), false);
         }
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         if (workbook.getNumberOfSheets() > 1) {
@@ -801,13 +824,13 @@ public class FileServiceImpl implements FileService {
         String materNo = structRow.getCell(3).toString();
         if ("".equals(materNo)) {
 //            throw new SummerException(StatusCode.MULTI_TOP_MATERIAL_NO_BLANK);
-            return new ImportResultResp(structure.getStructureNo(), false);
+            return new AnalyzeResult(structure.getStructureNo(), false);
         }
         // 根据物料号和专利方版本检查
         List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(materNo, 0);
         if (materials.size() > 0) {
 //            throw new SummerException(StatusCode.MULTI_STRUCTURE_EXIST);
-            return new ImportResultResp(structure.getStructureNo(), false);
+            return new AnalyzeResult(structure.getStructureNo(), false);
         } else {
             List<Material> materialList = new ArrayList<>(100);
             Sheet sheet = workbook.getSheetAt(0);
@@ -834,7 +857,7 @@ public class FileServiceImpl implements FileService {
             structure.setMaterialNo(materNo);
             structure.setVersion(0);
             structureRepository.save(structure);
-            return new ImportResultResp(structure.getStructureNo(), true);
+            return new AnalyzeResult(structure.getStructureNo(), true);
         }
     }
 
