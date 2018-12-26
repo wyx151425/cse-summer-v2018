@@ -1,6 +1,6 @@
 package com.cse.summer.controller;
 
-import com.cse.summer.domain.User;
+import com.cse.summer.model.entity.User;
 import com.cse.summer.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 

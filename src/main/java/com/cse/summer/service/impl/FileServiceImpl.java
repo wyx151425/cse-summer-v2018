@@ -1,8 +1,10 @@
 package com.cse.summer.service.impl;
 
 import com.cse.summer.context.exception.SummerException;
-import com.cse.summer.domain.*;
-import com.cse.summer.domain.Name;
+import com.cse.summer.model.dto.AnalyzeResult;
+import com.cse.summer.model.dto.Excel;
+import com.cse.summer.model.entity.*;
+import com.cse.summer.model.entity.Name;
 import com.cse.summer.repository.*;
 import com.cse.summer.service.FileService;
 import com.cse.summer.util.Generator;
@@ -20,7 +22,6 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;

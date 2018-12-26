@@ -1,6 +1,6 @@
 package com.cse.summer.service.impl;
 
-import com.cse.summer.domain.ImportResult;
+import com.cse.summer.model.entity.ImportResult;
 import com.cse.summer.repository.ResultRepository;
 import com.cse.summer.service.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.cse.summer.service;
 
-import com.cse.summer.domain.Machine;
+import com.cse.summer.model.entity.Machine;
 
 import java.util.List;
 

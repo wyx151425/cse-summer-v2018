@@ -1,7 +1,7 @@
 package com.cse.summer.context.handler;
 
 import com.cse.summer.context.exception.SummerException;
-import com.cse.summer.domain.Response;
+import com.cse.summer.model.dto.Response;
 import com.cse.summer.util.StatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

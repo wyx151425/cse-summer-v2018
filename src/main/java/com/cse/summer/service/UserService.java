@@ -1,6 +1,6 @@
 package com.cse.summer.service;
 
-import com.cse.summer.domain.User;
+import com.cse.summer.model.entity.User;
 
 /**
  * @author 王振琦

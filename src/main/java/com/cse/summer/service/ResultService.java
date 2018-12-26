@@ -1,6 +1,6 @@
 package com.cse.summer.service;
 
-import com.cse.summer.domain.ImportResult;
+import com.cse.summer.model.entity.ImportResult;
 
 import java.util.List;
 

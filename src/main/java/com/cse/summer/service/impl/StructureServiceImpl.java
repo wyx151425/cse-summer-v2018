@@ -1,9 +1,9 @@
 package com.cse.summer.service.impl;
 
 import com.cse.summer.context.exception.SummerException;
-import com.cse.summer.domain.AnalyzeResult;
-import com.cse.summer.domain.Material;
-import com.cse.summer.domain.Structure;
+import com.cse.summer.model.dto.AnalyzeResult;
+import com.cse.summer.model.entity.Material;
+import com.cse.summer.model.entity.Structure;
 import com.cse.summer.repository.MaterialRepository;
 import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.StructureService;

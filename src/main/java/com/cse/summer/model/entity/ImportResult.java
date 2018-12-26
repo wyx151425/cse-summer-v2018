@@ -1,4 +1,4 @@
-package com.cse.summer.domain;
+package com.cse.summer.model.entity;
 
 import com.cse.summer.util.Generator;
 

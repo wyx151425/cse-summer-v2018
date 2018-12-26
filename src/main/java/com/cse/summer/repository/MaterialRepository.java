@@ -1,6 +1,6 @@
 package com.cse.summer.repository;
 
-import com.cse.summer.domain.Material;
+import com.cse.summer.model.entity.Material;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

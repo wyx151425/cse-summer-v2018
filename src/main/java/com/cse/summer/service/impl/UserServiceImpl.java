@@ -1,8 +1,7 @@
 package com.cse.summer.service.impl;
 
 import com.cse.summer.context.exception.SummerException;
-import com.cse.summer.domain.Structure;
-import com.cse.summer.domain.User;
+import com.cse.summer.model.entity.User;
 import com.cse.summer.repository.MachineRepository;
 import com.cse.summer.repository.MaterialRepository;
 import com.cse.summer.repository.StructureRepository;

@@ -1,7 +1,7 @@
 package com.cse.summer.repository;
 
-import com.cse.summer.domain.StructMater;
-import com.cse.summer.domain.Structure;
+import com.cse.summer.model.dto.StructMater;
+import com.cse.summer.model.entity.Structure;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -58,7 +58,7 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
      * @param machineName 机器名
      * @return 部套对应的物料数据集合
      */
-    @Query("select new com.cse.summer.domain.StructMater(s, m) from Structure s left join Material m on s.materialNo = m.materialNo and s.version = m.version where s.status > 0 and s.machineName = :machineName and m.level = 0 order by s.structureNo, s.materialNo")
+    @Query("select new com.cse.summer.model.dto.StructMater(s, m) from Structure s left join Material m on s.materialNo = m.materialNo and s.version = m.version where s.status > 0 and s.machineName = :machineName and m.level = 0 order by s.structureNo, s.materialNo")
     List<StructMater> findAllStructureMaterial(@Param("machineName") String machineName);
 
     /**

@@ -1,6 +1,7 @@
-package com.cse.summer.domain;
+package com.cse.summer.model.dto;
 
 import com.cse.summer.context.exception.SummerException;
+import com.cse.summer.model.entity.Structure;
 import com.cse.summer.util.StatusCode;
 
 import java.lang.reflect.InvocationTargetException;

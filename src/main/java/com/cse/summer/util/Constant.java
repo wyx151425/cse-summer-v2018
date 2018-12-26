@@ -20,4 +20,47 @@ public class Constant {
         public static final int COMMON = 1;
         public static final int DESIGNER = 2;
     }
+
+    public static final class Status {
+        public static final int DISABLE = 0;
+        public static final int ENABLE = 1;
+    }
+
+    public static final class Roles {
+        public static final String USER = "ROLE_USER";
+        public static final String STRUCTURE_MANAGER = "ROLE_STRUCTURE_MANAGER";
+        public static final String PROJECT_MANAGER = "ROLE_PROJECT_MANAGER";
+        public static final String CHIEF_DESIGNER = "ROLE_CHIEF_DESIGNER";
+        public static final String ADMIN = "ROLE_ADMIN";
+    }
+
+    public static final class Permissions {
+        /**
+         * 部套负责人权限
+         */
+        public static final String IMPORT_MACHINE_BOM = "IMPORT_MACHINE_BOM";
+        public static final String EXPORT_MACHINE_BOM = "EXPORT_MACHINE_BOM";
+        public static final String EXPORT_STRUCTURE = "EXPORT_STRUCTURE";
+
+        /**
+         * 项目负责人权限
+         */
+        public static final String UPDATE_MACHINE_INFO = "UPDATE_MACHINE_INFO";
+        public static final String RELEASE_STRUCTURE = "RELEASE_STRUCTURE";
+        public static final String UPDATE_STRUCTURE_VERSION = "UPDATE_STRUCTURE_VERSION";
+        public static final String APPEND_STRUCTURE = "APPEND_STRUCTURE";
+
+        /**
+         * 主任设计师权限
+         */
+        public static final String IMPORT_NEW_MACHINE_BOM = "IMPORT_NEW_MACHINE_BOM";
+        public static final String DELETE_STRUCTURE = "DELETE_STRUCTURE";
+        public static final String IMPORT_STRUCTURE = "IMPORT_STRUCTURE";
+
+        /**
+         * 管理员权限
+         */
+        public static final String UPDATE_PERMISSION = "UPDATE_PERMISSION";
+        public static final String DELETE_ALL_MACHINE = "DELETE_ALL_MACHINE";
+    }
 }

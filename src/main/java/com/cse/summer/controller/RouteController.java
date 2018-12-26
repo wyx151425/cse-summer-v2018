@@ -1,7 +1,7 @@
 package com.cse.summer.controller;
 
-import com.cse.summer.domain.Machine;
-import com.cse.summer.domain.Structure;
+import com.cse.summer.model.entity.Machine;
+import com.cse.summer.model.entity.Structure;
 import com.cse.summer.service.MachineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

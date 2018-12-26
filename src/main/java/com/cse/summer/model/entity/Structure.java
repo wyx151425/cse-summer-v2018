@@ -1,11 +1,13 @@
-package com.cse.summer.domain;
+package com.cse.summer.model.entity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * @author 王振琦
  */
-@javax.persistence.Entity
+@Entity
 @Table(name = "cse_structure")
 public class Structure extends SummerEntity {
     /**

@@ -1,6 +1,6 @@
 package com.cse.summer.service;
 
-import com.cse.summer.domain.Material;
+import com.cse.summer.model.entity.Material;
 
 import java.util.List;
 import java.util.Map;

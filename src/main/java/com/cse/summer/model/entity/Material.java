@@ -1,15 +1,15 @@
-package com.cse.summer.domain;
+package com.cse.summer.model.entity;
 
+import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import java.io.Serializable;
 
 /**
  * @author 王振琦
  */
-@javax.persistence.Entity
+@Entity
 @Table(name = "cse_material")
-public class Material extends SummerEntity implements Serializable {
+public class Material extends SummerEntity {
     /**
      * 部套号
      */

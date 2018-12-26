@@ -1,6 +1,6 @@
 package com.cse.summer.context.interceptor;
 
-import com.cse.summer.domain.User;
+import com.cse.summer.model.entity.User;
 import com.cse.summer.util.Constant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

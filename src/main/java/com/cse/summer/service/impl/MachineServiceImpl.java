@@ -1,8 +1,8 @@
 package com.cse.summer.service.impl;
 
-import com.cse.summer.domain.Machine;
-import com.cse.summer.domain.StructMater;
-import com.cse.summer.domain.Structure;
+import com.cse.summer.model.entity.Machine;
+import com.cse.summer.model.dto.StructMater;
+import com.cse.summer.model.entity.Structure;
 import com.cse.summer.repository.MachineRepository;
 import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.MachineService;

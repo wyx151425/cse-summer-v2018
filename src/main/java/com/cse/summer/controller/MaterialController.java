@@ -1,7 +1,7 @@
 package com.cse.summer.controller;
 
-import com.cse.summer.domain.Material;
-import com.cse.summer.domain.Response;
+import com.cse.summer.model.entity.Material;
+import com.cse.summer.model.dto.Response;
 import com.cse.summer.service.MaterialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

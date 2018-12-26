@@ -1,4 +1,7 @@
-package com.cse.summer.domain;
+package com.cse.summer.model.dto;
+
+import com.cse.summer.model.entity.Material;
+import com.cse.summer.model.entity.Structure;
 
 public class StructMater {
     private Structure structure;

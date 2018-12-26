@@ -1,9 +1,9 @@
 package com.cse.summer.controller;
 
 import com.cse.summer.context.exception.SummerException;
-import com.cse.summer.domain.AnalyzeResult;
-import com.cse.summer.domain.Response;
-import com.cse.summer.domain.Structure;
+import com.cse.summer.model.dto.AnalyzeResult;
+import com.cse.summer.model.dto.Response;
+import com.cse.summer.model.entity.Structure;
 import com.cse.summer.service.StructureService;
 import com.cse.summer.util.StatusCode;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;

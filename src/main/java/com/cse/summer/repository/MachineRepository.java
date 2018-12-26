@@ -1,6 +1,6 @@
 package com.cse.summer.repository;
 
-import com.cse.summer.domain.Machine;
+import com.cse.summer.model.entity.Machine;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.cse.summer.domain;
+package com.cse.summer.model.entity;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

@@ -1,5 +1,6 @@
-package com.cse.summer.domain;
+package com.cse.summer.model.entity;
 
+import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  * @author 王振琦
  */
-@javax.persistence.Entity
+@Entity
 @Table(name = "cse_machine")
 public class Machine extends SummerEntity {
     private String name;
