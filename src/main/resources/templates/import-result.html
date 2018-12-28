@@ -10,18 +10,20 @@
 <header class="header">
     <div class="header-fixed">
         <div class="container">
-            <img class="logo" th:href="@{/images/CSE.png}" alt=""/>
-            <!--<div class="account">-->
-                <!--<span class="account-name">王振琦</span>-->
-                <!--<span class="icon icon-off"></span>-->
-            <!--</div>-->
+            <img class="logo" th:src="@{/images/cse.png}" alt=""/>
+            <div class="account">
+                <span class="account-name">王振琦</span>
+                <span class="icon icon-off"></span>
+            </div>
         </div>
     </div>
 </header>
 <main id="main" class="container">
     <div class="panel">
         <div class="btn-list">
-            <a th:href="@{/index}"><button class="btn pull-right" type="button">返回</button></a>
+            <a th:href="@{/index}">
+                <button class="btn pull-right" type="button">返回</button>
+            </a>
         </div>
         <table class="table table-bordered table-hover">
             <thead>
@@ -53,39 +55,8 @@
 </div>
 <script th:src="@{/js/vue.min.js}"></script>
 <script th:src="@{/js/axios.min.js}"></script>
+<script th:src="@{/js/cse.js}"></script>
 <script>
-    let requestContext = "http://10.10.20.102:8080/dmsdev/";
-
-    function getUrlParam(url, name) {
-        let pattern = new RegExp("[?&]" + name + "\=([^&]+)", "g");
-        let matcher = pattern.exec(url);
-        let items = null;
-        if (null !== matcher) {
-            try {
-                items = decodeURIComponent(decodeURIComponent(matcher[1]));
-            } catch (e) {
-                try {
-                    items = decodeURIComponent(matcher[1]);
-                } catch (e) {
-                    items = matcher[1];
-                }
-            }
-        }
-        return items;
-    }
-
-    const progress = new Vue({
-        el: "#progress",
-        data: {
-            isVisible: true
-        },
-        methods: {
-            dismiss: function () {
-                this.isVisible = false;
-            }
-        }
-    });
-
     const main = new Vue({
         el: "#main",
         data: {
@@ -104,8 +75,12 @@
                     let statusCode = response.data.statusCode;
                     if (200 === statusCode) {
                         main.setResultList(response.data.data);
+                        popover.append("服务器访问成功", true);
                         progress.dismiss();
                     }
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
                 });
         }
     });

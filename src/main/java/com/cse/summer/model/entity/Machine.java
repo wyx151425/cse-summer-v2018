@@ -11,13 +11,38 @@ import java.util.List;
 @Entity
 @Table(name = "cse_machine")
 public class Machine extends SummerEntity {
+    /**
+     * 机器名
+     */
     private String name;
+    /**
+     * 专利方类型
+     */
     private String patent;
+    /**
+     * 机号
+     */
     private String machineNo;
+    /**
+     * 船号
+     */
     private String shipNo;
+    /**
+     * 适用型号
+     */
     private String type;
+    /**
+     * 缸数
+     */
     private Integer cylinderAmount;
+    /**
+     * 船级社
+     */
     private String classificationSociety;
+    /**
+     * 信息是否已完善
+     */
+    private Boolean isComplete;
 
     @Transient
     private List<Structure> structureList;
@@ -79,6 +104,14 @@ public class Machine extends SummerEntity {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Boolean getComplete() {
+        return isComplete;
+    }
+
+    public void setComplete(Boolean complete) {
+        isComplete = complete;
     }
 
     public List<Structure> getStructureList() {

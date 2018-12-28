@@ -39,7 +39,7 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addDbStructure(Structure structure) {
+    public void appendStructure(Structure structure) {
         Material material = materialRepository.findMaterialByMaterialNoAndVersionAndLevel(structure.getMaterialNo(), structure.getVersion(), 0);
         if (null == material) {
             // 检查库中是否有该物料
@@ -53,7 +53,7 @@ public class StructureServiceImpl implements StructureService {
                 structure.setStatus(1);
                 structureRepository.save(structure);
             } else {
-                throw new SummerException(StatusCode.STRUCTURE_EXIST);
+                throw new SummerException(StatusCode.STRUCTURE_IS_EXIST);
             }
         }
     }
@@ -80,7 +80,7 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void confirmStructure(Integer id) {
+    public void releaseStructure(Integer id) {
         Structure structure = structureRepository.getOne(id);
         structure.setStatus(2);
         structureRepository.save(structure);
@@ -88,12 +88,12 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     @Transactional(rollbackFor = Exception.class, readOnly = true)
-    public List<Structure> searchStructureListByAssociateMaterialNo(String materialNo) {
+    public List<Structure> findRelationStructure(String materialNo) {
         return structureRepository.findAllByMaterialNo(materialNo);
     }
 
     @Override
-    public List<AnalyzeResult> checkStructureExistence(MultipartFile file) throws IOException, InvalidFormatException {
+    public List<AnalyzeResult> verifyStructureList(MultipartFile file) throws IOException, InvalidFormatException {
         Sheet sheet = ExcelUtil.formatExcelBOM(file, "整机BOM");
         int rowIndex = 0;
         List<AnalyzeResult> results = new ArrayList<>();

@@ -882,7 +882,7 @@ public class FileServiceImpl implements FileService {
                 // 解析物料层级
                 String levelStr = row.getCell(1).toString();
                 if ("".equals(levelStr)) {
-                    throw new SummerException(StatusCode.MULTI_MATERIAL_LEVEL_BLANK);
+                    throw new SummerException(StatusCode.MATERIAL_LEVEL_BLANK);
                 }
                 int level = (int) Double.parseDouble(levelStr);
                 material.setLevel(level);
@@ -892,7 +892,7 @@ public class FileServiceImpl implements FileService {
                     material.setAtNo(material.getMaterialNo());
                     String structNo = row.getCell(0).toString();
                     if (!structure.getStructureNo().equals(structNo)) {
-                        throw new SummerException(StatusCode.MULTI_STRUCTURE_NO_ERROR);
+                        throw new SummerException(StatusCode.STRUCTURE_NO_ERROR);
                     }
                 } else {
                     Material parentMat = levelArray[level - 1];
@@ -1017,7 +1017,7 @@ public class FileServiceImpl implements FileService {
             }
             materialRepository.saveAll(oldMaterialList);
         } else {
-            throw new SummerException(StatusCode.STRUCTURE_MATERIAL_NOT_EXIST);
+            throw new SummerException(StatusCode.STRUCTURE_NOT_EXIST);
         }
 
         List<Material> materialList = new ArrayList<>(100);

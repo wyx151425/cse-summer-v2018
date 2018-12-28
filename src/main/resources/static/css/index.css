@@ -1,0 +1,51 @@
+.form-horizon2 {
+
+ }
+
+.form-horizon2 .form-label {
+    width: 30px;
+    margin-right: 10px;
+}
+
+.form-horizon2 .form-control {
+    width: 330px;
+}
+
+.form-horizon3 {
+
+}
+
+.form-horizon3 .form-label {
+    width: 45px;
+    margin-right: 10px;
+}
+
+.form-horizon3 .form-control {
+    width: 315px;
+}
+
+.form-horizon4 {
+
+}
+
+.form-horizon4 .form-label {
+    width: 60px;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.form-horizon4 .form-control {
+    width: 300px;
+}
+
+.modal-footer .btn:disabled {
+    width: 92px;
+}
+
+.modal-footer .btn:disabled .rotate {
+    margin-right: 4px;
+}
+
+.icon-search:before {
+    content: "\e003";
+}

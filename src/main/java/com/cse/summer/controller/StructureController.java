@@ -5,6 +5,7 @@ import com.cse.summer.model.dto.AnalyzeResult;
 import com.cse.summer.model.dto.Response;
 import com.cse.summer.model.entity.Structure;
 import com.cse.summer.service.StructureService;
+import com.cse.summer.util.Constant;
 import com.cse.summer.util.StatusCode;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class StructureController extends BaseFacade {
 
     @PostMapping(value = "structures/db")
     public Response<Structure> actionAddDbStructure(@RequestBody Structure structure) {
-        structureService.addDbStructure(structure);
+        structureService.appendStructure(structure);
         return new Response<>();
     }
 
@@ -48,23 +49,27 @@ public class StructureController extends BaseFacade {
 
     @PutMapping(value = "structures/{id}/confirm")
     public Response<Structure> actionConfirmStructure(@PathVariable("id") Integer id) {
-        structureService.confirmStructure(id);
+        structureService.releaseStructure(id);
         return new Response<>();
     }
 
-    @GetMapping(value = "structures/search")
+    @GetMapping(value = "structures/query")
     public Response<List<Structure>> actionStructuresSearch(@RequestParam("materialNo") String materialNo) {
-        List<Structure> structureList = structureService.searchStructureListByAssociateMaterialNo(materialNo);
+        List<Structure> structureList = structureService.findRelationStructure(materialNo);
         return new Response<>(structureList);
     }
 
-    @PostMapping(value = "structures/check")
-    public Response<List<AnalyzeResult>> actionStructureCheck(@RequestParam("structureCheckFile") MultipartFile file) {
-        try {
-            List<AnalyzeResult> results = structureService.checkStructureExistence(file);
-            return new Response<>(results);
-        } catch (IOException | InvalidFormatException e) {
-            throw new SummerException(e, StatusCode.SYSTEM_ERROR);
+    @PostMapping(value = "structures/verify")
+    public Response<List<AnalyzeResult>> actionVerifyStructureList(@RequestParam("file") MultipartFile file) {
+        if (!Constant.DocType.XLSX.equals(file.getContentType())) {
+            throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
+        } else {
+            try {
+                List<AnalyzeResult> resultList = structureService.verifyStructureList(file);
+                return new Response<>(resultList);
+            } catch (InvalidFormatException | IOException e) {
+                throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
+            }
         }
     }
 }

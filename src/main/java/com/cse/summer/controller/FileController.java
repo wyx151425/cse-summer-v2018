@@ -36,57 +36,6 @@ public class FileController extends BaseFacade {
         this.fileService = fileService;
     }
 
-    @PostMapping(value = "files/import/cse")
-    public void actionImportCSEBOM(
-            @RequestParam("machineName") String machineName,
-            @RequestParam("csebom") MultipartFile cseBom
-    ) {
-        if (!Constant.DocType.XLSX.equals(cseBom.getContentType())) {
-            throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
-        }
-        List<AnalyzeResult> resultList;
-        try {
-            resultList = fileService.importCSEMachineBOM(machineName, cseBom);
-        } catch (InvalidFormatException | IOException e) {
-            throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
-        }
-        outputImportResult(machineName, resultList, false);
-    }
-
-    @PostMapping(value = "files/import/xml")
-    public void actionImportMANXml(
-            @RequestParam("machineName") String machineName,
-            @RequestParam("manXml") MultipartFile manXml
-    ) {
-        if (!Constant.DocType.XML.equals(manXml.getContentType())) {
-            throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
-        }
-        List<AnalyzeResult> resultList;
-        try {
-            resultList = fileService.importMANMachineBOM(machineName, manXml);
-        } catch (DocumentException | IOException e) {
-            throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
-        }
-        outputImportResult(machineName, resultList, false);
-    }
-
-    @PostMapping(value = "files/import/excel")
-    public void actionImportWinGDExcel(
-            @RequestParam("machineName") String machineName,
-            @RequestParam("winGDExcel") MultipartFile winGDExcel
-    ) {
-        if (!Constant.DocType.XLSX.equals(winGDExcel.getContentType())) {
-            throw new SummerException(StatusCode.FILE_FORMAT_ERROR);
-        }
-        List<AnalyzeResult> resultList;
-        try {
-            resultList = fileService.importWinGDMachineBOM(machineName, winGDExcel);
-        } catch (InvalidFormatException | IOException e) {
-            throw new SummerException(e, StatusCode.FILE_RESOLVE_ERROR);
-        }
-        outputImportResult(machineName, resultList, false);
-    }
-
     private void outputImportResult(String machineName, List<AnalyzeResult> resultList, boolean isStructure) {
         try {
             StringBuilder strBuilder = new StringBuilder();

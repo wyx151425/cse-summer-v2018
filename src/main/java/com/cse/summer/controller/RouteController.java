@@ -2,7 +2,9 @@ package com.cse.summer.controller;
 
 import com.cse.summer.model.entity.Machine;
 import com.cse.summer.model.entity.Structure;
+import com.cse.summer.repository.MachineRepository;
 import com.cse.summer.service.MachineService;
+import com.cse.summer.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,10 +20,12 @@ import java.util.List;
 public class RouteController {
 
     private final MachineService machineService;
+    private final MachineRepository machineRepository;
 
     @Autowired
-    public RouteController(MachineService machineService) {
+    public RouteController(MachineService machineService, MachineRepository machineRepository) {
         this.machineService = machineService;
+        this.machineRepository = machineRepository;
     }
 
     @RequestMapping(value = "login")
@@ -40,10 +44,11 @@ public class RouteController {
 
     @RequestMapping(value = "machine")
     public ModelAndView routeMachinePage(
-            @RequestParam(value = "machineId") Integer machineId
+            @RequestParam(value = "machineName") String machineName
     ) {
         ModelAndView mv = new ModelAndView();
-        Machine machine = machineService.findMachine(machineId);
+        Machine machine = machineRepository.findMachineByNameAndStatus(machineName, Constant.Status.ENABLE);
+        machine = machineService.findMachine(machine.getId());
         List<Structure> structureList = machine.getStructureList();
         machine.setStructureList(null);
         mv.addObject("machine", machine);

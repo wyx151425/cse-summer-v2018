@@ -17,7 +17,7 @@ public interface StructureService {
      *
      * @param structure 部套对象
      */
-    void addDbStructure(Structure structure);
+    void appendStructure(Structure structure);
 
     /**
      * 修改部套版本
@@ -38,7 +38,7 @@ public interface StructureService {
      *
      * @param id 部套ID
      */
-    void confirmStructure(Integer id);
+    void releaseStructure(Integer id);
 
     /**
      * 根据物料号查询关联的部套
@@ -46,12 +46,15 @@ public interface StructureService {
      * @param materialNo 关联物料号
      * @return 部套数据集合
      */
-    List<Structure> searchStructureListByAssociateMaterialNo(String materialNo);
+    List<Structure> findRelationStructure(String materialNo);
 
     /**
      * 检查部套是否存在
+     *
      * @param file CSE BOM文件
      * @return 检查结果
+     * @throws IOException            输入输出异常
+     * @throws InvalidFormatException 格式错误异常
      */
-    List<AnalyzeResult> checkStructureExistence(MultipartFile file) throws IOException, InvalidFormatException;
+    List<AnalyzeResult> verifyStructureList(MultipartFile file) throws IOException, InvalidFormatException;
 }

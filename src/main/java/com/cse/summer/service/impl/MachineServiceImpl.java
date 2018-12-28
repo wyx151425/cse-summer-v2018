@@ -61,6 +61,7 @@ public class MachineServiceImpl implements MachineService {
         targetMac.setMachineNo(machine.getMachineNo());
         targetMac.setShipNo(machine.getShipNo());
         targetMac.setPatent(machine.getPatent());
+        targetMac.setComplete(true);
         machineRepository.save(targetMac);
     }
 }

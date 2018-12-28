@@ -6,12 +6,14 @@ import com.cse.summer.repository.NameRepository;
 import com.cse.summer.repository.PermissionRepository;
 import com.cse.summer.repository.UserRepository;
 import com.cse.summer.util.Constant;
+import com.cse.summer.util.Generator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,34 +118,22 @@ public class SummerApplicationTests {
 //            e.printStackTrace();
 //        }
 //    }
-//
+
 //    @Test
 //    public void addUsers() {
 //        List<User> users = new ArrayList<>();
 //        User user1 = new User();
 //        user1.setObjectId(Generator.getObjectId());
 //        user1.setStatus(1);
-//        user1.setName("丁玮");
-//        user1.setUsername("dingwei");
+//        LocalDateTime dateTime = LocalDateTime.now();
+//        user1.setCreateAt(dateTime);
+//        user1.setUpdateAt(dateTime);
+//        user1.setName("魏汉雄");
+//        user1.setUsername("weihanxiong");
 //        user1.setPassword("123456");
 //        user1.setRole(1);
+//        user1.setRoles(Constant.Roles.STRUCTURE_MANAGER);
 //        users.add(user1);
-//        User user2 = new User();
-//        user2.setObjectId(Generator.getObjectId());
-//        user2.setStatus(1);
-//        user2.setName("熊丽君");
-//        user2.setUsername("xionglijun");
-//        user2.setPassword("123456");
-//        user2.setRole(1);
-//        users.add(user2);
-//        User user3 = new User();
-//        user3.setObjectId(Generator.getObjectId());
-//        user3.setStatus(1);
-//        user3.setName("乔霈轶");
-//        user3.setUsername("qiaopeiyi");
-//        user3.setPassword("123456");
-//        user3.setRole(1);
-//        users.add(user3);
 //        userRepository.saveAll(users);
 //    }
 

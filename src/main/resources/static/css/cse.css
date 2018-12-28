@@ -36,16 +36,18 @@ a:link, a:hover, a:active, a:visited {
 
 .pull-left {
     float: left;
+    margin-right: 14px;
 }
 
 .pull-right {
     float: right;
+    margin-left: 14px;
 }
 
 /* Header部分CSS */
 .header {
     width: 100%;
-    height: 65px;
+    height: 64px;
     margin-bottom: 40px;
 }
 
@@ -57,8 +59,7 @@ a:link, a:hover, a:active, a:visited {
     width: 100%;
     height: 64px;
     background-color: #fff;
-    border-bottom: 1px solid #dedfe0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
 }
 
 .header .container {
@@ -109,11 +110,95 @@ main.container {
 .panel {
     width: 1320px;
     min-height: 720px;
-    padding: 39px;
-    background-color: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    border: 1px solid #dedfe0;
+    padding: 40px;
     margin-bottom: 60px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 表单部分 */
+.form {
+
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-label {
+    width: 100%;
+    height: 36px;
+    line-height: 36px;
+    font-weight: 700;
+}
+
+.form-control {
+    width: 100%;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 10px;
+    font-size: 14px;
+    border: 1px solid #bbb;
+    box-sizing: border-box;
+}
+
+select.form-control {
+    padding-left: 6px;
+}
+
+input[type="file"].form-control {
+    line-height: normal;
+    font-size: 13px;
+    padding: 5px 10px;
+}
+
+.form-control:focus {
+    border: 1px solid #337ab7;
+}
+
+.form-horizontal {
+
+}
+
+.form-horizontal .form-group {
+    overflow: hidden;
+}
+
+.form-horizontal .form-label {
+    float: left;
+}
+
+.form-horizontal .form-control {
+    float: left;
+}
+
+.form-horizontal .form-icon {
+    position: relative;
+}
+
+.form-horizontal .form-icon .icon {
+    position: absolute;
+    top: 0;
+    right: 4px;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    font-size: 18px;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.form-horizontal .form-icon .icon:hover {
+    color: #b0b0b0;
+}
+
+.form-horizontal .form-icon .icon:active {
+    color: #a0a0a0;
+}
+
+.form-horizontal .form-icon .form-control {
+    padding-right: 36px;
 }
 
 /* 表格部分CSS */
@@ -354,13 +439,13 @@ table th[class*="col-"] {
 }
 
 .btn {
-    width: 96px;
+    width: 92px;
     height: 34px;
     color: #fff;
     font-size: 14px;
     cursor: pointer;
     background-color: #337ab7;
-    border-radius: 1px;
+    border-radius: 2px;
 }
 
 .btn:hover {
@@ -372,7 +457,114 @@ table th[class*="col-"] {
 }
 
 .btn:disabled {
+    cursor: not-allowed;
     background-color: #7ba9d0;
+}
+
+.btn-default {
+    width: 92px;
+    height: 34px;
+    color: #000;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 2px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+.btn-default:hover {
+    background-color: #e6e6e6;
+}
+
+.btn-default:active {
+    background-color: #d4d4d4;
+}
+
+.btn-default:disabled {
+    color: #888;
+    cursor: not-allowed;
+    background-color: #fff;
+}
+
+.btn-link {
+    color: #337ab7;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.btn-link:hover {
+    color: #286090;
+}
+
+.btn-link:active {
+    color: #204d74;
+}
+
+.btn-link:disabled {
+    cursor: not-allowed;
+    color: #7ba9d0;
+}
+
+/* Modal部分CSS */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9000;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-box {
+    overflow: hidden;
+    width: 450px;
+    height: auto;
+    margin: 120px auto 0;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 0 5px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+    position: relative;
+    padding: 16px;
+    border-bottom: 1px solid #dedfe0;
+}
+
+.modal-title {
+    height: 16px;
+    line-height: 1;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.modal-dismiss {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.modal-content {
+    overflow: hidden;
+    padding: 40px;
+}
+
+.modal-footer {
+    overflow: hidden;
+    padding: 16px;
+    border-top: 1px solid #dedfe0;
+}
+
+.modal-footer .btn, .modal-footer .btn-default {
+    width: 60px;
+}
+
+.modal-footer .pull-right {
+    margin-left: 12px;
 }
 
 /* Progress部分CSS */
@@ -445,6 +637,48 @@ span.progress-bar {
     }
 }
 
+/* Response框 */
+.popover {
+    position: fixed;
+    z-index: 999999;
+    top: 0;
+    right: 16px;
+    width: 270px;
+    height: auto;
+}
+
+.popover-box {
+    width: 100%;
+    height: 54px;
+    line-height: 54px;
+    color: #fff;
+    font-size: 14px;
+    margin: 16px 0;
+    padding: 0 16px;
+    border-radius: 2px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.popover-box .icon {
+    margin-right: 4px;
+}
+
+.success {
+    color: #fff;
+    background-color: #67c23a;
+}
+
+.error {
+    color: #fff;
+    background-color: #f56c6c;
+}
+
+.prompt {
+    color: #fff;
+    background-color: #409eff;
+}
+
 /* Icon部分CSS */
 @font-face {
     font-family: 'Glyphicons Halflings';
@@ -465,10 +699,23 @@ span.progress-bar {
     -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-ok:before {
+    content: "\e013";
+}
+
+.icon-remove:before {
+    content: "\e014";
+}
+
 .icon-off:before {
     content: "\e017";
 }
 
 .icon-cog:before {
     content: "\e019";
+}
+
+/* Vue相关CSS */
+[v-cloak] {
+    display: none !important;
 }
