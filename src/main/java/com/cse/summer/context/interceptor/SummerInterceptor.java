@@ -1,7 +1,10 @@
 package com.cse.summer.context.interceptor;
 
+import com.cse.summer.model.dto.Response;
 import com.cse.summer.model.entity.User;
 import com.cse.summer.util.Constant;
+import com.cse.summer.util.StatusCode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
@@ -10,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 
 /**
  * 请求拦截器
@@ -46,14 +50,14 @@ public class SummerInterceptor implements HandlerInterceptor {
         /* 3.Token 检查 */
         User user = (User) request.getSession().getAttribute(Constant.USER);
         if (null == user) {
-//            if (uri.contains("/api")) {
-//                ObjectMapper om = new ObjectMapper();
-//                PrintWriter out = response.getWriter();
-//                out.print(om.writeValueAsString(new Response<String>(StatusCode.USER_LOGIN_TIMEOUT)));
-//                out.flush();
-//            } else {
+            if (uri.contains("/api")) {
+                ObjectMapper om = new ObjectMapper();
+                PrintWriter out = response.getWriter();
+                out.print(om.writeValueAsString(new Response<String>(StatusCode.USER_LOGIN_TIMEOUT)));
+                out.flush();
+            } else {
                 response.sendRedirect(request.getContextPath() + "/login");
-//            }
+            }
             return false;
         } else {
             return true;

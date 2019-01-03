@@ -3,506 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="application/json; charset=UTF-8">
-    <title>CSE DMS</title>
-    <link rel="shortcut icon" th:href="@{/images/CSE.png}" type="image/x-icon"/>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/summer.css}">
+    <title>设计BOM管理工具</title>
+    <link rel="shortcut icon" th:href="@{/images/cse.png}" type="image/x-icon"/>
+    <link rel="stylesheet" th:href="@{/css/cse.css}">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
     <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
-    <script th:src="@{/js/ajaxfileupload.js}"></script>
-    <script th:src="@{/js/bootstrap.min.js}"></script>
     <script th:src="@{/js/summer.js}"></script>
     <script th:src="@{/js/machine.js}"></script>
 </head>
 <body>
-<header class="navbar navbar-default" style="position: fixed; width: 100%">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <!--<a class="navbar-brand" th:href="@{/index}">CSE DMS</a>-->
-            <a class="navbar-brand" th:href="@{/index}" style="color: #ff0000">CSE DMS 测试系统</a>
+<header class="header">
+    <div class="header-fixed">
+        <div class="container">
+            <img class="logo" th:src="@{/images/cse.png}" alt=""/>
+            <div class="account">
+                <span class="account-name">王振琦</span>
+                <span class="icon icon-off"></span>
+            </div>
         </div>
     </div>
 </header>
-<div class="aside-wrap">
-    <aside class="aside">
-        <ul class="list">
-            <li class="list-item" style="padding-left: 0">
-                <span class="glyphicon glyphicon-triangle-right"></span>
-                <span th:text="${machine.name}"></span>
-            </li>
+<main id="main" class="container">
+    <div class="panel">
+        <div class="btn-list">
+            <a class="pull-right" href="index">
+                <button class="btn">返回</button>
+            </a>
+            <button class="btn pull-right" type="button" @click="appendStructureModalVisible"
+                    v-if="user.permissions.IMPORT_STRUCTURE">添加部套
+            </button>
+            <button class="btn pull-right" type="button" @click="importStructureModalVisible"
+                    v-if="user.permissions.APPEND_STRUCTURE">导入部套
+            </button>
+        </div>
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>部套号</th>
+                <th>物料号</th>
+                <th>当前版本</th>
+                <th>最新版本</th>
+                <th>英文名</th>
+                <th>中文名</th>
+                <th>总数量</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(structure, index) in structureList">
+                <td>{{structure.structureNo}}</td>
+                <td>{{structure.materialNo}}</td>
+                <td>{{structure.version}}</td>
+                <td>{{structure.material.latestVersion}}</td>
+                <td>{{structure.material.name}}</td>
+                <td>{{structure.material.chinese}}</td>
+                <td>{{structure.amount}}</td>
+                <td class="col-yellow" v-if="1 == structure.status && user.permissions.RELEASE_STRUCTURE" v-cloak>
+                    <button class="btn-link" @click="releaseStructureModalVisible(structure, index)">设计
+                    </button>
+                </td>
+                <td class="col-yellow" v-if="1 == structure.status && !user.permissions.RELEASE_STRUCTURE">设计</td>
+                <td class="col-green" v-if="2 == structure.status">发布</td>
+                <td>
+                    <button class="btn-link pull-left" @click="exportStructureModalVisible(structure)">导出</button>
+                    <button class="btn-link pull-left" @click="deleteStructureModalVisible(structure, index)"
+                            v-if="user.permissions.DELETE_STRUCTURE" v-cloak>删除
+                    </button>
+                    <button class="btn-link pull-left" @click="updateStructureVersionModalVisible(structure, index)"
+                            v-if="0 != structure.material.latestVersion && user.permissions.UPDATE_STRUCTURE_VERSION"
+                            v-cloak>
+                        修改版本
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<div id="importStructureModal" class="modal" v-if="isVisible" v-cloak>
+    <div class="modal-box">
+        <div class="modal-header">
+            <p class="modal-title">导入部套</p>
+            <div class="modal-dismiss"><span class="icon icon-remove" @click="invisible"></span></div>
+        </div>
+        <ul class="modal-tab">
+            <li class="tab" :class="{active: 1 == tabIndex}" @click="changeTab(1)">新部套</li>
+            <li class="tab" :class="{active: 2 == tabIndex}" @click="changeTab(2)">新版本部套</li>
         </ul>
-    </aside>
-</div>
-<div id="main" style="padding-top: 50px">
-    <main class="container">
-        <div class="material-detail">
-            <div class="table-wrap">
-                <div th:if="${session.user.role == 2 || session.user.role == 4}">
-                    <button id="addDbButton" type="button" data-target="#addDbStructure" data-toggle="modal"
-                            class="btn btn-primary pull-right"
-                            style="margin-bottom: 20px">添加库中部套
-                    </button>
+        <div v-if="1 == tabIndex">
+            <div class="modal-content form-horizontal form-horizon4">
+                <div class="form-group">
+                    <label class="form-label">选择文件</label>
+                    <input id="newStructureFile" class="form-control" type="file" @change="analyzeFile"/>
                 </div>
-                <div th:if="${session.user.role == 4}"
-                     style="margin-bottom: 20px; margin-right: 16px; float: right"></div>
-                <div th:if="${session.user.role == 3 || session.user.role == 4}">
-                    <button id="addNewVersion" type="button" data-target="#importNewVersionStructure"
-                            data-toggle="modal"
-                            class="btn btn-primary pull-right"
-                            style="margin-bottom: 20px">导入新版本部套
-                    </button>
-                    <button id="addNewStructure" type="button" data-target="#importNewStructure" data-toggle="modal"
-                            class="btn btn-primary pull-right"
-                            style="margin-bottom: 20px; margin-right: 16px">导入新部套
-                    </button>
+                <div v-if="isNewStructureFileChosen">
+                    <div class="modal-line"></div>
+                    <div class="form-group">
+                        <label class="form-label">部套号</label>
+                        <input class="form-control" type="text" v-model="newStructureName"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">总数量</label>
+                        <input class="form-control" type="text" v-model="newStructureAmount"/>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn-default pull-right" @click="confirmFile">确认</button>
+                    </div>
                 </div>
-                <div th:if="${session.user.role == 1}" style="margin-top: 50px"></div>
-                <table id="table" class="table table-bordered table-hover">
-                    <thead>
-                    <tr>
-                        <th class="col-lg-1 col-md-1">部套号</th>
-                        <th class="col-lg-1 col-md-1">物料号</th>
-                        <th class="col-lg-1 col-md-1">当前文件版本</th>
-                        <th class="col-lg-1 col-md-1">最新文件版本</th>
-                        <th class="col-lg-2 col-md-2">英文名</th>
-                        <th class="col-lg-2 col-md-2">中文名</th>
-                        <th class="col-lg-1 col-md-1">总数量</th>
-                        <th class="col-lg-1 col-md-1">状态</th>
-                        <th class="col-lg-2 col-md-2">操作</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr class="structure" th:each="structure, structureStat : ${structureList}">
-                        <td th:text="${structure.structureNo}"></td>
-                        <td th:text="${structure.materialNo}"></td>
-                        <td th:text="${structure.version}"></td>
-                        <td th:text="${structure.material.latestVersion}"></td>
-                        <td th:text="${structure.material.name}"></td>
-                        <td th:text="${structure.material.chinese}"></td>
-                        <td th:text="${structure.amount}"></td>
-                        <td th:if="${structure.status == 1}" style="background-color: #ffc000">
-                            <a href="javascript:;" th:if="${session.user.role == 2 || session.user.role == 4}"
-                               th:onclick="|javascript:publishStructure('${structure.id}', '${structure.structureNo}');|">
-                                <span th:if="${structure.status == 1}" data-target="#structurePublish"
-                                      data-toggle="modal">设计</span></a>
-                            <span th:if="${session.user.role != 2 && session.user.role != 4 && structure.status == 1}">设计</span>
-                            <span th:if="${structure.status == 2}">发布</span>
-                        </td>
-                        <td th:if="${structure.status == 2}" style="background-color: #92d050">
-                            <a href="javascript:;" th:if="${session.user.role == 2 || session.user.role == 4}"
-                               th:onclick="|javascript:publishStructure('${structure.id}', '${structure.structureNo}');|">
-                                <span th:if="${structure.status == 1}" data-target="#structurePublish"
-                                      data-toggle="modal">设计</span></a>
-                            <span th:if="${session.user.role != 2 && structure.status == 1}">设计</span>
-                            <span th:if="${structure.status == 2}">发布</span>
-                        </td>
-                        <td>
-                            <a href="javascript:;" style="margin-right: 16px"
-                               th:onclick="|javascript:structureExport('${structure.structureNo}', '${structure.materialNo}', '${structure.material.latestVersion}');|">
-                                <span data-target="#structureExport" data-toggle="modal">导出</span>
-                            </a>
-                            <a href="javascript:;" style="margin-right: 16px" data-target="#deleteStr" data-toggle="modal"
-                               th:if="${session.user.role == 3 || session.user.role == 4}"
-                               th:onclick="|javascript:deleteStructure('${structure.id}', '${structure.structureNo}');|">删除</a>
-                            <a href="javascript:;"
-                               th:onclick="|javascript:versionList('${structure.structureNo}', '${structure.materialNo}', '${structure.material.latestVersion}');|"
-                               th:if="${(session.user.role == 2 || session.user.role == 4) && structure.material.latestVersion > 0}">
-                                <span data-target="#versionChoose" data-toggle="modal">修改版本</span>
-                            </a>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <table id="material-info" class="table table-bordered table-hover hidden">
-                    <thead>
-                    <tr>
-                        <th class="col-lg-2 col-md-2">属性</th>
-                        <th class="col-lg-10 col-md-10">值</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr hidden="hidden">
-                        <td>ID</td>
-                        <td id="id0"></td>
-                    </tr>
-                    <tr>
-                        <td>名称（英文）</td>
-                        <td id="name0"></td>
-                    </tr>
-                    <tr>
-                        <td>名称（中文）</td>
-                        <td id="chinese0"></td>
-                    </tr>
-                    <tr>
-                        <td>部套号</td>
-                        <td id="structureNo0"></td>
-                    </tr>
-                    <tr>
-                        <td>物料号</td>
-                        <td id="materialNo0"></td>
-                    </tr>
-                    <tr>
-                        <td>材料</td>
-                        <td id="material0"></td>
-                    </tr>
-                    <tr>
-                        <td>图号</td>
-                        <td id="drawingNo0"></td>
-                    </tr>
-                    <tr>
-                        <td>图幅</td>
-                        <td id="drawingSize0"></td>
-                    </tr>
-                    <tr>
-                        <td>部件号</td>
-                        <td id="positionNo0"></td>
-                    </tr>
-                    <tr>
-                        <td>重量</td>
-                        <td id="weight0"></td>
-                    </tr>
-                    <tr>
-                        <td>数量</td>
-                        <td id="absoluteAmount0"></td>
-                    </tr>
-                    <tr>
-                        <td>排序号</td>
-                        <td id="sequenceNo0"></td>
-                    </tr>
-                    <tr>
-                        <td>更改通知</td>
-                        <td id="modifyNote0"></td>
-                    </tr>
-                    <tr>
-                        <td>子组件数</td>
-                        <td id="childCount0"></td>
-                    </tr>
-                    </tbody>
-                </table>
+                <div class="modal-area" v-if="newStructureList.length > 0">
+                    <p v-for="newStructure in newStructureList">{{newStructure.structureNo}} : {{newStructure.amount}} : {{newStructure.file.name}}</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-default pull-right" @click="invisible" :disabled="isImportNewStructureDisabled">取消</button>
+                <button class="btn pull-right" @click="importNewStructure" :disabled="isImportNewStructureDisabled">
+                    <span class="icon icon-cog rotate" v-if="isImportNewStructureDisabled"></span>{{importNewStructureAction}}
+                </button>
             </div>
         </div>
-    </main>
-</div>
-<div class="modal fade" id="addDbStructure" tabindex="-1" role="dialog" aria-labelledby="addDbStructureLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title" id="addDbStructureLabel">添加库中部套</h4>
+        <div v-if="2 == tabIndex">
+            <div class="modal-content form-horizontal form-horizon3">
+                <div class="form-group">
+                    <label class="form-label">机器名</label>
+                    <p class="form-control">{{structure.machineName}}</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">部套号</label>
+                    <select class="form-control" v-model="structure.structureNo">
+                        <option selected disabled>请选择</option>
+                        <option v-for="structure in structureList" :value="structure.structureNo">
+                            {{structure.structureNo}}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">文件</label>
+                    <input id="newVersionStructureFile" class="form-control" type="file"/>
+                </div>
             </div>
-            <form id="addDbStructureForm">
-                <div class="modal-body">
-                    <label for="machineName7" class="control-label col-lg-2 col-md-2">机器名</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="machineName7" type="text" class="form-control" th:value="${machine.name}"
-                               readonly="readonly"/>
-                    </div>
-                    <label for="materNo7" class="control-label col-lg-2 col-md-2">查询编号</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="materNo7" type="text" class="form-control"/>
-                    </div>
-                    <label for="search" class="control-label col-lg-2 col-md-2"></label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <button id="search" type="button" class="btn btn-info">模糊查询</button>
-                    </div>
-                    <label for="materialNo7" class="control-label col-lg-2 col-md-2">物料号</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <select id="materialNo7" class="form-control">
-                        </select>
-                    </div>
-                    <label for="version7" class="control-label col-lg-2 col-md-2">版本号</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <select id="version7" class="form-control">
-                        </select>
-                    </div>
-                    <label for="structureNo7" class="control-label col-lg-2 col-md-2">部套号</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="structureNo7" type="text" class="form-control"/>
-                    </div>
-                    <label for="amount7" class="control-label col-lg-2 col-md-2">总数量</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="amount7" type="text" class="form-control"/>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="addDbStructureFile" type="button" class="btn btn-primary">添加</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                </div>
-            </form>
-            <div id="addDbStructureConfirm" style="display: none">
-                <div class="modal-body">
-                    <p id="addDbStructureProgress" class="progress-prompt">数据更新中...</p>
-                </div>
+            <div class="modal-footer">
+                <button class="btn-default pull-right" @click="invisible" :disabled="isImportNewVersionStructureDisabled">取消</button>
+                <button class="btn pull-right" @click="importNewVersionStructure" :disabled="isImportNewVersionStructureDisabled">
+                    <span class="icon icon-cog rotate" v-if="isImportNewVersionStructureDisabled"></span>{{importNewVersionStructureAction}}
+                </button>
             </div>
         </div>
     </div>
 </div>
-<div class="modal fade" id="importNewStructure" tabindex="-1" role="dialog" aria-labelledby="newStructureLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title" id="newStructureLabel">导入新部套（最多可上传9个EXCEL文件）</h4>
+<div id="exportStructureModal" class="modal" v-if="isVisible" v-cloak>
+    <div class="modal-box">
+        <div class="modal-header">
+            <p class="modal-title">导出部套</p>
+            <div class="modal-dismiss"><span class="icon icon-remove" @click="invisible"></span></div>
+        </div>
+        <div class="modal-content form-horizontal form-horizon3">
+            <div class="form-group">
+                <label class="form-label">机器名</label>
+                <p class="form-control">{{structure.machineName}}</p>
             </div>
-            <form id="newStructureExcelForm">
-                <div class="modal-body">
-                    <label for="machineName8" class="control-label col-lg-2 col-md-2">机器名</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="machineName8" type="text" class="form-control" th:value="${machine.name}"
-                               readonly="readonly"/>
-                    </div>
-                    <table class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <td class="col-lg-3 col-md-3">部套号</td>
-                            <td class="col-lg-3 col-md-3">总数量</td>
-                            <td class="col-lg-6 col-md-6">文件</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td><input id="structureNo81" type="text" class="form-control"/></td>
-                            <td><input id="amount81" type="text" class="form-control"/></td>
-                            <td><input id="strFile81" class="form-control" type="file" name="strFile"/></td>
-                        </tr>
-                        <tr>
-                            <td><input id="structureNo82" type="text" class="form-control"/></td>
-                            <td><input id="amount82" type="text" class="form-control"/></td>
-                            <td><input id="strFile82" class="form-control" type="file" name="strFile"/></td>
-                        </tr>
-                        <tr>
-                            <td><input id="structureNo83" type="text" class="form-control"/></td>
-                            <td><input id="amount83" type="text" class="form-control"/></td>
-                            <td><input id="strFile83" class="form-control" type="file" name="strFile"/></td>
-                        </tr>
-                        <tr>
-                            <td><input id="structureNo84" type="text" class="form-control"/></td>
-                            <td><input id="amount84" type="text" class="form-control"/></td>
-                            <td><input id="strFile84" class="form-control" type="file" name="strFile"/></td>
-                        </tr>
-                        <tr>
-                            <td><input id="structureNo85" type="text" class="form-control"/></td>
-                            <td><input id="amount85" type="text" class="form-control"/></td>
-                            <td><input id="strFile85" class="form-control" type="file" name="strFile"/></td>
-                        </tr>
-                        <tr>
-                            <td><input id="structureNo86" type="text" class="form-control"/></td>
-                            <td><input id="amount86" type="text" class="form-control"/></td>
-                            <td><input id="strFile86" class="form-control" type="file" name="strFile"/></td>
-                        </tr>
-                        <tr>
-                            <td><input id="structureNo87" type="text" class="form-control"/></td>
-                            <td><input id="amount87" type="text" class="form-control"/></td>
-                            <td><input id="strFile87" class="form-control" type="file" name="strFile"/></td>
-                        </tr>
-                        <tr>
-                            <td><input id="structureNo88" type="text" class="form-control"/></td>
-                            <td><input id="amount88" type="text" class="form-control"/></td>
-                            <td><input id="strFile88" class="form-control" type="file" name="strFile"/></td>
-                        </tr>
-                        <tr>
-                            <td><input id="structureNo89" type="text" class="form-control"/></td>
-                            <td><input id="amount89" type="text" class="form-control"/></td>
-                            <td><input id="strFile89" class="form-control" type="file" name="strFile"/></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button id="importNewStructureFile" type="button" class="btn btn-primary">导入</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                </div>
-            </form>
-            <div id="newStructureExcelConfirm" style="display: none">
-                <div class="modal-body">
-                    <p id="newStructureExcelProgress" class="progress-prompt">文件上传中...</p>
-                </div>
+            <div class="form-group">
+                <label class="form-label">部套号</label>
+                <p class="form-control">{{structure.structureNo}}</p>
             </div>
+            <div class="form-group">
+                <label class="form-label">物料号</label>
+                <p class="form-control">{{structure.materialNo}}</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">版本号</label>
+                <select class="form-control" v-model="structure.version">
+                    <option selected disabled>请选择</option>
+                    <option v-for="version in versionList" :value="version">{{version}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-default pull-right" @click="invisible" :disabled="isDisabled">取消</button>
+            <button class="btn pull-right" @click="exportStructureFile" :disabled="isDisabled">
+                <span class="icon icon-cog rotate" v-if="isDisabled"></span>{{action}}
+            </button>
         </div>
     </div>
 </div>
-<div class="modal fade" id="importNewVersionStructure" tabindex="-1" role="dialog" aria-labelledby="StructureLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title" id="StructureLabel">导入新版本部套</h4>
+<div id="appendStructureModal" class="modal" v-if="isVisible" v-cloak>
+    <div class="modal-box">
+        <div class="modal-header">
+            <p class="modal-title">添加部套</p>
+            <div class="modal-dismiss"><span class="icon icon-remove" @click="invisible"></span></div>
+        </div>
+        <div class="modal-content form-horizontal form-horizon3">
+            <div class="form-group">
+                <label class="form-label">机器名</label>
+                <p class="form-control">{{structure.machineName}}</p>
             </div>
-            <form id="structureExcelForm">
-                <div class="modal-body">
-                    <label for="machineName3" class="control-label col-lg-2 col-md-2">机器名</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="machineName3" type="text" class="form-control" name="machineName"
-                               th:value="${machine.name}" readonly="readonly"/>
-                    </div>
-                    <label for="structureNo3" class="control-label col-lg-2 col-md-2">部套号</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <select id="structureNo3" class="form-control" name="structureNo">
-                            <option th:value="${structure.structureNo}"
-                                    th:each="structure, structureStat : ${structureList}"
-                                    th:text="${structure.structureNo}"></option>
-                        </select>
-                    </div>
-                    <label for="structureExcel" class="control-label col-lg-2 col-md-2">文件</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="structureExcel" class="form-control" name="structureExcel" type="file"/>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="importFile" type="button" class="btn btn-primary">导入</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                </div>
-            </form>
-            <div id="structureExcelConfirm" style="display: none">
-                <div class="modal-body">
-                    <p id="structureExcelProgress" class="progress-prompt">文件上传中...</p>
-                </div>
+            <div class="form-group form-icon">
+                <label class="form-label">查询号</label>
+                <input class="form-control" type="text" v-model="structureStr"/>
+                <span class="icon icon-search" @click="queryStructure"></span>
             </div>
+            <div class="modal-line"></div>
+            <div class="form-group">
+                <label class="form-label">物料号</label>
+                <select class="form-control" v-model="structure.materialNo" @change="selectStructure">
+                    <option selected disabled>请选择</option>
+                    <option v-for="structure in structureList" :value="structure.materialNo">
+                        {{structure.materialNo}}
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">版本号</label>
+                <select class="form-control" v-model="structure.version">
+                    <option selected disabled>请选择</option>
+                    <option v-for="version in versionList" :value="version">{{version}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">部套号</label>
+                <input class="form-control" type="text" v-model="structure.structureNo"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label">总数量</label>
+                <input class="form-control" type="text" v-model="structure.amount"/>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-default pull-right" @click="invisible" :disabled="isDisabled">取消</button>
+            <button class="btn pull-right" @click="appendStructure" :disabled="isDisabled">
+                <span class="icon icon-cog rotate" v-if="isDisabled"></span>{{action}}
+            </button>
         </div>
     </div>
 </div>
-<div class="modal fade" id="versionChoose" tabindex="-1" role="dialog" aria-labelledby="versionChooseLabel">
-    <div class="modal-dialog" role="document">
+<div id="releaseStructureModal" class="modal" v-if="isVisible" v-cloak>
+    <div class="modal-box">
+        <div class="modal-header">
+            <p class="modal-title">发布部套</p>
+            <div class="modal-dismiss"><span class="icon icon-remove" @click="invisible"></span></div>
+        </div>
         <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title" id="versionChooseLabel">修改版本</h4>
-            </div>
-            <form id="versionChooseForm">
-                <div class="modal-body">
-                    <label for="machineName4" class="control-label col-lg-2 col-md-2">机器名</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="machineName4" type="text" class="form-control" th:value="${machine.name}"
-                               readonly="readonly"/>
-                    </div>
-                    <label for="structureNo4" class="control-label col-lg-2 col-md-2">部套号</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="structureNo4" type="text" class="form-control" readonly="readonly"/>
-                    </div>
-                    <label for="materialNo4" class="control-label col-lg-2 col-md-2">物料号</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="materialNo4" type="text" class="form-control" readonly="readonly"/>
-                    </div>
-                    <label for="version4" class="control-label col-lg-2 col-md-2">版本号</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <select id="version4" class="form-control">
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="updateVersion" type="button" class="btn btn-primary">修改</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                </div>
-            </form>
-            <div id="versionChooseConfirm" style="display: none">
-                <div class="modal-body">
-                    <p id="versionChooseProgress" class="progress-prompt">版本修改中...</p>
-                </div>
-            </div>
+            <p class="modal-prompt">您确定要发布{{structure.structureNo}}部套吗？</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-default pull-right" @click="invisible" :disabled="isDisabled">取消</button>
+            <button class="btn pull-right" @click="releaseStructure" :disabled="isDisabled">
+                <span class="icon icon-cog rotate" v-if="isDisabled"></span>{{action}}
+            </button>
         </div>
     </div>
 </div>
-<div class="modal fade" id="structureExport" tabindex="-1" role="dialog" aria-labelledby="structureExportLabel">
-    <div class="modal-dialog" role="document">
+<div id="deleteStructureModal" class="modal" v-if="isVisible" v-cloak>
+    <div class="modal-box">
+        <div class="modal-header">
+            <p class="modal-title">删除部套</p>
+            <div class="modal-dismiss"><span class="icon icon-remove" @click="invisible"></span></div>
+        </div>
         <div class="modal-content">
-            <div class="modal-header">
-                <button id="closeStrExport" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title" id="structureExportLabel">导出部套</h4>
-            </div>
-            <form id="structureExportForm">
-                <div class="modal-body">
-                    <label for="machineName5" class="control-label col-lg-2 col-md-2">机器名</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="machineName5" type="text" class="form-control" th:value="${machine.name}"
-                               readonly="readonly"/>
-                    </div>
-                    <label for="structureNo5" class="control-label col-lg-2 col-md-2">部套号</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="structureNo5" type="text" class="form-control" readonly="readonly"/>
-                    </div>
-                    <label for="materialNo5" class="control-label col-lg-2 col-md-2">物料号</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <input id="materialNo5" type="text" class="form-control" readonly="readonly"/>
-                    </div>
-                    <label for="version5" class="control-label col-lg-2 col-md-2">版本号</label>
-                    <div class="form-group col-lg-10 col-md-10">
-                        <select id="version5" class="form-control">
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="exportStructure" type="button" class="btn btn-primary">导出</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                </div>
-            </form>
-            <div id="structureExportConfirm" style="display: none">
-                <div class="modal-body">
-                    <p id="structureExportProgress" class="progress-prompt">部套导出中...</p>
-                </div>
-            </div>
+            <p class="modal-prompt">您确定要删除{{structure.structureNo}}部套吗？</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-default pull-right" @click="invisible" :disabled="isDisabled">取消</button>
+            <button class="btn pull-right" @click="deleteStructure" :disabled="isDisabled">
+                <span class="icon icon-cog rotate" v-if="isDisabled"></span>{{action}}
+            </button>
         </div>
     </div>
 </div>
-<div class="modal fade" id="structurePublish" tabindex="-1" role="dialog" aria-labelledby="structurePublishLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title" id="structurePublishLabel">发布部套</h4>
+<div id="updateStructureVersionModal" class="modal" v-if="isVisible" v-cloak="">
+    <div class="modal-box">
+        <div class="modal-header">
+            <p class="modal-title">修改部套版本</p>
+            <div class="modal-dismiss"><span class="icon icon-remove" @click="invisible"></span></div>
+        </div>
+        <div class="modal-content form-horizontal form-horizon3">
+            <div class="form-group">
+                <label class="form-label">机器名</label>
+                <p class="form-control">{{structure.machineName}}</p>
             </div>
-            <form id="structurePublishForm">
-                <div class="modal-body">
-                    <input id="structureId9" type="text" class="form-control" style="display: none"/>
-                    <div id="structurePublishConfirm">
-                        <div class="modal-body">
-                            <p id="structurePublishProgress" class="progress-prompt"></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="publishBtn" type="button" class="btn btn-primary">发布</button>
-                    <button id="publishCancel" type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                </div>
-            </form>
+            <div class="form-group">
+                <label class="form-label">部套号</label>
+                <p class="form-control">{{structure.structureNo}}</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">物料号</label>
+                <p class="form-control">{{structure.materialNo}}</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">版本号</label>
+                <select class="form-control" v-model="structure.version">
+                    <option selected disabled>请选择</option>
+                    <option v-for="version in versionList" :value="version">{{version}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-default pull-right" @click="invisible" :disabled="isDisabled">取消</button>
+            <button class="btn pull-right" @click="updateStructureVersion" :disabled="isDisabled">
+                <span class="icon icon-cog rotate" v-if="isDisabled"></span>{{action}}
+            </button>
         </div>
     </div>
 </div>
-<div class="modal fade" id="deleteStr" tabindex="-1" role="dialog" aria-labelledby="deleteStrLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title" id="deleteStrLabel">发布部套</h4>
-            </div>
-            <form id="deleteStrForm">
-                <div class="modal-body">
-                    <div id="deleteStrConfirm">
-                        <div class="modal-body">
-                            <p id="deleteStrProgress" class="progress-prompt">你确定要删除<span id="strNoName"></span>的部套吗？</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="deleteStrBtn" type="button" class="btn btn-primary">删除</button>
-                    <button id="deleteStrCancel" type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                </div>
-            </form>
-        </div>
-    </div>
+<div id="popover" class="popover" v-if="prompts.length > 0">
+    <popover v-for="prompt in prompts" v-bind:key="prompt.id" v-bind:prompt="prompt"></popover>
 </div>
+<div id="progress" class="progress-modal" v-if="isVisible">
+    <p class="progress">
+        <span class="icon icon-cog progress-bar rotate"></span>
+        <span>正在获取数据...</span>
+    </p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script th:src="@{/js/cse.js}"></script>
+<script th:src="@{/js/machine2.js}"></script>
 </body>
 </html>

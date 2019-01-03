@@ -2,6 +2,7 @@ package com.cse.summer.service.impl;
 
 import com.cse.summer.context.exception.SummerException;
 import com.cse.summer.model.dto.AnalyzeResult;
+import com.cse.summer.model.dto.StructMater;
 import com.cse.summer.model.entity.Material;
 import com.cse.summer.model.entity.Structure;
 import com.cse.summer.repository.MaterialRepository;
@@ -43,7 +44,7 @@ public class StructureServiceImpl implements StructureService {
         Material material = materialRepository.findMaterialByMaterialNoAndVersionAndLevel(structure.getMaterialNo(), structure.getVersion(), 0);
         if (null == material) {
             // 检查库中是否有该物料
-            throw new SummerException(StatusCode.MATERIAL_NO_EXIST);
+            throw new SummerException(StatusCode.STRUCTURE_NOT_EXIST);
         } else {
             // 检查该部套是否已经与该物料关联
             Structure target = structureRepository.findStructureByMachineNameAndMaterialNoAndStatusGreaterThanEqual(
@@ -53,7 +54,7 @@ public class StructureServiceImpl implements StructureService {
                 structure.setStatus(1);
                 structureRepository.save(structure);
             } else {
-                throw new SummerException(StatusCode.STRUCTURE_IS_EXIST);
+                throw new SummerException(StatusCode.STRUCTURE_HAS_RELATED);
             }
         }
     }
@@ -114,5 +115,18 @@ public class StructureServiceImpl implements StructureService {
             }
         }
         return results;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
+    public List<Structure> findStructureListByMachineName(String machineName) {
+        List<StructMater> list = structureRepository.findAllStructureMaterial(machineName);
+        List<Structure> structureList = new ArrayList<>();
+        for (StructMater structMater : list) {
+            Structure structure = structMater.getStructure();
+            structure.setMaterial(structMater.getMaterial());
+            structureList.add(structure);
+        }
+        return structureList;
     }
 }

@@ -13,6 +13,9 @@ public class AnalyzeResult {
      */
     private Boolean result;
 
+    public AnalyzeResult() {
+    }
+
     public AnalyzeResult(String structureNo, Boolean result) {
         this.structureNo = structureNo;
         this.result = result;

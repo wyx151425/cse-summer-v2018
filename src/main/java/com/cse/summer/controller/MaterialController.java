@@ -38,7 +38,7 @@ public class MaterialController {
         return new Response<>(materialList);
     }
 
-    @GetMapping(value = "materials/search")
+    @GetMapping(value = "materials/query")
     public Response<List<Map<String, String>>> actionSearchStructureMaterialVersion(@RequestParam("materialNo") String materialNo) {
         List<Map<String, String>> list = materialService.findMaterialNoAndLatestVersion(materialNo);
         return new Response<>(list);

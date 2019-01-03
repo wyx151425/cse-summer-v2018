@@ -57,4 +57,12 @@ public interface StructureService {
      * @throws InvalidFormatException 格式错误异常
      */
     List<AnalyzeResult> verifyStructureList(MultipartFile file) throws IOException, InvalidFormatException;
+
+    /**
+     * 根据机器名查询部套数据集合
+     *
+     * @param machineName 机器名
+     * @return 部套数据集合
+     */
+    List<Structure> findStructureListByMachineName(String machineName);
 }

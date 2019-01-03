@@ -4,6 +4,7 @@
 
 .form-horizon2 .form-label {
     width: 30px;
+    text-align: right;
     margin-right: 10px;
 }
 
@@ -17,6 +18,7 @@
 
 .form-horizon3 .form-label {
     width: 45px;
+    text-align: right;
     margin-right: 10px;
 }
 
@@ -36,14 +38,6 @@
 
 .form-horizon4 .form-control {
     width: 300px;
-}
-
-.modal-footer .btn:disabled {
-    width: 92px;
-}
-
-.modal-footer .btn:disabled .rotate {
-    margin-right: 4px;
 }
 
 .icon-search:before {

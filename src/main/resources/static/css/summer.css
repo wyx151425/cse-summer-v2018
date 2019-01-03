@@ -36,12 +36,12 @@ body {
 
 .aside-wrap {
     display: block;
-    margin-top: 50px;
+    margin-top: 65px;
     position: fixed;
     top: 0;
     bottom: 0;
     width: 300px;
-    height: calc(100% - 50px);
+    height: calc(100% - 65px);
     z-index: 1000;
     background-color: #fff;
     border: 1px solid #e7e7e7;

@@ -6,6 +6,7 @@ import com.cse.summer.model.dto.Excel;
 import com.cse.summer.model.dto.MachineRequest;
 import com.cse.summer.model.entity.Machine;
 import com.cse.summer.model.dto.Response;
+import com.cse.summer.model.entity.User;
 import com.cse.summer.service.FileService;
 import com.cse.summer.service.MachineService;
 import com.cse.summer.util.Constant;
@@ -81,6 +82,13 @@ public class MachineController extends BaseFacade {
         buffer.flush();
         excel.getWorkbook().write(buffer);
         buffer.close();
+    }
+
+    @DeleteMapping(value = "machines")
+    public Response<Machine> actionDeleteAllMachine() {
+        User user = getSessionUser();
+        machineService.deleteAllMachine(user);
+        return new Response<>();
     }
 
     @PutMapping(value = "machines")

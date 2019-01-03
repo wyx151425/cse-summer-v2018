@@ -22,8 +22,12 @@ function getMessage(statusCode) {
     switch (statusCode) {
         case 500:
             return "系统错误";
+        case 600:
+            return "参数错误";
         case 1001:
             return "用户未注册";
+        case 1002:
+            return "用户已注册";
         case 1003:
             return "用户被禁用";
         case 1004:
@@ -36,19 +40,21 @@ function getMessage(statusCode) {
             return "文件格式错误";
         case 2002:
             return "文件解析错误";
+        case 2003:
+            return "Sheet解析错误";
         case 3001:
-            return "机器已包含该部套";
-        case 3002:
             return "部套不存在";
-        case 3003:
-            return "输入部套号与文件内部套号不对应";
-        case 3004:
+        case 3002:
             return "库中已存在该部套";
+        case 3003:
+            return "部套号解析错误";
+        case 3004:
+            return "机器已包含该部套";
+        case 4001:
+            return "存在物料号为空的物料";
         case 4002:
             return "存在层级为空的物料";
         case 4003:
-            return "部套的物料号为空";
-        case 4004:
             return "存在数量为空的物料";
         default:
             return "系统错误";

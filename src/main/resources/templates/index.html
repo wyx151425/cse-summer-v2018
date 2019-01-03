@@ -2,9 +2,8 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>CSE DMS</title>
+    <title>设计BOM管理工具</title>
     <link rel="shortcut icon" th:href="@{/images/cse.png}" type="image/x-icon"/>
-    <!--<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>-->
     <link rel="stylesheet" th:href="@{/css/cse.css}">
     <link rel="stylesheet" th:href="@{/css/index.css}">
 </head>
@@ -23,7 +22,7 @@
 <main id="main" class="container">
     <div class="panel">
         <div class="btn-list">
-            <button class="btn pull-right">清空数据</button>
+            <button class="btn pull-right" @click="deleteAllMachineModalVisible">清空数据</button>
             <button class="btn pull-right" @click="importMachineBOMModalVisible">导入BOM</button>
             <button class="btn pull-right" @click="verifyStructureListModalVisible">检查部套</button>
             <button class="btn pull-right" @click="queryRelationModalVisible">查询关联</button>
@@ -52,8 +51,11 @@
                 <td>{{machine.classificationSociety}}</td>
                 <td>
                     <button class="btn-link pull-left" type="button" @click="checkMachineDetail(machine)">查看</button>
-                    <button class="btn-link pull-left" type="button" @click="editMachineInfoModalVisible(machine)">编辑</button>
-                    <button class="btn-link pull-left" type="button" @click="exportMachineBOMModalVisible(machine.name)">导出BOM</button>
+                    <button class="btn-link pull-left" type="button" @click="editMachineInfoModalVisible(machine)">编辑
+                    </button>
+                    <button class="btn-link pull-left" type="button"
+                            @click="exportMachineBOMModalVisible(machine.name)">导出BOM
+                    </button>
                     <a class="btn-link pull-left" :href="'importResult?machineName=' + machine.name">导入记录</a>
                 </td>
             </tr>
@@ -116,9 +118,9 @@
                 <label class="form-label">类型</label>
                 <select class="form-control" v-model="type">
                     <option disabled selected>请选择</option>
-                    <option value="1">整机BOM</option>
-                    <option value="2">设计参考BOM</option>
-                    <option value="3">发布BOM</option>
+                    <option value="0">整机BOM</option>
+                    <option value="1">设计参考BOM</option>
+                    <option value="2">发布BOM</option>
                 </select>
             </div>
         </div>
@@ -230,6 +232,23 @@
         </div>
     </div>
 </div>
+<div id="deleteAllMachineModal" class="modal" v-if="isVisible" v-cloak>
+    <div class="modal-box">
+        <div class="modal-header">
+            <p class="modal-title">删除全部数据</p>
+            <div class="modal-dismiss"><span class="icon icon-remove" @click="invisible"></span></div>
+        </div>
+        <div class="modal-content">
+            <p class="modal-prompt">您确定要删除全部数据吗？</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-default pull-right" @click="invisible" :disabled="isDisabled">取消</button>
+            <button class="btn pull-right" @click="deleteAllMachine" :disabled="isDisabled">
+                <span class="icon icon-cog rotate" v-if="isDisabled"></span>{{action}}
+            </button>
+        </div>
+    </div>
+</div>
 <div id="popover" class="popover" v-if="prompts.length > 0">
     <popover v-for="prompt in prompts" v-bind:key="prompt.id" v-bind:prompt="prompt"></popover>
 </div>
@@ -243,343 +262,5 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script th:src="@{/js/cse.js}"></script>
 <script th:src="@{/js/index.js}"></script>
-<!--<div class="modal fade" id="importCSEBOM" tabindex="-1" role="dialog" aria-labelledby="CSEBOMLabel">-->
-<!--<div class="modal-dialog" role="document">-->
-<!--<div class="modal-content">-->
-<!--<div class="modal-header">-->
-<!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
-<!--</button>-->
-<!--<h4 class="modal-title" id="CSEBOMLabel">导入CSE BOM文件</h4>-->
-<!--</div>-->
-<!--<form id="CSEBOMForm">-->
-<!--<div class="modal-body">-->
-<!--<label for="machineName3" class="control-label col-lg-2 col-md-2"-->
-<!--th:if="${3 == session.user.role || 4 == session.user.role}">机器</label>-->
-<!--<div class="form-group col-lg-10 col-md-10"-->
-<!--th:if="${3 == session.user.role || 4 == session.user.role}">-->
-<!--<input id="machineName3" class="form-control" type="text"/>-->
-<!--</div>-->
-<!--<label for="machineName33" class="control-label col-lg-2 col-md-2"-->
-<!--th:if="${1 == session.user.role || 2 == session.user.role}">机器</label>-->
-<!--<div class="form-group col-lg-10 col-md-10"-->
-<!--th:if="${1 == session.user.role || 2 == session.user.role}">-->
-<!--<select id="machineName33" class="form-control">-->
-<!--<option selected disabled>请选择</option>-->
-<!--<option th:each="machine, machineStat : ${machineList}" th:value="${machine.name}"-->
-<!--th:text="${machine.name}"></option>-->
-<!--</select>-->
-<!--</div>-->
-<!--<label for="csebom" class="control-label col-lg-2 col-md-2">文件</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<input id="csebom" class="form-control" type="file" name="csebom"/>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="modal-footer">-->
-<!--<button id="CSEBOMImport1" type="button" class="btn btn-primary"-->
-<!--th:if="${1 == session.user.role || 2 == session.user.role}">导入-->
-<!--</button>-->
-<!--<button id="CSEBOMImport2" type="button" class="btn btn-primary"-->
-<!--th:if="${3 == session.user.role || 4 == session.user.role}">导入-->
-<!--</button>-->
-<!--<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>-->
-<!--</div>-->
-<!--</form>-->
-<!--<div id="CSEBOMConfirm" style="display: none">-->
-<!--<div class="modal-body">-->
-<!--<div id="CSEBOMProgress" class="progress-prompt">-->
-<!--<div class="loader loader-1">-->
-<!--<div class="loader-outter"></div>-->
-<!--<div class="loader-inner"></div>-->
-<!--</div>-->
-<!--文件上传中...-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div id="CSEBOMResult" class="modal-body" style="display: none">-->
-<!--<table class="table table-bordered table-hover">-->
-<!--<thead>-->
-<!--<tr>-->
-<!--<th>部套号</th>-->
-<!--<th>导入结果</th>-->
-<!--</tr>-->
-<!--</thead>-->
-<!--<tbody id="analyzeResult">-->
-<!--</tbody>-->
-<!--</table>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="modal fade" id="importManXml" tabindex="-1" role="dialog" aria-labelledby="ManXmlLabel">-->
-<!--<div class="modal-dialog" role="document">-->
-<!--<div class="modal-content">-->
-<!--<div class="modal-header">-->
-<!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
-<!--</button>-->
-<!--<h4 class="modal-title" id="ManXmlLabel">导入MAN XML文件</h4>-->
-<!--</div>-->
-<!--<form id="manXmlForm">-->
-<!--<div class="modal-body">-->
-<!--<label for="machineName1" class="control-label col-lg-2 col-md-2"-->
-<!--th:if="${3 == session.user.role || 4 == session.user.role}">机器</label>-->
-<!--<div class="form-group col-lg-10 col-md-10"-->
-<!--th:if="${3 == session.user.role || 4 == session.user.role}">-->
-<!--<input id="machineName1" class="form-control" type="text"/>-->
-<!--</div>-->
-<!--<label for="machineName11" class="control-label col-lg-2 col-md-2"-->
-<!--th:if="${1 == session.user.role || 2 == session.user.role}">机器</label>-->
-<!--<div class="form-group col-lg-10 col-md-10"-->
-<!--th:if="${1 == session.user.role || 2 == session.user.role}">-->
-<!--<select id="machineName11" class="form-control">-->
-<!--<option selected disabled>请选择</option>-->
-<!--<option th:each="machine, machineStat : ${machineList}" th:value="${machine.name}"-->
-<!--th:text="${machine.name}"></option>-->
-<!--</select>-->
-<!--</div>-->
-<!--<label for="manXml" class="control-label col-lg-2 col-md-2">文件</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<input id="manXml" class="form-control" type="file" name="manXml"/>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="modal-footer">-->
-<!--<button id="xmlImport1" type="button" class="btn btn-primary"-->
-<!--th:if="${1 == session.user.role || 2 == session.user.role}">导入-->
-<!--</button>-->
-<!--<button id="xmlImport2" type="button" class="btn btn-primary"-->
-<!--th:if="${3 == session.user.role || 4 == session.user.role}">导入-->
-<!--</button>-->
-<!--<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>-->
-<!--</div>-->
-<!--</form>-->
-<!--<div id="manXmlConfirm" style="display: none">-->
-<!--<div class="modal-body">-->
-<!--<div id="manXmlProgress" class="progress-prompt">-->
-<!--<div class="loader loader-1">-->
-<!--<div class="loader-outter"></div>-->
-<!--<div class="loader-inner"></div>-->
-<!--</div>-->
-<!--文件上传中...-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="modal fade" id="importWinGDExcel" tabindex="-1" role="dialog" aria-labelledby="WinGDExcelLabel">-->
-<!--<div class="modal-dialog" role="document">-->
-<!--<div class="modal-content">-->
-<!--<div class="modal-header">-->
-<!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
-<!--</button>-->
-<!--<h4 class="modal-title" id="WinGDExcelLabel">导入WinGD Excel文件</h4>-->
-<!--</div>-->
-<!--<form id="winGDExcelForm">-->
-<!--<div class="modal-body">-->
-<!--<label for="machineName2" class="control-label col-lg-2 col-md-2"-->
-<!--th:if="${3 == session.user.role || 4 == session.user.role}">机器</label>-->
-<!--<div class="form-group col-lg-10 col-md-10"-->
-<!--th:if="${3 == session.user.role || 4 == session.user.role}">-->
-<!--<input id="machineName2" class="form-control" type="text" name="machineName"/>-->
-<!--</div>-->
-<!--<label for="machineName22" class="control-label col-lg-2 col-md-2"-->
-<!--th:if="${1 == session.user.role || 2 == session.user.role}">机器</label>-->
-<!--<div class="form-group col-lg-10 col-md-10"-->
-<!--th:if="${1 == session.user.role || 2 == session.user.role}">-->
-<!--<select id="machineName22" class="form-control">-->
-<!--<option selected disabled>请选择</option>-->
-<!--<option th:each="machine, machineStat : ${machineList}" th:value="${machine.name}"-->
-<!--th:text="${machine.name}"></option>-->
-<!--</select>-->
-<!--</div>-->
-<!--<label for="winGDExcel" class="control-label col-lg-2 col-md-2">文件</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<input id="winGDExcel" class="form-control" name="winGDExcel" type="file"/>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="modal-footer">-->
-<!--<button id="excelImport1" type="button" class="btn btn-primary"-->
-<!--th:if="${1 == session.user.role || 2 == session.user.role}">导入-->
-<!--</button>-->
-<!--<button id="excelImport2" type="button" class="btn btn-primary"-->
-<!--th:if="${3 == session.user.role || 4 == session.user.role}">导入-->
-<!--</button>-->
-<!--<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>-->
-<!--</div>-->
-<!--</form>-->
-<!--<div id="winGDExcelConfirm" style="display: none">-->
-<!--<div class="modal-body">-->
-<!--<div id="winGDExcelProgress" class="progress-prompt">-->
-<!--<div class="loader loader-1">-->
-<!--<div class="loader-outter"></div>-->
-<!--<div class="loader-inner"></div>-->
-<!--</div>-->
-<!--文件上传中...-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="modal fade" id="machineEdit" tabindex="-1" role="dialog" aria-labelledby="machineEditLabel">-->
-<!--<div class="modal-dialog" role="document">-->
-<!--<div class="modal-content">-->
-<!--<div class="modal-header">-->
-<!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
-<!--</button>-->
-<!--<h4 class="modal-title" id="machineEditLabel">修改机器信息</h4>-->
-<!--</div>-->
-<!--<form id="machineEditForm">-->
-<!--<div class="modal-body">-->
-<!--<input id="id" class="form-control" type="hidden"/>-->
-<!--<label for="name" class="control-label col-lg-2 col-md-2">名称</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<input id="name" class="form-control" type="text" readonly="readonly"/>-->
-<!--</div>-->
-<!--<label for="machineNo" class="control-label col-lg-2 col-md-2">适用机号</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<input id="machineNo" class="form-control" type="text"/>-->
-<!--</div>-->
-<!--<label for="type" class="control-label col-lg-2 col-md-2">机型</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<input id="type" class="form-control" type="text"/>-->
-<!--</div>-->
-<!--<label for="patent" class="control-label col-lg-2 col-md-2">专利机型</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<select id="patent" class="form-control">-->
-<!--<option value="MAN">MAN</option>-->
-<!--<option value="WinGD">WinGD</option>-->
-<!--<option value="J-ENG">J-ENG</option>-->
-<!--<option value="CSE">CSE</option>-->
-<!--</select>-->
-<!--</div>-->
-<!--<label for="cylinderAmount" class="control-label col-lg-2 col-md-2">缸数</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<input id="cylinderAmount" class="form-control" type="text"/>-->
-<!--</div>-->
-<!--<label for="shipNo" class="control-label col-lg-2 col-md-2">船号</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<input id="shipNo" class="form-control" type="text"/>-->
-<!--</div>-->
-<!--<label for="classificationSociety" class="control-label col-lg-2 col-md-2">船级社</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<input id="classificationSociety" class="form-control" type="text"/>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="modal-footer">-->
-<!--<button id="updateBtn" type="button" class="btn btn-primary">修改</button>-->
-<!--<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>-->
-<!--</div>-->
-<!--</form>-->
-<!--<div id="machineEditConfirm" style="display: none">-->
-<!--<div class="modal-body">-->
-<!--<p id="machineEditProgress" class="progress-prompt">文件上传中...</p>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="dialog-bg" th:if="${session.user.password == '123456'}">-->
-<!--<div class="dialog">-->
-<!--<p class="dialog-title"><span>修改密码</span></p>-->
-<!--<div class="dialog-content">-->
-<!--<div class="ipt-group">-->
-<!--<input id="newPwd" class="ipt-item" type="password" placeholder="新密码，不少于6位"/>-->
-<!--</div>-->
-<!--<div class="ipt-group">-->
-<!--<input id="confirmPwd" class="ipt-item" type="password" placeholder="确认您的密码"/>-->
-<!--</div>-->
-<!--<p id="response" class="response"></p>-->
-<!--<div class="ipt-group">-->
-<!--<button id="pwdBtn" class="pwd-btn" type="button">修改</button>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="modal fade" id="searchStruct" tabindex="-1" role="dialog" aria-labelledby="searchStructLabel">-->
-<!--<div class="modal-dialog" role="document">-->
-<!--<div class="modal-content">-->
-<!--<div class="modal-header">-->
-<!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
-<!--</button>-->
-<!--<h4 class="modal-title" id="searchStructLabel">查询部套关联关系</h4>-->
-<!--</div>-->
-<!--<form id="searchStructForm">-->
-<!--<div class="modal-body">-->
-<!--<label for="materialNoI" class="control-label col-lg-2 col-md-2">物料号</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<input id="materialNoI" type="text" class="form-control"/>-->
-<!--</div>-->
-<!--<label for="searchStrB" class="control-label col-lg-2 col-md-2"></label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<button id="searchStrB" type="button" class="btn btn-info pull-right">精准查询</button>-->
-<!--</div>-->
-<!--<label for="machineNameI" class="control-label col-lg-2 col-md-2">机器</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<table id="machineNameI" class="table table-bordered table-hover">-->
-<!--<thead>-->
-<!--<tr>-->
-<!--<td class="col-md-4">机器名</td>-->
-<!--<td class="col-md-4">版本</td>-->
-<!--<td class="col-md-4">总数量</td>-->
-<!--</tr>-->
-<!--</thead>-->
-<!--<tbody id="structureList">-->
-<!--</tbody>-->
-<!--</table>-->
-<!--</div>-->
-<!--</div>-->
-<!--</form>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="modal fade" id="clearDataModal" tabindex="-1" role="dialog" aria-labelledby="clearDataLabel">-->
-<!--<div class="modal-dialog" role="document">-->
-<!--<div class="modal-content">-->
-<!--<div class="modal-header">-->
-<!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
-<!--</button>-->
-<!--<h4 class="modal-title" id="clearDataLabel">清理数据</h4>-->
-<!--</div>-->
-<!--<form id="clearDataForm">-->
-<!--<div id="clearPrompt" class="modal-body">-->
-<!--<p id="thisPrompt" class="progress-prompt">您确定要清空数据库中全部数据吗？</p>-->
-<!--</div>-->
-<!--<div id="clearPromptProgress" class="progress-prompt" style="display: none;margin: 16px 0;">-->
-<!--<div class="loader loader-1">-->
-<!--<div class="loader-outter"></div>-->
-<!--<div class="loader-inner"></div>-->
-<!--</div>-->
-<!--正在清理...-->
-<!--</div>-->
-<!--<div id="clearPromptFooter" class="modal-footer">-->
-<!--<button id="clearConfirm" type="button" class="btn btn-primary">确定</button>-->
-<!--<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>-->
-<!--</div>-->
-<!--</form>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="modal fade" id="structureCheck" tabindex="-1" role="dialog" aria-labelledby="structureCheckLabel">-->
-<!--<div class="modal-dialog" role="document">-->
-<!--<div class="modal-content">-->
-<!--<div class="modal-header">-->
-<!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
-<!--</button>-->
-<!--<h4 class="modal-title" id="structureCheckLabel">检查部套</h4>-->
-<!--</div>-->
-<!--<div class="modal-body">-->
-<!--<label for="structureCheckFile" class="control-label col-lg-2 col-md-2">文件</label>-->
-<!--<div class="form-group col-lg-10 col-md-10">-->
-<!--<input id="structureCheckFile" class="form-control" name="structureCheckFile" type="file"/>-->
-<!--</div>-->
-<!--</div>-->
-<!--<div class="modal-footer">-->
-<!--<button id="structureCheckBtn" type="button" class="btn btn-primary">导入-->
-<!--</button>-->
-<!--<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
-<!--</div>-->
 </body>
 </html>

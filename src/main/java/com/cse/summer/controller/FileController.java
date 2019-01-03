@@ -128,20 +128,4 @@ public class FileController extends BaseFacade {
         excel.getWorkbook().write(buffer);
         buffer.close();
     }
-
-    @GetMapping(value = "files/export/structure")
-    public void actionExportStructureExcel(
-            @ModelAttribute Structure structure
-    ) throws IOException {
-        Excel excel = fileService.exportStructureBOM(getSessionUser(), structure);
-        getResponse().reset();
-        getResponse().setHeader("content-disposition", "attachment;filename="
-                + URLEncoder.encode(excel.getName(), "UTF-8"));
-        getResponse().setContentType(Constant.DocType.XLSX_UTF8);
-        OutputStream out = getResponse().getOutputStream();
-        BufferedOutputStream buffer = new BufferedOutputStream(out);
-        buffer.flush();
-        excel.getWorkbook().write(buffer);
-        buffer.close();
-    }
 }

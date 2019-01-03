@@ -11,6 +11,9 @@ const main = new Vue({
         setMachineList: function (machineList) {
             this.machineList = machineList;
         },
+        deleteAllMachineModalVisible: function () {
+            deleteAllMachineModal.visible();
+        },
         importMachineBOMModalVisible: function () {
             importMachineBOMModal.visible(this.user, this.machineList);
         },
@@ -47,7 +50,8 @@ const main = new Vue({
                     progress.dismiss();
                 }
             }).catch(function () {
-
+            popover.append("服务器访问失败", false);
+            progress.dismiss();
         });
     }
 });
@@ -332,7 +336,7 @@ const verifyStructureListModal = new Vue({
         invisible: function () {
             this.isVisible = false;
         },
-        importStructureFile: function () {
+        importNewVersionStructureFile: function () {
             let file = document.getElementById("structureFile").files[0];
             if (!file) {
                 popover.append("请选择文件", false);
@@ -376,6 +380,45 @@ const verifyStructureListModal = new Vue({
         },
         importCallback: function () {
             this.action = "导入";
+            this.isDisabled = false;
+        }
+    }
+});
+
+const deleteAllMachineModal = new Vue({
+    el: "#deleteAllMachineModal",
+    data: {
+        isVisible: false,
+        isDisabled: false,
+        action: "确定",
+    },
+    methods: {
+        visible: function () {
+            this.isVisible = true;
+        },
+        invisible: function () {
+            this.isVisible = false;
+        },
+        deleteAllMachine: function () {
+            this.isDisabled = true;
+            this.action = "正在删除";
+            axios.delete(requestContext + "api/machines")
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        window.location.reload();
+                    } else {
+                        popover.append("数据删除失败", false);
+                        deleteAllMachineModal.deleteCallback();
+                    }
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                    deleteAllMachineModal.deleteCallback();
+                });
+        },
+        deleteCallback: function () {
+            this.action = "确定";
             this.isDisabled = false;
         }
     }

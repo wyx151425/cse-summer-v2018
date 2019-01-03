@@ -149,7 +149,7 @@ select.form-control {
 input[type="file"].form-control {
     line-height: normal;
     font-size: 13px;
-    padding: 5px 10px;
+    padding: 6px 10px;
 }
 
 .form-control:focus {
@@ -548,9 +548,70 @@ table th[class*="col-"] {
     cursor: pointer;
 }
 
+.modal-tab {
+    width: 414px;
+    padding-top: 6px;
+    padding-left: 16px;
+    padding-right: 16px;
+    height: 36px;
+}
+
+.modal-tab .tab {
+    display: inline-block;
+    list-style: none;
+    height: 36px;
+    line-height: 36px;
+    color: #888;
+    font-size: 15px;
+    font-weight: 700;
+    margin-right: 12px;
+    cursor: pointer;
+}
+
+.modal-tab .tab:hover {
+    color: #444;
+}
+
+.modal-tab .tab:active {
+    color: #000;
+}
+
+.modal-tab .active {
+    color: #000;
+    border-bottom: 2px solid #dedfe0;
+}
+
+.modal-tab .active:hover {
+    color: #000;
+}
+
 .modal-content {
     overflow: hidden;
     padding: 40px;
+}
+
+.modal-content .modal-prompt {
+    font-size: 20px;
+}
+
+.modal-content .modal-line {
+    width: 100%;
+    height: 1px;
+    margin: 20px 0;
+    background-color: #ddd;
+}
+
+.modal-area {
+    width: 100%;
+    max-height: 212px;
+    border: 1px solid #bbb;
+    margin: 0 4px 12px;
+    padding: 6px 12px;
+    color: #888;
+    overflow: scroll;
+    font-size: 12px;
+    line-height: 20px;
+    box-sizing: border-box;
 }
 
 .modal-footer {
@@ -563,8 +624,12 @@ table th[class*="col-"] {
     width: 60px;
 }
 
-.modal-footer .pull-right {
-    margin-left: 12px;
+.modal-footer .btn:disabled {
+    width: 92px;
+}
+
+.modal-footer .btn:disabled .rotate {
+    margin-right: 4px;
 }
 
 /* Progress部分CSS */

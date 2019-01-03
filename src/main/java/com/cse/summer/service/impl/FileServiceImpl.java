@@ -284,7 +284,7 @@ public class FileServiceImpl implements FileService {
                     material.setAbsoluteAmount(1);
                 } else {
                     if (null == row.getCell(10) || "".equals(row.getCell(10).toString().trim())) {
-                        throw new SummerException(StatusCode.MATERIAL_AMOUNT_NULL);
+                        throw new SummerException(StatusCode.MATERIAL_AMOUNT_IS_NULL);
                     } else {
                         if ("*".equals(row.getCell(10).toString().trim())) {
                             material.setAbsoluteAmount(0);
@@ -798,12 +798,11 @@ public class FileServiceImpl implements FileService {
     @Transactional(rollbackFor = Exception.class)
     public AnalyzeResult importNewStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException {
         if (null == structure.getStructureNo() || "".equals(structure.getStructureNo()) || structure.getAmount() == null) {
-//            throw new SummerException(StatusCode.MULTI_PARAM_DEFECT);
-            return new AnalyzeResult(structure.getStructureNo(), false);
+            throw new SummerException(StatusCode.PARAM_ERROR);
         }
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         if (workbook.getNumberOfSheets() > 1) {
-            throw new SummerException(StatusCode.SHEET_NOT_UNIQUE);
+            throw new SummerException(StatusCode.FILE_SHEET_NOT_UNIQUE);
         }
 
         // 解析首行 获取编校审数据
@@ -824,14 +823,12 @@ public class FileServiceImpl implements FileService {
         Row structRow = workbook.getSheetAt(0).getRow(4);
         String materNo = structRow.getCell(3).toString();
         if ("".equals(materNo)) {
-//            throw new SummerException(StatusCode.MULTI_TOP_MATERIAL_NO_BLANK);
-            return new AnalyzeResult(structure.getStructureNo(), false);
+            throw new SummerException(StatusCode.MATERIAL_NO_BLANK);
         }
         // 根据物料号和专利方版本检查
         List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(materNo, 0);
         if (materials.size() > 0) {
-//            throw new SummerException(StatusCode.MULTI_STRUCTURE_EXIST);
-            return new AnalyzeResult(structure.getStructureNo(), false);
+            throw new SummerException(StatusCode.STRUCTURE_HAS_EXISTED);
         } else {
             List<Material> materialList = new ArrayList<>(100);
             Sheet sheet = workbook.getSheetAt(0);
@@ -892,7 +889,7 @@ public class FileServiceImpl implements FileService {
                     material.setAtNo(material.getMaterialNo());
                     String structNo = row.getCell(0).toString();
                     if (!structure.getStructureNo().equals(structNo)) {
-                        throw new SummerException(StatusCode.STRUCTURE_NO_ERROR);
+                        throw new SummerException(StatusCode.STRUCTURE_NO_ANALYZE_ERROR);
                     }
                 } else {
                     Material parentMat = levelArray[level - 1];
@@ -926,7 +923,7 @@ public class FileServiceImpl implements FileService {
                     material.setStandard(row.getCell(9).toString());
                 }
                 if (null == row.getCell(10) || "".equals(row.getCell(10).toString().trim())) {
-                    throw new SummerException(StatusCode.MATERIAL_AMOUNT_NULL);
+                    throw new SummerException(StatusCode.MATERIAL_AMOUNT_IS_NULL);
                 } else {
                     String amount = row.getCell(10).toString().trim();
                     if (amount.endsWith(".0")) {
@@ -981,7 +978,7 @@ public class FileServiceImpl implements FileService {
         // 开始解析新版本数据
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         if (workbook.getNumberOfSheets() > 1) {
-            throw new SummerException(StatusCode.SHEET_NOT_UNIQUE);
+            throw new SummerException(StatusCode.FILE_SHEET_NOT_UNIQUE);
         }
 
         // 解析首行 获取编校审数据
@@ -1002,7 +999,7 @@ public class FileServiceImpl implements FileService {
         Row structRow = workbook.getSheetAt(0).getRow(4);
         String materNo = structRow.getCell(3).toString();
         if ("".equals(materNo)) {
-            throw new SummerException(StatusCode.TOP_MATERIAL_NO_BLANK);
+            throw new SummerException(StatusCode.MATERIAL_NO_BLANK);
         }
 
         // 若能查询到旧部套则更新旧部套的最新版本号
