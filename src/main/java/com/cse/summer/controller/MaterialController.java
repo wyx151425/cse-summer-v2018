@@ -25,10 +25,9 @@ public class MaterialController {
 
     @GetMapping(value = "materials")
     public Response<List<Material>> actionQueryBomRecordList(
-            @RequestParam(value = "structureNo") String structureNo,
             @RequestParam(value = "parentId") String parentId
     ) {
-        List<Material> materialList = materialService.findMaterialListByParentId(structureNo, parentId);
+        List<Material> materialList = materialService.findMaterialListByParentId(parentId);
         return new Response<>(materialList);
     }
 

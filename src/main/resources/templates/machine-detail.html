@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>设计BOM管理工具</title>
+    <link rel="stylesheet" th:href="@{/css/cse.css}">
+    <style>
+        .left-panel {
+            float: left;
+            width: 1000px;
+            height: 800px;
+            padding: 30px;
+            margin-bottom: 60px;
+            box-sizing: border-box;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .right-panel {
+            float: right;
+            width: 380px;
+            height: 800px;
+            padding: 30px;
+            margin-bottom: 60px;
+            box-sizing: border-box;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .list-form {
+            width: 939px;
+            height: 740px;
+            padding: 12px 12px 12px 0;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            overflow: scroll;
+        }
+
+        ul.list {
+            list-style: none;
+        }
+
+        li.item {
+            list-style: none;
+            padding-left: 16px;
+            line-height: 20px;
+        }
+
+        ul li {
+            cursor: pointer;
+        }
+
+        li.item .icon {
+            top: 0;
+            font-size: 11px;
+            color: #c0c0c0;
+        }
+
+        li.item span:nth-child(2).code {
+            font-size: 14px;
+        }
+
+        li.item span:nth-child(3).icon {
+            top: 1px;
+            font-size: 12px;
+        }
+
+        .icon-triangle-right:before {
+            content: "\e250";
+        }
+
+        .icon-triangle-bottom:before {
+            content: "\e252";
+        }
+
+        table > thead > tr > th {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-fixed">
+        <div class="container">
+            <img class="logo" th:src="@{/images/cse.png}" alt=""/>
+            <div class="account">
+                <span class="account-name">王振琦</span>
+                <span class="icon icon-off"></span>
+            </div>
+        </div>
+    </div>
+</header>
+<main id="main" class="container">
+    <div class="left-panel">
+        <div class="list-form">
+            <ul class="list">
+                <li class="item">
+                    <span class="icon icon-triangle-right"></span>
+                    <span class="code" @click="queryStructure(machine.name)">{{machine.name}}</span>
+                    <ul class="list" v-for="structure in machine.structureList" v-if="machine.structureList">
+                        <li class="item">
+                            <span class="icon icon-triangle-right"></span>
+                            <span class="code" @click="queryMaterial(structure.material)">{{structure.structureNo}}&nbsp;({{structure.materialNo}})</span>
+                            <span class="icon icon-cog" @click="showMaterialDetail(structure.material)"></span>
+                            <ul class="list">
+                                <material-node v-for="material in structure.material.materialList" :key="material.objectId" :material="material"></material-node>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="right-panel">
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <th>属性</th>
+                <th>值</th>
+            </tr>
+            </thead>
+            <tbody v-if="material">
+            <tr>
+                <td>物料号</td>
+                <td>{{material.materialNo}}</td>
+            </tr>
+            <tr>
+                <td>图号</td>
+                <td>{{material.drawingNo}}</td>
+            </tr>
+            <tr>
+                <td>图幅</td>
+                <td>{{material.drawingSize}}</td>
+            </tr>
+            <tr>
+                <td>名称（中文）</td>
+                <td>{{material.chinese}}</td>
+            </tr>
+            <tr>
+                <td>名称（英文）</td>
+                <td>{{material.name}}</td>
+            </tr>
+            <tr>
+                <td>专利材料</td>
+                <td>{{material.material}}</td>
+            </tr>
+            <tr>
+                <td>国标材料</td>
+                <td>{{material.standard}}</td>
+            </tr>
+            <tr>
+                <td>层数量</td>
+                <td>{{material.absoluteAmount}}</td>
+            </tr>
+            <tr>
+                <td>重量</td>
+                <td>{{material.weight}}</td>
+            </tr>
+            <tr>
+                <td>货源</td>
+                <td>{{material.source}}</td>
+            </tr>
+            <tr>
+                <td>设计备注</td>
+                <td>{{material.designNote}}</td>
+            </tr>
+            <tr>
+                <td>喷涂防护</td>
+                <td>{{material.paintProtect}}</td>
+            </tr>
+            <tr>
+                <td>更改</td>
+                <td>{{material.modifyNote}}</td>
+            </tr>
+            <tr>
+                <td>ERP父项</td>
+                <td>{{material.erpParent}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <button class="btn pull-right" th:href="@{/index}" type="button" style="margin-top: 16px">返回</button>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script th:src="@{/js/cse.js}"></script>
+<script>
+    const main = new Vue({
+        el: "#main",
+        data: {
+            machine: {
+                name: ""
+            },
+            material: null
+        },
+        methods: {
+            setMachineName: function (machineName) {
+                this.machine.name = machineName;
+            },
+            setStructureList: function (structureList) {
+                this.machine.structureList = structureList;
+            },
+            queryStructure: function (machineName) {
+                axios.get(requestContext + "api/machines/" + machineName + "/structures")
+                    .then(function (response) {
+                        let statusCode = response.data.statusCode;
+                        if (200 === statusCode) {
+                            main.setStructureList(response.data.data);
+                            main.$forceUpdate();
+                        } else {
+                            popover.append("数据获取失败", false);
+                        }
+                    })
+                    .catch(function () {
+                        popover.append("服务器访问失败", false);
+                    });
+            },
+            queryMaterial: function (parent) {
+                axios.get(requestContext + "api/materials?parentId=" + parent.objectId)
+                    .then(function (response) {
+                        let statusCode = response.data.statusCode;
+                        if (200 === statusCode) {
+                            parent.materialList = response.data.data;
+                            main.$forceUpdate();
+                        } else {
+                            popover.append("数据获取失败", false);
+                        }
+                    })
+                    .catch(function () {
+                        popover.append("服务器访问失败", false);
+                    });
+            },
+            showMaterialDetail: function (material) {
+                this.material = material;
+            }
+        },
+        mounted: function () {
+            let url = window.location;
+            let machineName = getUrlParam(url, "machineName");
+            this.setMachineName(machineName);
+        }
+    });
+
+    Vue.component("material-node", {
+        props: ["material"],
+        template: `
+            <li class="item">
+                <span class="icon icon-triangle-right"></span>
+                <span class="code" @click="queryMaterial(material)">{{material.materialNo}}</span>
+                <span class="icon icon-cog" @click="showMaterialDetail(material)"></span>
+                <ul class="list">
+                    <material-node v-for="material in material.materialList" :key="material.objectId" :material="material"></material-node>
+                </ul>
+            </li>
+        `,
+        methods: {
+            queryMaterial: function (parent) {
+                console.log(parent);
+                axios.get(requestContext + "api/materials?parentId=" + parent.objectId)
+                    .then(function (response) {
+                        let statusCode = response.data.statusCode;
+                        if (200 === statusCode) {
+                            parent.materialList = response.data.data;
+                            main.$forceUpdate();
+                        } else {
+                            popover.append("数据获取失败", false);
+                        }
+                    })
+                    .catch(function () {
+                        popover.append("服务器访问失败", false);
+                    });
+            },
+            showMaterialDetail: function (material) {
+                main.showMaterialDetail(material);
+            }
+        }
+    });
+
+    // Vue.component("material-node", {
+    //     props: ["material"],
+    //     template: `
+    //         <li class="item">
+    //             <span class="icon icon-triangle-right"></span>
+    //             <span class="code">{{material.materialNo}}</span>
+    //             <span class="icon icon-cog"></span>
+    //         </li>
+    //     `
+    // });
+    //
+    // const materialView = new Vue({
+    //     el: "#materialView",
+    //     data: {
+    //         materials: []
+    //     },
+    //     methods: {
+    //         setMaterials: function (materials) {
+    //             this.materials = materials;
+    //         },
+    //         queryMaterial: function (parent) {
+    //             axios.get(requestContext + "api/materials?parentId=" + parent.objectId)
+    //                 .then(function (response) {
+    //                     let statusCode = response.data.statusCode;
+    //                     if (200 === statusCode) {
+    //                         parent.materialList = response.data.data;
+    //                     } else {
+    //                         popover.append("数据获取失败", false);
+    //                     }
+    //                 })
+    //                 .catch(function () {
+    //                     popover.append("服务器访问失败", false);
+    //                 });
+    //         },
+    //         showMaterialDetail: function (material) {
+    //             main.showMaterialDetail(material);
+    //         }
+    //     }
+    // });
+</script>
+</body>
+</html>

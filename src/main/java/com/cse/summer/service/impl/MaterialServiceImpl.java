@@ -32,12 +32,8 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public List<Material> findMaterialListByParentId(String structureNo, String parentId) {
-        List<Material> materialList = materialRepository.findAllByParentId(parentId);
-        for (Material material : materialList) {
-            material.setStructureNo(structureNo);
-        }
-        return materialList;
+    public List<Material> findMaterialListByParentId(String parentId) {
+        return materialRepository.findAllByParentId(parentId);
     }
 
     @Override

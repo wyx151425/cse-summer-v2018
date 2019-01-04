@@ -23,11 +23,18 @@ public class SummerWebConfigurer implements WebMvcConfigurer {
                 .addPathPatterns("/")
                 .addPathPatterns("/index")
                 .addPathPatterns("/machine")
+                .addPathPatterns("/machineDetail")
                 .addPathPatterns("/importResult");
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-
+        registry.addViewController("").setViewName("index");
+        registry.addViewController("/").setViewName("index");
+        registry.addViewController("/index").setViewName("index");
+        registry.addViewController("/machine").setViewName("machine");
+        registry.addViewController("/machineDetail").setViewName("machine-detail");
+        registry.addViewController("/importResult").setViewName("import-result");
+        registry.addViewController("/login").setViewName("login");
     }
 }
