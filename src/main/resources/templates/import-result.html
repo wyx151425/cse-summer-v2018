@@ -8,12 +8,12 @@
     <link rel="stylesheet" th:href="@{/css/summer.css}"/>
 </head>
 <body>
-<header class="header">
+<header id="header" class="header">
     <div class="header-fixed">
         <div class="container">
             <img class="logo" th:src="@{/images/cse.png}" alt=""/>
             <div class="account">
-                <span class="account-name">王振琦</span>
+                <span class="account-name">{{user.name}}</span>
                 <a class="icon icon-off" th:href="@{/logout}"></a>
             </div>
         </div>

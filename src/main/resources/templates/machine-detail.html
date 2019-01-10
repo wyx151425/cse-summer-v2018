@@ -9,12 +9,12 @@
     <link rel="stylesheet" th:href="@{/css/material-detail.css}">
 </head>
 <body>
-<header class="header">
+<header id="header" class="header">
     <div class="header-fixed">
         <div class="container">
             <img class="logo" th:src="@{/images/cse.png}" alt=""/>
             <div class="account">
-                <span class="account-name">王振琦</span>
+                <span class="account-name">{{user.name}}</span>
                 <a class="icon icon-off" th:href="@{/logout}"></a>
             </div>
         </div>
@@ -119,6 +119,9 @@
         </a>
     </div>
 </main>
+<footer class="footer">
+    <span>&copy;2018 中国船舶重工集团柴油机有限公司</span>
+</footer>
 <div id="popover" class="popover" v-if="prompts.length > 0">
     <popover v-for="prompt in prompts" :key="prompt.id" :prompt="prompt"></popover>
 </div>

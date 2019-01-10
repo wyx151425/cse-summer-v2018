@@ -9,12 +9,12 @@
     <link rel="stylesheet" th:href="@{/css/index.css}">
 </head>
 <body>
-<header class="header">
+<header id="header" class="header">
     <div class="header-fixed">
         <div class="container">
             <img class="logo" th:src="@{/images/cse.png}" alt=""/>
             <div class="account">
-                <span class="account-name">王振琦</span>
+                <span class="account-name">{{user.name}}</span>
                 <a class="icon icon-off" th:href="@{/logout}"></a>
             </div>
         </div>
@@ -23,8 +23,8 @@
 <main id="main" class="container">
     <div class="panel">
         <div class="btn-list">
-            <button class="btn pull-right" @click="deleteAllMachineModalVisible">清空数据</button>
-            <button class="btn pull-right" @click="importMachineBOMModalVisible">导入BOM</button>
+            <button class="btn pull-right" @click="deleteAllMachineModalVisible" v-if="user.permissions.DELETE_ALL_MACHINE" v-cloak>清空数据</button>
+            <button class="btn pull-right" @click="importMachineBOMModalVisible" v-if="user.permissions.IMPORT_MACHINE_BOM || user.permissions.IMPORT_NEW_MACHINE_BOM">导入BOM</button>
             <button class="btn pull-right" @click="verifyStructureListModalVisible">检查部套</button>
             <button class="btn pull-right" @click="queryRelationModalVisible">查询关联</button>
         </div>
@@ -52,10 +52,12 @@
                 <td>{{machine.classificationSociety}}</td>
                 <td>
                     <button class="btn-link pull-left" type="button" @click="checkMachineDetail(machine)">查看</button>
-                    <button class="btn-link pull-left" type="button" @click="editMachineInfoModalVisible(machine)">编辑
+                    <button class="btn-link pull-left" type="button" @click="editMachineInfoModalVisible(machine)"
+                            v-if="user.permissions.UPDATE_MACHINE_INFO" v-cloak>编辑
                     </button>
                     <button class="btn-link pull-left" type="button"
-                            @click="exportMachineBOMModalVisible(machine.name)">导出BOM
+                            @click="exportMachineBOMModalVisible(machine.name)"
+                            v-if="user.permissions.EXPORT_MACHINE_BOM">导出BOM
                     </button>
                     <a class="btn-link pull-left" :href="'importResult?machineName=' + machine.name">导入记录</a>
                     <a class="btn-link pull-left" :href="'machineDetail?machineName=' + machine.name">结构分析</a>
@@ -65,6 +67,9 @@
         </table>
     </div>
 </main>
+<footer class="footer">
+    <span>&copy;2018 中国船舶重工集团柴油机有限公司</span>
+</footer>
 <div id="importMachineBOMModal" class="modal" v-if="isVisible" v-cloak>
     <div class="modal-box">
         <div class="modal-header">

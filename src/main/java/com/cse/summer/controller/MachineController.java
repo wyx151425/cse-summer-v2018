@@ -23,6 +23,9 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author WangZhenqi
+ */
 @RestController
 @RequestMapping(value = "api")
 public class MachineController extends BaseFacade {

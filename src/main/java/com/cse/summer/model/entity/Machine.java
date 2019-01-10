@@ -42,7 +42,7 @@ public class Machine extends SummerEntity {
     /**
      * 信息是否已完善
      */
-    private Boolean isComplete;
+    private Boolean complete;
 
     @Transient
     private List<Structure> structureList;
@@ -107,11 +107,11 @@ public class Machine extends SummerEntity {
     }
 
     public Boolean getComplete() {
-        return isComplete;
+        return complete;
     }
 
     public void setComplete(Boolean complete) {
-        isComplete = complete;
+        this.complete = complete;
     }
 
     public List<Structure> getStructureList() {

@@ -9,12 +9,12 @@
     <link rel="stylesheet" th:href="@{/css/index.css}">
 </head>
 <body>
-<header class="header">
+<header id="header" class="header">
     <div class="header-fixed">
         <div class="container">
             <img class="logo" th:src="@{/images/cse.png}" alt=""/>
             <div class="account">
-                <span class="account-name">王振琦</span>
+                <span class="account-name">{{user.name}}</span>
                 <a class="icon icon-off" th:href="@{/logout}"></a>
             </div>
         </div>
@@ -27,10 +27,10 @@
                 <button class="btn">返回</button>
             </a>
             <button class="btn pull-right" type="button" @click="appendStructureModalVisible"
-                    v-if="user.permissions.IMPORT_STRUCTURE">添加部套
+                    v-if="user.permissions.APPEND_STRUCTURE" v-cloak>添加部套
             </button>
             <button class="btn pull-right" type="button" @click="importStructureModalVisible"
-                    v-if="user.permissions.APPEND_STRUCTURE">导入部套
+                    v-if="user.permissions.IMPORT_STRUCTURE" v-cloak>导入部套
             </button>
         </div>
         <table class="table table-bordered table-hover">
@@ -78,6 +78,9 @@
         </table>
     </div>
 </main>
+<footer class="footer">
+    <span>&copy;2018 中国船舶重工集团柴油机有限公司</span>
+</footer>
 <div id="importStructureModal" class="modal" v-if="isVisible" v-cloak>
     <div class="modal-box">
         <div class="modal-header">

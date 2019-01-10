@@ -47,7 +47,7 @@ public class UserController extends BaseFacade {
     public Response<Object> actionClearData() {
         User user = getSessionUser();
         if (4 != user.getRole()) {
-            throw new SummerException(StatusCode.SYSTEM_ERROR);
+            throw new SummerException(StatusCode.USER_PERMISSION_DEFECT);
         } else {
             userService.clearData();
         }
