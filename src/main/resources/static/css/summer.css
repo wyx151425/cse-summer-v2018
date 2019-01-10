@@ -89,6 +89,7 @@ a:link, a:hover, a:active, a:visited {
 
 .icon-off {
     cursor: pointer;
+    color: #000;
 }
 
 /* Footer部分CSS */
