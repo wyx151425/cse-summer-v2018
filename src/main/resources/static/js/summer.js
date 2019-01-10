@@ -1,447 +1,132 @@
-$(document).ready(function () {
-    $("#CSEBOMImport2").click(function () {
-        let machineName = $("#machineName3").val();
-        if (undefined === machineName || null == machineName || "" === machineName) {
-            alert("请输入机器名");
-            return;
-        }
-        cseBomImportAction(machineName);
-    });
+let requestContext = "http://localhost:8080/dmsdev/";
 
-    $("#CSEBOMImport1").click(function () {
-        let machineName = $("#machineName33").val();
-        if (undefined === machineName || null == machineName || "" === machineName || "请选择" === machineName) {
-            alert("请选择机器");
-            return;
-        }
-        cseBomImportAction(machineName);
-    });
-
-    $("#xmlImport2").click(function () {
-        let machineName = $("#machineName1").val();
-        if (undefined === machineName || null == machineName || "" === machineName) {
-            alert("请输入机器名");
-            return;
-        }
-        manBomImportAction(machineName);
-    });
-
-    $("#xmlImport1").click(function () {
-        let machineName = $("#machineName11").val();
-        if (undefined === machineName || null == machineName || "" === machineName || "请选择" === machineName) {
-            alert("请选择机器");
-            return;
-        }
-        manBomImportAction(machineName);
-    });
-
-    $("#excelImport2").click(function () {
-        let machineName = $("#machineName2").val();
-        if (undefined === machineName || null == machineName || "" === machineName) {
-            alert("请输入机器名");
-            return;
-        }
-        winGDBomImportAction(machineName);
-    });
-
-    $("#excelImport1").click(function () {
-        let machineName = $("#machineName22").val();
-        if (undefined === machineName || null == machineName || "" === machineName || "请选择" === machineName) {
-            alert("请选择机器");
-            return;
-        }
-        winGDBomImportAction(machineName);
-    });
-
-    $("#importNewStructureFile").click(function () {
-        $("#newStructureExcelForm").css("display", "none");
-        $("#newStructureExcelConfirm").css("display", "block");
-
-        $.ajaxFileUpload({
-            url: 'api/files/import/structure/new',  // 用于文件上传的服务器端请求地址
-            secureuri: false,  // 是否需要安全协议，一般设置为false
-            fileElementId: ['strFile81', 'strFile82', 'strFile83', 'strFile84', 'strFile85', 'strFile86', 'strFile87', 'strFile88', 'strFile89'],
-            dataType: 'json',  // 返回值类型 一般设置为json
-            data: {
-                machineName: $("#machineName8").val(),
-                structureNo1: $("#structureNo81").val(), amount1: $("#amount81").val(),
-                structureNo2: $("#structureNo82").val(), amount2: $("#amount82").val(),
-                structureNo3: $("#structureNo83").val(), amount3: $("#amount83").val(),
-                structureNo4: $("#structureNo84").val(), amount4: $("#amount84").val(),
-                structureNo5: $("#structureNo85").val(), amount5: $("#amount85").val(),
-                structureNo6: $("#structureNo86").val(), amount6: $("#amount86").val(),
-                structureNo7: $("#structureNo87").val(), amount7: $("#amount87").val(),
-                structureNo8: $("#structureNo88").val(), amount8: $("#amount88").val(),
-                structureNo9: $("#structureNo89").val(), amount9: $("#amount89").val()
-            },
-            success: function (data) {
-                successCallback(data);
-            },
-            error: function () {
-                $(".progress-prompt").text("系统错误");
+function getUrlParam(url, name) {
+    let pattern = new RegExp("[?&]" + name + "\=([^&]+)", "g");
+    let matcher = pattern.exec(url);
+    let items = null;
+    if (null !== matcher) {
+        try {
+            items = decodeURIComponent(decodeURIComponent(matcher[1]));
+        } catch (e) {
+            try {
+                items = decodeURIComponent(matcher[1]);
+            } catch (e) {
+                items = matcher[1];
             }
-        });
-    });
-
-    $("#importFile").click(function () {
-        $("#structureExcelForm").css("display", "none");
-        $("#structureExcelConfirm").css("display", "block");
-
-        $.ajaxFileUpload({
-            url: 'api/files/import/structure/newVersion',  // 用于文件上传的服务器端请求地址
-            secureuri: false,  // 是否需要安全协议，一般设置为false
-            fileElementId: 'structureExcel',  // 文件上传域的ID
-            dataType: 'json',  // 返回值类型 一般设置为json
-            data: {
-                machineName: $("#machineName3").val(),
-                structureNo: $("#structureNo3").val()
-            },
-            success: function (data) {
-                successCallback(data);
-            },
-            error: function () {
-                $(".progress-prompt").text("系统错误");
-            }
-        });
-    });
-
-    function successCallback(data) {
-        if (200 === data.statusCode) {
-            $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
-            location.reload();
-        } else if (602 === data.statusCode) {
-            $(".progress-prompt").text("上传文件缺少部套号或数量");
-        } else if (7004 === data.statusCode) {
-            location.reload();
-        } else if (8001 === data.statusCode) {
-            $(".progress-prompt").text("文件格式错误");
-        } else if (8002 === data.statusCode) {
-            $(".progress-prompt").text("文件解析错误");
-        } else if (8003 === data.statusCode) {
-            $(".progress-prompt").text("存在多个Sheet，发生解析错误");
-        } else if (9001 === data.statusCode) {
-            $(".progress-prompt").text("部套已存在");
-        } else if (9002 === data.statusCode) {
-            $(".progress-prompt").text("输入部套号与文件内部套号不相同");
-        } else if (9003 === data.statusCode) {
-            $(".progress-prompt").text("库中不存在该部套，无法更新版本");
-        } else if (10002 === data.statusCode) {
-            $(".progress-prompt").text("存在层级为空的物料");
-        } else if (10003 === data.statusCode) {
-            $(".progress-prompt").text("顶层物料的物料号为空");
-        } else if (10004 === data.statusCode) {
-            $(".progress-prompt").text("存在层数量为空的物料");
-        } else if (20001 === data.statusCode) {
-            $(".progress-prompt").text("某顶层物料的物料号为空，因此部分文件导入失败");
-        } else if (20002 === data.statusCode) {
-            $(".progress-prompt").text("缺少某部套的部套号或数量，因此部分文件导入失败");
-        } else if (20003 === data.statusCode) {
-            $(".progress-prompt").text("某部套已存在，因此部分文件导入失败");
-        } else if (20004 === data.statusCode) {
-            $(".progress-prompt").text("某部套存在空层级物料，因此部分文件导入失败");
-        } else if (20005 === data.statusCode) {
-            $(".progress-prompt").text("某部套输入部套号与文件内部套号不一致，因此部分文件导入失败");
-        } else {
-            $(".progress-prompt").text("系统错误");
         }
     }
+    return items;
+}
 
-    $("#updateBtn").click(function () {
-        $("#machineEditForm").css("display", "none");
-        $("#machineEditConfirm").css("display", "block");
-        let machineEditProgress = $("#machineEditProgress");
-        machineEditProgress.css("display", "block")
-            .text("数据修改中...");
-        $.ajax({
-            url: "api/machines",
-            dataType: "json", // 预期服务器返回的数据类型
-            type: "put", // 请求方式PUT
-            contentType: "application/json", // 发送信息至服务器时的内容编码类型
-            // 发送到服务器的数据。
-            data: JSON.stringify({
-                id: $("#id").val(),
-                machineNo: $("#machineNo").val(),
-                type: $("#type").val(),
-                patent: $("#patent").val(),
-                cylinderAmount: $("#cylinderAmount").val(),
-                shipNo: $("#shipNo").val(),
-                classificationSociety: $("#classificationSociety").val()
-            }),
-            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
-            // 请求成功后的回调函数。
-            success: function (data) {
-                if (200 === data.statusCode) {
-                    location.reload();
-                } else if (7004 === data.statusCode) {
-                    location.reload();
-                } else if (9001 === data.statusCode) {
-                    $("#machineEditProgress").text("部套不存在");
-                } else {
-                    $("#machineEditProgress").text("系统错误");
-                }
-            },
-            // 请求出错时调用的函数
-            error: function () {
-                $("#machineEditProgress").text("系统错误");
-            }
-        });
-    });
+function getMessage(statusCode) {
+    switch (statusCode) {
+        case 500:
+            return "系统错误";
+        case 600:
+            return "参数错误";
+        case 1001:
+            return "用户未注册";
+        case 1002:
+            return "用户已注册";
+        case 1003:
+            return "用户被禁用";
+        case 1004:
+            return "登录超时";
+        case 1005:
+            return "密码错误";
+        case 1006:
+            return "缺少权限";
+        case 2001:
+            return "文件格式错误";
+        case 2002:
+            return "文件解析错误";
+        case 2003:
+            return "Sheet解析错误";
+        case 3001:
+            return "部套不存在";
+        case 3002:
+            return "库中已存在该部套";
+        case 3003:
+            return "部套号解析错误";
+        case 3004:
+            return "机器已包含该部套";
+        case 4001:
+            return "存在物料号为空的物料";
+        case 4002:
+            return "存在层级为空的物料";
+        case 4003:
+            return "存在数量为空的物料";
+        default:
+            return "系统错误";
+    }
+}
 
-    $("#logout").click(function () {
-        $.ajax({
-            url: "api/users/logout",
-            dataType: "json",
-            type: "post",
-            contentType: "application/json",
-            async: true,
-            success: function (data) {
-                if (200 === data.statusCode) {
-                    location.reload();
-                }
-            }
-        });
-    });
+function createAndDownload(filename, content, contentType) {
+    if (!contentType) {
+        contentType = "application/octet-stream";
+    }
+    let a = document.createElement("a");
+    let blob = new Blob([content], {"type": contentType});
+    a.href = window.URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+}
 
-    $("#pwdBtn").click(function () {
-        let pwdBtn = $(this);
-        pwdBtn.attr("disabled", "disabled");
-        let response = $("#response");
-        response.text("");
-        let newPwd = $("#newPwd").val();
-        let confirmPwd = $("#confirmPwd").val();
-        if (confirmPwd !== newPwd) {
-            response.text("两次密码不一致");
-            pwdBtn.removeAttr("disabled");
-            return;
+function download(file) {
+    if (!file) {
+        return;
+    }
+    let url = window.URL.createObjectURL(new Blob([file.data],
+        {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"}));
+    let link = document.createElement("a");
+    link.style.display = "none";
+    link.download = decodeURI((file.headers["content-disposition"].split("="))[1]);
+    link.href = url;
+
+    document.body.appendChild(link);
+    link.click();
+}
+
+const progress = new Vue({
+    el: "#progress",
+    data: {
+        isVisible: true
+    },
+    methods: {
+        show: function () {
+            this.isVisible = true;
+        },
+        dismiss: function () {
+            this.isVisible = false;
         }
-        if (newPwd.length < 6) {
-            response.text("密码长度应不少于6位");
-            pwdBtn.removeAttr("disabled");
-            return;
-        }
-        pwdBtn.text("修改中...");
-        $.ajax({
-            url: "api/users/password",
-            dataType: "json",
-            type: "put",
-            contentType: "application/json",
-            data: JSON.stringify({
-                password: newPwd
-            }),
-            async: true,
-            success: function (data) {
-                if (200 === data.statusCode) {
-                    window.location.href = "index";
-                }
-            },
-            error: function () {
-                response.text("系统错误");
-            }
-        });
-    });
-
-    $("#searchStrB").click(function () {
-        let search = $(this);
-        search.text("查询中...");
-        $.ajax({
-            url: "api/structures/search?materialNo=" + $("#materialNoI").val(),
-            dataType: "json", // 预期服务器返回的数据类型
-            type: "get", // 请求方式GET
-            contentType: "application/json", // 发送信息至服务器时的内容编码类型
-            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
-            // 请求成功后的回调函数。
-            success: function (data) {
-                if (200 === data.statusCode) {
-                    search.text("精确查询");
-                    list = data.data;
-                    let machineNameSel = $("#structureList");
-                    machineNameSel.empty();
-                    $.each(list, function (index, value) {
-                        let _html = '';
-                        _html += '<tr>' +
-                            '   <td>' + value.machineName + '</td>' +
-                            '   <td>' + value.version + '</td>';
-                        if (null !== value.amount) {
-                            _html += '   <td>' + value.amount + '</td>';
-                        }
-                        _html += '</tr>';
-                        machineNameSel.append(_html);
-                    });
-                } else if (7004 === data.statusCode) {
-                    location.reload();
-                }
-            },
-            // 请求出错时调用的函数
-            error: function () {
-                search.text("模糊查询");
-                alert("数据发送失败");
-            }
-        });
-    });
-
-    $("#clearConfirm").click(function () {
-        let clearPrompt = $("#clearPrompt");
-        let clearPromptProgress = $("#clearPromptProgress");
-        let clearPromptFooter = $("#clearPromptFooter");
-        clearPrompt.css("display", "none");
-        clearPromptProgress.css("display", "block");
-        clearPromptFooter.css("display", "none");
-        $.ajax({
-            url: "api/data/clear",
-            dataType: "json", // 预期服务器返回的数据类型
-            type: "post", // 请求方式GET
-            contentType: "application/json", // 发送信息至服务器时的内容编码类型
-            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
-            // 请求成功后的回调函数。
-            success: function (data) {
-                if (200 === data.statusCode) {
-                    location.reload();
-                } else {
-                    clearPrompt.css("display", "block");
-                    clearPromptProgress.css("display", "none");
-                    clearPromptFooter.css("display", "block");
-                    $("#thisPrompt").text("清理失败");
-                }
-            },
-            // 请求出错时调用的函数
-            error: function () {
-                clearPrompt.css("display", "block");
-                clearPromptProgress.css("display", "none");
-                clearPromptFooter.css("display", "block");
-                $("#thisPrompt").text("清理失败");
-            }
-        });
-    });
-
-    $("#structureCheckBtn").click(function () {
-        $(this).text("正在检查");
-        $.ajaxFileUpload({
-            url: 'api/structures/check',  // 用于文件上传的服务器端请求地址
-            secureuri: false,  // 是否需要安全协议，一般设置为false
-            fileElementId: ['structureCheckFile'],
-            dataType: 'json',  // 返回值类型 一般设置为json
-            success: function (data) {
-                let statusCode = data.statusCode;
-                if (200 === statusCode) {
-                    let content = "";
-                    for (let index = 0; index < data.data.length; index++) {
-                        content += data.data[index].structureNo;
-                        content += " ";
-                        if (data.data[index].result) {
-                            content += "新部套，库中不存在";
-                        } else {
-                            content += "库中已存在";
-                        }
-                        content += "\r\n";
-                    }
-                    let a = document.createElement("a");
-                    let blob = new Blob([content], {"type": "application/octet-stream"});
-                    a.href = window.URL.createObjectURL(blob);
-                    a.download = "部套检查结果.txt";
-
-                    $("#structureCheckBtn").text("导入");
-                    $("#structureCheckFile").val(null);
-
-                    a.click();
-                } else {
-                    successCallback(data);
-                }
-            },
-            error: function () {
-                $(".progress-prompt").text("系统错误");
-            }
-        });
-    });
+    }
 });
 
-function toUpdateMachine(machineId, machineName, machineNo, machineType, patent, cylinderAmount, shipNo, classificationSociety) {
-    $("#id").val(machineId);
-    $("#name").val(machineName);
-    $("#machineNo").val(machineNo);
-    $("#type").val(machineType);
-    $("#patent").val(patent);
-    $("#cylinderAmount").val(cylinderAmount);
-    $("#shipNo").val(shipNo);
-    $("#classificationSociety").val(classificationSociety);
-    $("#machineEditForm").css("display", "block");
-    $("#machineEditConfirm").css("display", "none");
-}
+Vue.component("popover", {
+    props: ["prompt"],
+    template: `
+            <div class="popover-box" :class="{success: prompt.status, error: !prompt.status}">
+                <span class="icon icon-ok" v-if="prompt.status"></span>
+                <span class="icon icon-remove" v-if="!prompt.status"></span>
+                <span>{{prompt.message}}</span>
+            </div>
+        `
+});
 
-function toView(machineId, machineNo, machineType, patent, machineCylinder, shipNo, cs) {
-    if (null == machineNo || null == machineType || null == machineCylinder || null == shipNo || null == cs || null == patent || "" === patent
-        || "" === machineNo || "" === machineType || "" === machineCylinder || "" === shipNo || "" === cs) {
-        alert("请完善机器信息");
-    } else {
-        let url = "machine?machineId=" + machineId;
-        let link = $('<a href="' + url + '"></a>');
-        link.get(0).click();
+const popover = new Vue({
+    el: "#popover",
+    data: {
+        prompts: [],
+        index: 0
+    },
+    methods: {
+        append: function (message, status) {
+            let prompt = {id: this.index, status: status, message: message};
+            this.index++;
+            this.prompts.push(prompt);
+            setTimeout(function () {
+                popover.prompts.shift(prompt);
+            }, 5000);
+        }
     }
-}
-
-function toExportMachineBom(machineName, machineNo, machineType, patent, machineCylinder, shipNo, cs, status) {
-    if (null == machineNo || null == machineType || null == machineCylinder || null == shipNo || null == cs || null == patent || "" === patent
-        || "" === machineNo || "" === machineType || "" === machineCylinder || "" === shipNo || "" === cs) {
-        alert("请完善机器信息");
-    } else {
-        let url = "api/files/export/machine?machineName=" + machineName + "&status=" + status;
-        let link = $('<a href="' + url + '"></a>');
-        link.get(0).click();
-    }
-}
-
-function cseBomImportAction(machineName) {
-    $("#CSEBOMForm").css("display", "none");
-    $("#CSEBOMConfirm").css("display", "block");
-    $.ajaxFileUpload({
-        url: 'api/files/import/cse',  // 用于文件上传的服务器端请求地址
-        secureuri: false,  // 是否需要安全协议，一般设置为false
-        fileElementId: 'csebom',  // 文件上传域的ID
-        dataType: 'json',  // 返回值类型 一般设置为json
-        data: {machineName: machineName},
-        success: function (data) {
-            $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
-            location.reload();
-        },
-        error: function () {
-            $(".progress-prompt").text("系统错误");
-        }
-    });
-}
-
-function manBomImportAction(machineName) {
-    $("#manXmlForm").css("display", "none");
-    $("#manXmlConfirm").css("display", "block");
-    $.ajaxFileUpload({
-        url: 'api/files/import/xml',  // 用于文件上传的服务器端请求地址
-        secureuri: false,  // 是否需要安全协议，一般设置为false
-        fileElementId: 'manXml',  // 文件上传域的ID
-        dataType: 'json',  // 返回值类型 一般设置为json
-        data: {machineName: machineName},
-        success: function (data) {
-            $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
-            location.reload();
-        },
-        error: function () {
-            $(".progress-prompt").text("系统错误");
-        }
-    });
-}
-
-function winGDBomImportAction(machineName) {
-    $("#winGDExcelForm").css("display", "none");
-    $("#winGDExcelConfirm").css("display", "block");
-    $.ajaxFileUpload({
-        url: 'api/files/import/excel',  // 用于文件上传的服务器端请求地址
-        secureuri: false,  // 是否需要安全协议，一般设置为false
-        fileElementId: 'winGDExcel',  // 文件上传域的ID
-        dataType: 'json',  // 返回值类型 一般设置为json
-        data: {machineName: machineName},
-        success: function (data) {
-            $(".progress-prompt").text("上传成功, 请刷新页面查看更新");
-            location.reload();
-        },
-        error: function () {
-            $(".progress-prompt").text("系统错误");
-        }
-    });
-}
+});

@@ -336,7 +336,7 @@ const verifyStructureListModal = new Vue({
         invisible: function () {
             this.isVisible = false;
         },
-        importNewVersionStructureFile: function () {
+        importStructureFile: function () {
             let file = document.getElementById("structureFile").files[0];
             if (!file) {
                 popover.append("请选择文件", false);

@@ -1,0 +1,79 @@
+.left-panel {
+    position: relative;
+    float: left;
+    width: 1000px;
+    height: 800px;
+    padding: 30px;
+    margin-bottom: 60px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.right-panel {
+    float: right;
+    width: 380px;
+    height: 800px;
+    padding: 30px;
+    margin-bottom: 60px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.list-form {
+    width: 939px;
+    height: 740px;
+    padding: 12px 12px 12px 0;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    overflow: scroll;
+}
+
+ul.list {
+    list-style: none;
+}
+
+li.item {
+    list-style: none;
+    padding-left: 16px;
+    line-height: 22px;
+}
+
+ul li {
+    cursor: pointer;
+}
+
+li.item .icon {
+    top: 0;
+    font-size: 11px;
+    color: #c0c0c0;
+}
+
+li.item span:nth-child(2).code {
+    font-size: 14px;
+}
+
+li.item span:nth-child(3).icon {
+    top: 1px;
+    font-size: 12px;
+}
+
+.icon-triangle-right:before {
+    content: "\e250";
+}
+
+.icon-triangle-bottom:before {
+    content: "\e252";
+}
+
+.progress-modal {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    width: 1000px;
+    height: 800px;
+    background-color: rgba(255, 255, 255, 0.5);
+}

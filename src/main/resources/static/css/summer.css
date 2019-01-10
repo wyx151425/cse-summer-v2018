@@ -1,295 +1,666 @@
-body {
-    background: #f1f2f3;
-}
+@charset "utf-8";
 
-.navbar {
-    margin-bottom: 30px;
-}
-
-.navbar-default {
-    background: #fff;
-}
-
-.navbar-default .navbar-brand {
-    color: #444;
-    font-size: 28px;
-}
-
-.navbar-default .navbar-nav > li > a {
-    color: #444;
-    font-size: 15px;
-}
-
-@media (min-width: 768px) {
-    .modal-dialog {
-        width: 600px;
-        margin: 100px auto;
-    }
-}
-
-.aside {
-    width: 100%;
+/* 全局CSS */
+html {
     height: 100%;
-    padding: 8px 8px 8px 0;
-    overflow: scroll;
+    background: #f1f2f3;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    min-width: 320px !important;
 }
 
-.aside-wrap {
-    display: block;
-    margin-top: 65px;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    width: 300px;
-    height: calc(100% - 65px);
-    z-index: 1000;
-    background-color: #fff;
-    border: 1px solid #e7e7e7;
-}
-
-@media (min-width: 1400px) {
-    .container {
-        width: 1400px;
-    }
-}
-
-ul.list, li.list-item {
-    list-style: none;
-    -webkit-padding-start: 8px;
-    padding-left: 8px;
-}
-
-ul li {
-    cursor: pointer;
-}
-
-ul li span:nth-child(1) {
-    font-size: 10px;
-    color: #c0c0c0;
-}
-
-ul li span:nth-child(2) {
+body {
+    color: #000;
     font-size: 15px;
+    font-family: "Microsoft Yahei", "微软雅黑", "Hiragino Sans GB", "WenQuanYi Micro Hei", "宋体", "sans-serif";
 }
 
-.material-detail {
-    background-color: #fff;
-    border: 1px solid #e7e7e7;
+body, input, select, textarea, button, p, ul, li {
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+}
+
+a:link, a:hover, a:active, a:visited {
+    text-decoration: none;
+}
+
+.container {
     width: 1400px;
-    min-height: 798px;
-    margin: 40px auto;
-}
-
-.table-wrap {
-    width: 1300px;
-    min-height: 600px;
-    margin: 30px 50px 50px;
-}
-
-#main {
-    margin-left: 300px;
-    overflow: hidden;
-}
-
-main.container {
     margin: 0 auto;
 }
 
-.modal-body {
-    overflow: hidden;
+.pull-left {
+    float: left;
+    margin-right: 14px;
 }
 
-.progress-prompt {
+.pull-right {
+    float: right;
+    margin-left: 14px;
+}
+
+/* Header部分CSS */
+.header {
+    width: 100%;
+    height: 64px;
+    margin-bottom: 40px;
+}
+
+.header-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    width: 100%;
+    height: 64px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.header .container {
+    height: 64px;
+}
+
+.logo {
+    display: block;
+    float: left;
+    width: 110px;
+    height: 53px;
+    margin-top: 3px;
+    margin-left: -2px;
+}
+
+.account {
+    float: right;
+    height: 64px;
+    line-height: 64px;
+    font-size: 16px;
+}
+
+.account-name {
+    font-weight: 700;
+    margin-right: 4px;
+}
+
+.icon-off {
+    cursor: pointer;
+}
+
+/* Footer部分CSS */
+.footer {
+    width: 100%;
+    height: 64px;
+    line-height: 64px;
+    background-color: #e1e2e3;
     text-align: center;
-    font-size: 24px;
+    font-size: 16px;
+    border-top: 1px solid #ccc;
 }
 
-.hidden {
-    display: none;
+/* Container部分CSS */
+main.container {
+    min-height: 800px;
+}
+
+.panel {
+    width: 1320px;
+    min-height: 720px;
+    padding: 40px;
+    margin-bottom: 60px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 表单部分 */
+.form {
+
 }
 
 .form-group {
+    margin-bottom: 12px;
+}
+
+.form-label {
+    width: 100%;
+    height: 36px;
+    line-height: 36px;
+    font-weight: 700;
+}
+
+.form-control {
+    width: 100%;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 10px;
+    font-size: 14px;
+    border: 1px solid #bbb;
+    box-sizing: border-box;
+}
+
+select.form-control {
+    padding-left: 6px;
+}
+
+input[type="file"].form-control {
+    line-height: normal;
+    font-size: 13px;
+    padding: 6px 10px;
+}
+
+.form-control:focus {
+    border: 1px solid #337ab7;
+}
+
+.form-horizontal {
+
+}
+
+.form-horizontal .form-group {
     overflow: hidden;
 }
 
-#search {
-    float: right;
+.form-horizontal .form-label {
+    float: left;
 }
 
-*, *:before, *:after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+.form-horizontal .form-control {
+    float: left;
 }
 
-@media only screen and (max-width: 600px) {
-    section {
-        min-width: 350px;
-    }
-}
-
-.loader {
+.form-horizontal .form-icon {
     position: relative;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: inline-block;
-    vertical-align: middle;
 }
 
-/*LOADER-1*/
-
-.loader-1 .loader-outter {
+.form-horizontal .form-icon .icon {
     position: absolute;
-    border: 4px solid #22b4f6;
-    border-left-color: transparent;
-    border-bottom: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    -webkit-animation: loader-1-outter 1s cubic-bezier(.42, .61, .58, .41) infinite;
-    animation: loader-1-outter 1s cubic-bezier(.42, .61, .58, .41) infinite;
-}
-
-.loader-1 .loader-inner {
-    position: absolute;
-    border: 4px solid #f50057;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    left: calc(50% - 20px);
-    top: calc(50% - 20px);
-    border-right: 0;
-    border-top-color: transparent;
-    -webkit-animation: loader-1-inner 1s cubic-bezier(.42, .61, .58, .41) infinite;
-    animation: loader-1-inner 1s cubic-bezier(.42, .61, .58, .41) infinite;
-}
-
-/*LOADER-2*/
-
-@-webkit-keyframes loader-1-outter {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes loader-1-outter {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
-    }
-}
-
-@-webkit-keyframes loader-1-inner {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(-360deg);
-        transform: rotate(-360deg);
-    }
-}
-
-@keyframes loader-1-inner {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(-360deg);
-        transform: rotate(-360deg);
-    }
-}
-
-.dialog-bg {
-    position: fixed;
-    width: 100%;
-    height: 100%;
     top: 0;
-    left: 0;
-    z-index: 9000;
-    background-color: rgba(0, 0, 0, 0.25);
-}
-
-.dialog {
-    position: relative;
-    margin: 100px auto;
-    width: 500px;
-    background-color: #fff;
-    border: 1px solid #dedfe0;
-    border-radius: 3px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05), 0 0 5px rgba(0, 0, 0, 0.05);
-}
-
-.dialog-title {
-    font-size: 18px;
+    right: 4px;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
     text-align: center;
-    padding: 12px;
-    font-weight: bold;
-    border-bottom: solid 1px #dedfe0;
-}
-
-.dialog-content {
-    padding: 32px 64px;
-}
-
-.ipt-group {
-    overflow: hidden;
-    margin-bottom: 8px;
-}
-
-.ipt-item {
-    display: block;
-    width: 100%;
-    height: 45px;
-    line-height: 45px;
-    border: 1px solid #dedfe0;
-    padding: 0 12px;
-    color: #444;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.ipt-item:focus {
-    border-color: #337ab7;
-}
-
-.response {
-    margin: 0;
-    font-size: 14px;
-    line-height: 20px;
-    padding: 4px 0;
-    color: #ff4e43;
-}
-
-.pwd-btn {
-    outline: none;
-    margin: 0;
-    padding: 0;
-    border: none;
-    width: 384px;
-    height: 54px;
-    color: #fff;
-    font-size: 16px;
+    font-size: 18px;
+    color: #ccc;
     cursor: pointer;
-    margin-top: 8px;
-    background-color: #337ab7;
 }
 
-.pwd-btn:hover, .pwd-btn:active {
+.form-horizontal .form-icon .icon:hover {
+    color: #b0b0b0;
+}
+
+.form-horizontal .form-icon .icon:active {
+    color: #a0a0a0;
+}
+
+.form-horizontal .form-icon .form-control {
+    padding-right: 36px;
+}
+
+/* 表格部分CSS */
+table {
+    background-color: transparent;
+}
+
+caption {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    color: #777;
+    text-align: left;
+}
+
+th {
+    text-align: left;
+}
+
+.table {
+    width: 100%;
+    max-width: 100%;
+    border-collapse: collapse !important;
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 1px solid #ddd;
+}
+
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+    font-size: 14px;
+}
+
+.table > thead > tr > th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #ddd;
+}
+
+.table > caption + thead > tr:first-child > th,
+.table > colgroup + thead > tr:first-child > th,
+.table > thead:first-child > tr:first-child > th,
+.table > caption + thead > tr:first-child > td,
+.table > colgroup + thead > tr:first-child > td,
+.table > thead:first-child > tr:first-child > td {
+    border-top: 0;
+}
+
+.table > tbody + tbody {
+    border-top: 2px solid #ddd;
+}
+
+.table .table {
+    background-color: #fff;
+}
+
+.table-condensed > thead > tr > th,
+.table-condensed > tbody > tr > th,
+.table-condensed > tfoot > tr > th,
+.table-condensed > thead > tr > td,
+.table-condensed > tbody > tr > td,
+.table-condensed > tfoot > tr > td {
+    padding: 5px;
+}
+
+.table-bordered {
+    border: 1px solid #ddd;
+}
+
+.table-bordered > thead > tr > th,
+.table-bordered > tbody > tr > th,
+.table-bordered > tfoot > tr > th,
+.table-bordered > thead > tr > td,
+.table-bordered > tbody > tr > td,
+.table-bordered > tfoot > tr > td {
+    border: 1px solid #ddd;
+}
+
+.table-bordered > thead > tr > th,
+.table-bordered > thead > tr > td {
+    border-bottom-width: 2px;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: #f5f5f5;
+}
+
+.table-responsive {
+    min-height: .01%;
+    overflow-x: auto;
+}
+
+.col-green {
+    background-color: #92d050;
+}
+
+.col-yellow {
+    background-color: #ffc000;
+}
+
+/* 按钮部分 */
+.btn-list {
+    width: 100%;
+    height: 34px;
+    margin-bottom: 16px;
+}
+
+.btn {
+    width: 92px;
+    height: 34px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #337ab7;
+    border-radius: 2px;
+}
+
+.btn:hover {
+    background-color: #286090;
+}
+
+.btn:active {
     background-color: #204d74;
 }
 
-.multi tr td {
-    padding: 2px;
+.btn:disabled {
+    cursor: not-allowed;
+    background-color: #7ba9d0;
+}
+
+.btn-default {
+    width: 92px;
+    height: 34px;
+    color: #000;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 2px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+.btn-default:hover {
+    background-color: #e6e6e6;
+}
+
+.btn-default:active {
+    background-color: #d4d4d4;
+}
+
+.btn-default:disabled {
+    color: #888;
+    cursor: not-allowed;
+    background-color: #fff;
+}
+
+.btn-link {
+    color: #337ab7;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.btn-link:hover {
+    color: #286090;
+}
+
+.btn-link:active {
+    color: #204d74;
+}
+
+.btn-link:disabled {
+    cursor: not-allowed;
+    color: #7ba9d0;
+}
+
+/* Modal部分CSS */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9000;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-box {
+    overflow: hidden;
+    width: 450px;
+    height: auto;
+    margin: 120px auto 0;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 0 5px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+    position: relative;
+    padding: 16px;
+    border-bottom: 1px solid #dedfe0;
+}
+
+.modal-title {
+    height: 16px;
+    line-height: 1;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.modal-dismiss {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.modal-tab {
+    width: 414px;
+    padding-top: 6px;
+    padding-left: 16px;
+    padding-right: 16px;
+    height: 36px;
+}
+
+.modal-tab .tab {
+    display: inline-block;
+    list-style: none;
+    height: 36px;
+    line-height: 36px;
+    color: #888;
+    font-size: 15px;
+    font-weight: 700;
+    margin-right: 12px;
+    cursor: pointer;
+}
+
+.modal-tab .tab:hover {
+    color: #444;
+}
+
+.modal-tab .tab:active {
+    color: #000;
+}
+
+.modal-tab .active {
+    color: #000;
+    border-bottom: 2px solid #dedfe0;
+}
+
+.modal-tab .active:hover {
+    color: #000;
+}
+
+.modal-content {
+    overflow: hidden;
+    padding: 40px;
+}
+
+.modal-content .modal-prompt {
+    font-size: 20px;
+}
+
+.modal-content .modal-line {
+    width: 100%;
+    height: 1px;
+    margin: 20px 0;
+    background-color: #ddd;
+}
+
+.modal-area {
+    width: 100%;
+    max-height: 212px;
+    border: 1px solid #bbb;
+    margin: 0 4px 12px;
+    padding: 6px 12px;
+    color: #888;
+    overflow: scroll;
+    font-size: 12px;
+    line-height: 20px;
+    box-sizing: border-box;
+}
+
+.modal-footer {
+    overflow: hidden;
+    padding: 16px;
+    border-top: 1px solid #dedfe0;
+}
+
+.modal-footer .btn, .modal-footer .btn-default {
+    width: 60px;
+}
+
+.modal-footer .btn:disabled {
+    width: 92px;
+}
+
+.modal-footer .btn:disabled .rotate {
+    margin-right: 4px;
+}
+
+/* Progress部分CSS */
+.progress-modal {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+.progress {
+    margin: auto;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+span.progress-bar {
+    top: 4px;
+    font-size: 21px;
+}
+
+.rotate {
+    -webkit-transition-property: -webkit-transform;
+    -webkit-transition-duration: 1s;
+    -moz-transition-property: -moz-transform;
+    -moz-transition-duration: 1s;
+    -webkit-animation: rotate 2s linear infinite;
+    -moz-animation: rotate 2s linear infinite;
+    -o-animation: rotate 2s linear infinite;
+    animation: rotate 2s linear infinite;
+}
+
+@-webkit-keyframes rotate {
+    from {
+        -webkit-transform: rotate(0deg)
+    }
+    to {
+        -webkit-transform: rotate(360deg)
+    }
+}
+
+@-moz-keyframes rotate {
+    from {
+        -moz-transform: rotate(0deg)
+    }
+    to {
+        -moz-transform: rotate(359deg)
+    }
+}
+
+@-o-keyframes rotate {
+    from {
+        -o-transform: rotate(0deg)
+    }
+    to {
+        -o-transform: rotate(359deg)
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg)
+    }
+    to {
+        transform: rotate(359deg)
+    }
+}
+
+/* Response框 */
+.popover {
+    position: fixed;
+    z-index: 999999;
+    top: 0;
+    right: 16px;
+    width: 270px;
+    height: auto;
+}
+
+.popover-box {
+    width: 100%;
+    height: 54px;
+    line-height: 54px;
+    color: #fff;
+    font-size: 14px;
+    margin: 16px 0;
+    padding: 0 16px;
+    border-radius: 2px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.popover-box .icon {
+    margin-right: 4px;
+}
+
+.success {
+    color: #fff;
+    background-color: #67c23a;
+}
+
+.error {
+    color: #fff;
+    background-color: #f56c6c;
+}
+
+.prompt {
+    color: #fff;
+    background-color: #409eff;
+}
+
+/* Icon部分CSS */
+@font-face {
+    font-family: 'Glyphicons Halflings';
+    src: url('../fonts/glyphicons-halflings-regular.eot');
+    src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+
+.icon {
+    position: relative;
+    top: 2px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings', serif;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-ok:before {
+    content: "\e013";
+}
+
+.icon-remove:before {
+    content: "\e014";
+}
+
+.icon-off:before {
+    content: "\e017";
+}
+
+.icon-cog:before {
+    content: "\e019";
+}
+
+/* Vue相关CSS */
+[v-cloak] {
+    display: none !important;
 }

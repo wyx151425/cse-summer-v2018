@@ -1,372 +1,548 @@
-$(document).ready(function () {
-    $("li.list-item").click(function (event) {
-        let li = $(this);
-        li.attr("disabled", "disabled");
-        event.stopPropagation();
-        let childUl = li.children("ul");
-        if (0 === childUl.length) {
-            $.ajax({
-                url: "api/machines/" + li.children("span:last").text() + "/materials",
-                dataType: "json",
-                type: "get",
-                contentType: "application/json",
-                async: true,
-                success: function (data) {
-                    if (200 === data.statusCode) {
-                        let _html = '<ul class="list">';
-                        $.each(data.data, function (index, value) {
-                            _html += '<li class="list-item">';
-                            if (0 === value.childCount) {
-                                _html += '   <span class="glyphicon glyphicon-cog"></span>';
-                            } else {
-                                _html += '   <span class="glyphicon glyphicon-triangle-right"></span>';
-                            }
-                            _html +=
-                                "   <span id='" + JSON.stringify(value) + "'>" + value.materialNo + '</span>' +
-                                '</li>';
-                        });
-                        _html += '</ul>';
-                        li.append(_html);
-                        li.children("span:first").removeClass("glyphicon glyphicon-triangle-right");
-                        li.children("span:first").addClass("glyphicon glyphicon-triangle-bottom");
-                        li.removeAttr("disabled");
-                    } else {
-                        alert("数据获取失败");
-                        li.removeAttr("disabled");
-                    }
+const main = new Vue({
+    el: "#main",
+    data: {
+        user: {},
+        machine: {
+            name: ""
+        },
+        structureList: []
+    },
+    methods: {
+        setUser: function (user) {
+            this.user = user;
+        },
+        setMachineName: function (machineName) {
+            this.machine.name = machineName;
+        },
+        getMachineName: function () {
+            return this.machine.name;
+        },
+        setStructureList: function (structureList) {
+            this.structureList = structureList;
+        },
+        getStructureList: function () {
+            return this.structureList;
+        },
+        importStructureModalVisible: function () {
+            importStructureModal.visible();
+        },
+        exportStructureModalVisible: function (structure) {
+            exportStructureModal.visible(structure);
+        },
+        appendStructureModalVisible: function () {
+            appendStructureModal.visible();
+        },
+        releaseStructureModalVisible: function (structure, index) {
+            releaseStructureModal.visible(structure, index);
+        },
+        deleteStructureModalVisible: function (structure, index) {
+            deleteStructureModal.visible(structure, index);
+        },
+        updateStructureVersionModalVisible: function (structure, index) {
+            updateStructureVersionModal.visible(structure, index);
+        },
+        releaseStructure: function (index) {
+            this.structureList[index].status = 2;
+        },
+        deleteStructure: function (index) {
+            this.structureList.splice(index, 1);
+        },
+        updateStructureVersion: function (index, version) {
+            this.structureList[index].status = 1;
+            this.structureList[index].version = version;
+        }
+    },
+    mounted: function () {
+        let user = JSON.parse(localStorage.getItem("user"));
+        this.setUser(user);
+        let url = window.location;
+        let machineName = getUrlParam(url, "machineName");
+        this.setMachineName(machineName);
+        axios.get(requestContext + "api/machines/" + machineName + "/structures")
+            .then(function (response) {
+                let statusCode = response.data.statusCode;
+                if (200 === statusCode) {
+                    main.setStructureList(response.data.data);
+                } else {
+                    popover.append("数据获取失败", false);
                 }
+                progress.dismiss();
+            })
+            .catch(function () {
+                popover.append("服务器访问失败", false);
+                progress.dismiss();
             });
-        } else {
-            if (childUl.is(":hidden")) {
-                li.children("span:first").removeClass("glyphicon glyphicon-triangle-right");
-                li.children("span:first").addClass("glyphicon glyphicon-triangle-bottom");
-                childUl.show();
-            } else {
-                li.children("span:first").removeClass("glyphicon glyphicon-triangle-bottom");
-                li.children("span:first").addClass("glyphicon glyphicon-triangle-right");
-                childUl.hide();
-                $("#table").removeClass("hidden");
-                $("#material-info").addClass("hidden");
-            }
-        }
-    });
-
-    $("li").on('click', ".list-item", function (event) {
-        let li = $(this);
-        $("#table").addClass("hidden");
-        $("#material-info").removeClass("hidden");
-        li.attr("disabled", "disabled");
-        event.stopPropagation();
-        let childUl = li.children("ul");
-        let idStr = li.children("span:last").attr("id");
-        let currentNode = JSON.parse(idStr);
-        $("#id0").text(currentNode.id);
-        $("#name0").text(currentNode.name);
-        $("#chinese0").text(currentNode.chinese);
-        $("#structureNo0").text(currentNode.structureNo);
-        $("#materialNo0").text(currentNode.materialNo);
-        $("#material0").text(currentNode.material);
-        $("#drawingNo0").text(currentNode.drawingNo);
-        $("#drawingSize0").text(currentNode.drawingSize);
-        $("#positionNo0").text(currentNode.positionNo);
-        $("#weight0").text(currentNode.weight);
-        $("#absoluteAmount0").text(currentNode.absoluteAmount);
-        $("#sequenceNo0").text(currentNode.sequenceNo);
-        $("#modifyNote0").text(currentNode.modifyNote);
-        $("#childCount0").text(currentNode.childCount);
-        if (0 === childUl.length) {
-            $.ajax({
-                url: "api/materials?parentId=" + currentNode.objectId + "&structureNo=" + currentNode.structureNo,
-                dataType: "json",
-                type: "get",
-                contentType: "application/json",
-                async: true,
-                success: function (data) {
-                    if (200 === data.statusCode) {
-                        if (0 === data.data.length) {
-                            li.children("span:first").removeClass("glyphicon glyphicon-triangle-right");
-                            li.children("span:first").addClass("glyphicon glyphicon-cog");
-                            li.removeAttr("disabled");
-                        } else {
-                            let _html = '<ul class="list">';
-                            $.each(data.data, function (index, value) {
-                                value.parentMaterialNo = currentNode.materialNo;
-                                _html += '<li class="list-item">';
-                                if (0 === value.childCount) {
-                                    _html += '   <span class="glyphicon glyphicon-cog"></span>';
-                                } else {
-                                    _html += '   <span class="glyphicon glyphicon-triangle-right"></span>';
-                                }
-                                _html +=
-                                    "   <span id='" + JSON.stringify(value) + "'>" + value.materialNo + '</span>' +
-                                    '</li>';
-                            });
-                            _html += '</ul>';
-                            li.append(_html);
-                            li.children("span:first").removeClass("glyphicon glyphicon-triangle-right");
-                            li.children("span:first").addClass("glyphicon glyphicon-triangle-bottom");
-                            li.removeAttr("disabled");
-                        }
-                    } else {
-                        alert("数据获取失败");
-                        li.removeAttr("disabled");
-                    }
-                }
-            });
-        } else {
-            if (childUl.is(":hidden")) {
-                li.children("span:first").removeClass("glyphicon glyphicon-triangle-right");
-                li.children("span:first").addClass("glyphicon glyphicon-triangle-bottom");
-                childUl.show();
-            } else {
-                li.children("span:first").removeClass("glyphicon glyphicon-triangle-bottom");
-                li.children("span:first").addClass("glyphicon glyphicon-triangle-right");
-                childUl.hide();
-            }
-        }
-    });
-
-    $("#updateVersion").click(function () {
-        $("#versionChooseForm").css("display", "none");
-        $("#versionChooseConfirm").css("display", "block");
-        $.ajax({
-            url: "api/structures/version",
-            dataType: "json", // 预期服务器返回的数据类型
-            type: "put", // 请求方式PUT
-            contentType: "application/json", // 发送信息至服务器时的内容编码类型
-            // 发送到服务器的数据。
-            data: JSON.stringify({
-                machineName: $("#machineName4").val(),
-                structureNo: $("#structureNo4").val(),
-                materialNo: $("#materialNo4").val(),
-                version: $("#version4").val()
-            }),
-            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
-            // 请求成功后的回调函数。
-            success: function (data) {
-                if (200 === data.statusCode) {
-                    location.reload();
-                } else if (7004 === data.statusCode) {
-                    location.reload();
-                } else {
-                    $("#versionChooseProgress").text("系统错误");
-                }
-            },
-            // 请求出错时调用的函数
-            error: function () {
-                $("#versionChooseProgress").text("系统错误");
-            }
-        });
-    });
-
-    $("#exportStructure").click(function () {
-        let machineName = $("#machineName5").val();
-        let structureNo = $("#structureNo5").val();
-        let materialNo = $("#materialNo5").val();
-        let version = $("#version5").val();
-        let url = "api/files/export/structure?machineName=" + machineName + "&structureNo=" + structureNo + "&materialNo=" + materialNo + "&version=" + version;
-        let link = $('<a href="' + url + '"></a>');
-        $("#closeStrExport").click();
-        link.get(0).click();
-    });
-
-    $("#addDbButton").click(function () {
-        $("#addDbStructureForm").css("display", "block");
-        $("#addDbStructureConfirm").css("display", "none");
-    });
-
-    $("#addDbStructureFile").click(function () {
-        $("#addDbStructureForm").css("display", "none");
-        $("#addDbStructureConfirm").css("display", "block");
-        $.ajax({
-            url: "api/structures/db",
-            dataType: "json", // 预期服务器返回的数据类型
-            type: "post", // 请求方式PUT
-            contentType: "application/json", // 发送信息至服务器时的内容编码类型
-            // 发送到服务器的数据。
-            data: JSON.stringify({
-                machineName: $("#machineName7").val(),
-                structureNo: $("#structureNo7").val(),
-                materialNo: $("#materialNo7").val(),
-                version: $("#version7").val(),
-                amount: $("#amount7").val()
-            }),
-            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
-            // 请求成功后的回调函数。
-            success: function (data) {
-                if (200 === data.statusCode) {
-                    location.reload();
-                } else if (7004 === data.statusCode) {
-                    location.reload();
-                } else if (9001 === data.statusCode) {
-                    $("#addDbStructureProgress").text("该部套已存在于该机器中");
-                } else if (10001 === data.statusCode) {
-                    $("#addDbStructureProgress").text("物料不存在");
-                } else {
-                    $("#addDbStructureProgress").text("系统错误");
-                }
-            },
-            // 请求出错时调用的函数
-            error: function () {
-                $("#addDbStructureProgress").text("系统错误");
-            }
-        });
-    });
-
-    let list;
-
-    $("#search").click(function () {
-        let search = $(this);
-        search.text("查询中...");
-        $.ajax({
-            url: "api/materials/search?materialNo=" + $("#materNo7").val(),
-            dataType: "json", // 预期服务器返回的数据类型
-            type: "get", // 请求方式GET
-            contentType: "application/json", // 发送信息至服务器时的内容编码类型
-            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
-            // 请求成功后的回调函数。
-            success: function (data) {
-                if (200 === data.statusCode) {
-                    search.text("模糊查询");
-                    list = data.data;
-                    let revisionSel = $("#materialNo7");
-                    revisionSel.empty();
-                    let versionSel = $("#version7");
-                    versionSel.empty();
-                    $.each(list, function (index, value) {
-                        revisionSel.append('<option value="' + value.materialNo + '">' + value.materialNo + '</option>');
-                    });
-                    let latestVersion = list[0].latestVersion;
-                    for (let index = 0; index <= latestVersion; index++) {
-                        versionSel.append('<option value="' + index + '">' + index + '</option>');
-                    }
-                } else if (7004 === data.statusCode) {
-                    location.reload();
-                }
-            },
-            // 请求出错时调用的函数
-            error: function () {
-                search.text("模糊查询");
-                alert("数据发送失败");
-            }
-        });
-    });
-
-    $("#materialNo7").change(function () {
-        let revision7 = $(this);
-        let revision = revision7.val();
-        let latestVersion;
-        for (let index = 0; index < list.length; index++) {
-            if (revision == list[index].materialNo) {
-                latestVersion = list[index].latestVersion;
-                break;
-            }
-        }
-        let versionSel = $("#version7");
-        versionSel.empty();
-        for (let index = 0; index <= latestVersion; index++) {
-            versionSel.append('<option value="' + index + '">' + index + '</option>');
-        }
-    });
-
-    $("#publishBtn").click(function () {
-        let publishBtn = $(this);
-        let publishCancel = $("#publishCancel");
-        let structurePublishProgress = $("#structurePublishProgress");
-        publishBtn.text("发布中...");
-        publishBtn.attr("disabled", "disabled");
-        $.ajax({
-            url: "api/structures/" + $("#structureId9").val() + "/confirm",
-            dataType: "json", // 预期服务器返回的数据类型
-            type: "put", // 请求方式GET
-            contentType: "application/json", // 发送信息至服务器时的内容编码类型
-            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
-            // 请求成功后的回调函数。
-            success: function (data) {
-                if (200 === data.statusCode) {
-                    location.reload();
-                } else if (7004 === data.statusCode) {
-                    location.reload();
-                } else {
-                    structurePublishProgress.text("系统错误");
-                    publishBtn.css("display", "none");
-                    publishCancel.text("确定");
-                }
-            },
-            // 请求出错时调用的函数
-            error: function () {
-                structurePublishProgress.text("系统错误");
-                publishBtn.css("display", "none");
-                publishCancel.text("确定");
-            }
-        });
-    });
-
-    $("#deleteStrBtn").click(function () {
-        let deleteStrBtn = $(this);
-        deleteStrBtn.text("正在删除...");
-        $.ajax({
-            url: "api/structures",
-            dataType: "json", // 预期服务器返回的数据类型
-            type: "delete", // 请求方式DELETE
-            contentType: "application/json", // 发送信息至服务器时的内容编码类型
-            // 发送到服务器的数据。
-            data: JSON.stringify({
-                id: structure.id
-            }),
-            async: true, // 默认设置下，所有请求均为异步请求。如果设置为false，则发送同步请求
-            // 请求成功后的回调函数。
-            success: function (data) {
-                if (200 === data.statusCode) {
-                    location.reload();
-                } else if (7004 === data.statusCode) {
-                    location.reload();
-                } else {
-                    alert("系统错误");
-                }
-            },
-            // 请求出错时调用的函数
-            error: function () {
-                alert("数据发送失败");
-            }
-        });
-    });
+    }
 });
 
-let structure = {id: 0, structureNo: ""};
+const importStructureModal = new Vue({
+    el: "#importStructureModal",
+    data: {
+        isVisible: false,
+        isNewStructureFileChosen: false,
+        isImportNewStructureDisabled: false,
+        isImportNewVersionStructureDisabled: false,
+        importNewStructureAction: "导入",
+        importNewVersionStructureAction: "导入",
 
-function deleteStructure(id, structureNo) {
-    structure.id = id;
-    structure.structureNo = structureNo;
-    $("#strNoName").text(structureNo);
-}
+        tabIndex: 1,
 
-function versionList(structureNo, materialNo, latestVersion) {
-    $("#versionChooseForm").css("display", "block");
-    $("#versionChooseConfirm").css("display", "none");
-    $("#structureNo4").attr("value", structureNo);
-    $("#materialNo4").attr("value", materialNo);
-    let select = $("#version4");
-    select.empty();
-    for (let index = 0; index <= latestVersion; index++) {
-        select.append('<option value="' + index + '">' + index + '</option>');
+        machineName: "",
+        newStructureName: "",
+        newStructureAmount: "",
+        newStructureList: [],
+        importResult: [],
+
+        structure: {},
+        structureList: []
+    },
+    methods: {
+        visible: function () {
+            this.machineName = main.getMachineName();
+            this.structure.machineName = main.getMachineName();
+            this.structure.structureNo = "请选择";
+            this.structureList = main.getStructureList();
+            this.isVisible = true;
+        },
+        invisible: function () {
+            this.isVisible = false;
+        },
+        pushResult: function (result) {
+            this.importResult.push(result);
+            if (this.importResult.length === this.newStructureList.length) {
+                importStructureModal.importNewStructureCallback();
+                let content = "";
+                for (let index = 0; index < this.importResult.length; index++) {
+                    content += this.importResult[index].structureNo;
+                    content += " ";
+                    content += this.importResult[index].result;
+                    content += "\r\n";
+                }
+                createAndDownload("部套导入结果.txt", content);
+            }
+            importStructureModal.invisible();
+            window.location.reload();
+        },
+        changeTab: function (index) {
+            this.tabIndex = index;
+        },
+        analyzeFile: function () {
+            let file = document.getElementById("newStructureFile").files[0];
+                if (!file) {
+                this.isNewStructureFileChosen = false;
+            } else {
+                this.isNewStructureFileChosen = true;
+            }
+        },
+        confirmFile: function () {
+            if ("" === this.newStructureName) {
+                popover.append("请填写部套号");
+                return;
+            }
+            if ("" === this.newStructureAmount) {
+                popover.append("请填写总数量");
+                return;
+            }
+
+            let fileElement = document.getElementById("newStructureFile");
+            let structure = {};
+            structure.structureNo = this.newStructureName;
+            structure.amount = this.newStructureAmount;
+            structure.file = fileElement.files[0];
+
+            this.newStructureList.push(structure);
+
+            this.newStructureName = "";
+            this.newStructureAmount = "";
+            fileElement.value = "";
+            this.isNewStructureFileChosen = false;
+        },
+        importNewStructure: function () {
+            this.isImportNewStructureDisabled = true;
+            this.importNewStructureAction = "正在导入";
+            this.importResult = [];
+            for (let index = 0; index < this.newStructureList.length; index++) {
+                let file = this.newStructureList[index];
+                let param = new FormData();  // 创建Form对象
+                // 通过append向Form对象添加数据
+                param.append("machineName", this.machineName);
+                param.append("structureNo", file.structureNo);
+                param.append("amount", file.amount);
+                param.append("file", file.file, file.file.name);
+                let config = {
+                    headers: {"Content-Type": "multipart/form-data"}
+                };  // 添加请求头
+                axios.post(requestContext + "api/structures/import", param, config)
+                    .then(function (response) {
+                        let statusCode = response.data.statusCode;
+                        if (200 === statusCode) {
+                            importStructureModal.pushResult({structureNo: file.structureNo, result: "导入成功"});
+                        } else {
+                            let message = getMessage(statusCode);
+                            importStructureModal.pushResult({structureNo: file.structureNo, result: message});
+                        }
+                    })
+                    .catch(function () {
+                        popover.append("服务器访问失败", false);
+                        importStructureModal.importNewStructureCallback();
+                    });
+            }
+        },
+        importNewStructureCallback: function () {
+            this.newStructureList = [];
+            this.importNewStructureAction = "导入";
+            this.isImportNewStructureDisabled = false;
+        },
+        importNewVersionStructure: function () {
+            if ("请选择" === this.structure.structureNo) {
+                popover.append("请选择部套号", false);
+                return;
+            }
+            let file = document.getElementById("newVersionStructureFile").files[0];
+            if (!file) {
+                popover.append("请选择部套BOM文件", false);
+                return;
+            }
+            this.isImportNewVersionStructureDisabled = true;
+            this.importNewVersionStructureAction = "正在导入";
+            let param = new FormData();  // 创建Form对象
+            // 通过append向Form对象添加数据
+            param.append("structureNo", this.structure.structureNo);
+            param.append("file", file, file.name);
+            let config = {
+                headers: {"Content-Type": "multipart/form-data"}
+            };  // 添加请求头
+            axios.post(requestContext + "api/structures/import/version", param, config)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        popover.append("导入成功", true);
+                        window.location.reload();
+                    } else {
+                        let message = getMessage(statusCode);
+                        popover.append(message, false);
+                    }
+                    importStructureModal.importNewVersionStructureCallback();
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                    importStructureModal.importNewVersionStructureCallback();
+                });
+        },
+        importNewVersionStructureCallback: function () {
+            this.importNewVersionStructureAction = "导入";
+            this.isImportNewVersionStructureDisabled = false;
+        }
     }
-}
+});
 
-function structureExport(structureNo, materialNo, latestVersion) {
-    $("#structureNo5").attr("value", structureNo);
-    $("#materialNo5").attr("value", materialNo);
-    let select = $("#version5");
-    select.empty();
-    for (let index = latestVersion; index >= 0; index--) {
-        select.append('<option value="' + index + '">' + index + '</option>');
+const exportStructureModal = new Vue({
+    el: "#exportStructureModal",
+    data: {
+        isVisible: false,
+        isDisabled: false,
+        action: "导出",
+        structure: {},
+        versionList: []
+    },
+    methods: {
+        visible: function (structure) {
+            this.setStructure(structure);
+            let latestVersion = structure.material.latestVersion;
+            this.versionList = [];
+            for (let version = latestVersion; version >= 0; version--) {
+                this.versionList.push(version);
+            }
+            this.isVisible = true;
+        },
+        invisible: function () {
+            this.isVisible = false;
+        },
+        setStructure: function (structure) {
+            this.structure.machineName = structure.machineName;
+            this.structure.structureNo = structure.structureNo;
+            this.structure.materialNo = structure.materialNo;
+            this.structure.version = structure.material.latestVersion;
+        },
+        exportStructureFile: function () {
+            this.isDisabled = true;
+            this.action = "正在导出";
+            axios({
+                method: "post",
+                url: requestContext + "api/structures/export",
+                data: this.structure,
+                responseType: "blob"
+            }).then(function (response) {
+                download(response);
+                exportStructureModal.exportCallback();
+            }).catch(function (error) {
+                popover.append("服务器访问失败", false);
+                exportStructureModal.exportCallback();
+            });
+        },
+        exportCallback: function () {
+            this.action = "导出";
+            this.isDisabled = false;
+        }
     }
-}
+});
 
-function publishStructure(structId, structNo) {
-    $("#structurePublishProgress").text("您确定要发布" + structNo + "部套吗？");
-    $("#structureId9").attr("value", structId);
+const appendStructureModal = new Vue({
+    el: "#appendStructureModal",
+    data: {
+        isVisible: false,
+        isDisabled: false,
+        action: "添加",
+        structure: {
+            machineName: "",
+            materialNo: "请选择",
+            version: "请选择",
+            structureNo: "",
+            amount: "",
+        },
+        structureStr: "",
+        structureList: [],
+        versionList: []
+    },
+    methods: {
+        visible: function () {
+            this.structure.machineName = main.getMachineName();
+            this.isVisible = true;
+        },
+        invisible: function () {
+            this.isVisible = false;
+        },
+        initStructure: function () {
+            this.structure.materialNo = "请选择";
+            this.structure.version = "请选择";
+            this.structure.structureNo = "";
+            this.structure.amount = "";
+            this.versionList = [];
+        },
+        setStructureList: function (structureList) {
+            this.structureList = structureList;
+        },
+        selectStructure: function () {
+            let latestVersion;
+            for (let index = 0; index < this.structureList.length; index++) {
+                if (this.structureList[index].materialNo === this.structure.materialNo) {
+                    latestVersion = this.structureList[index].latestVersion;
+                    break;
+                }
+            }
+            this.structure.version = "请选择";
+            this.versionList = [];
+            for (let version = 0; version <= latestVersion; version++) {
+                this.versionList.push(version);
+            }
+        },
+        queryStructure: function () {
+            axios.get(requestContext + "api/materials/query?materialNo=" + this.structureStr)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        appendStructureModal.setStructureList(response.data.data);
+                        appendStructureModal.initStructure();
+                    } else {
+                        popover.append("数据获取失败", false);
+                    }
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                });
+        },
+        appendStructure: function () {
+            if ("请选择" === this.structure.materialNo) {
+                popover.append("请选择物料号", false);
+                return;
+            }
+            if ("请选择" === this.structure.version) {
+                popover.append("请选择版本号", false);
+                return;
+            }
+            if ("" === this.structure.structureNo) {
+                popover.append("请填写部套号", false);
+                return;
+            }
+            if ("" === this.structure.amount) {
+                popover.append("请选择总数量", false);
+                return;
+            }
+            this.isDisabled = true;
+            this.action = "正在添加";
+            axios.post(requestContext + "api/structures/append", this.structure)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        popover.append("添加成功", true);
+                        location.reload();
+                    } else {
+                        let message = getMessage(statusCode);
+                        popover.append(message, false);
+                    }
+                    appendStructureModal.appendCallback();
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                    appendStructureModal.appendCallback();
+                });
+        },
+        appendCallback: function () {
+            this.action = "添加";
+            this.isDisabled = false;
+        }
+    }
+});
 
-    $("#publishBtn").removeAttr("disabled").text("发布");
-    $("#publishCancel").text("取消");
-}
+const releaseStructureModal = new Vue({
+    el: "#releaseStructureModal",
+    data: {
+        isVisible: false,
+        isDisabled: false,
+        action: "发布",
+        index: 0,
+        structure: {}
+    },
+    methods: {
+        visible: function (structure, index) {
+            this.index = index;
+            this.structure = structure;
+            this.isVisible = true;
+        },
+        invisible: function () {
+            this.isVisible = false;
+        },
+        releaseStructure: function () {
+            this.isDisabled = true;
+            this.action = "正在发布";
+            axios.put(requestContext + "api/structures/" + this.structure.id + "/release")
+                .then(function (response) {
+                    if (200 === response.data.statusCode) {
+                        main.releaseStructure(releaseStructureModal.index);
+                        releaseStructureModal.invisible();
+                        popover.append("发布成功", true);
+                    } else {
+                        popover.append("发布失败", false);
+                    }
+                    releaseStructureModal.releaseCallback();
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                    releaseStructureModal.releaseCallback();
+                });
+        },
+        releaseCallback: function () {
+            this.action = "发布";
+            this.isDisabled = false;
+        }
+    }
+});
+
+const deleteStructureModal = new Vue({
+    el: "#deleteStructureModal",
+    data: {
+        isVisible: false,
+        isDisabled: false,
+        action: "删除",
+        index: 0,
+        structure: {}
+    },
+    methods: {
+        visible: function (structure, index) {
+            this.index = index;
+            this.structure = structure;
+            this.isVisible = true;
+        },
+        invisible: function () {
+            this.isVisible = false;
+        },
+        deleteStructure: function () {
+            this.isDisabled = true;
+            this.action = "正在删除";
+            axios.delete(requestContext + "api/structures/" + this.structure.id)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        main.deleteStructure(deleteStructureModal.index);
+                        deleteStructureModal.invisible();
+                        popover.append("删除成功", true);
+                    } else {
+                        popover.append("删除失败", false);
+                    }
+                    deleteStructureModal.deleteCallback();
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                    deleteStructureModal.deleteCallback();
+                });
+        },
+        deleteCallback: function () {
+            this.action = "删除";
+            this.isDisabled = false;
+        }
+    }
+});
+
+const updateStructureVersionModal = new Vue({
+    el: "#updateStructureVersionModal",
+    data: {
+        isVisible: false,
+        isDisabled: false,
+        action: "修改",
+        index: 0,
+        version: 0,
+        structure: {},
+        versionList: []
+    },
+    methods: {
+        visible: function (structure, index) {
+            this.index = index;
+            this.setStructure(structure);
+            let latestVersion = structure.material.latestVersion;
+            this.versionList = [];
+            for (let version = 0; version <= latestVersion; version++) {
+                this.versionList.push(version);
+            }
+            this.isVisible = true;
+        },
+        invisible: function () {
+            this.isVisible = false;
+        },
+        setStructure: function (structure) {
+            this.structure.machineName = structure.machineName;
+            this.structure.structureNo = structure.structureNo;
+            this.structure.materialNo = structure.materialNo;
+            this.structure.version = structure.version;
+            this.version = structure.version;
+        },
+        updateStructureVersion: function () {
+            if (this.version === this.structure.version) {
+                popover.append("修改成功", true);
+                this.invisible();
+            } else {
+                this.isDisabled = true;
+                this.action = "正在修改";
+                axios.put(requestContext + "api/structures/version", this.structure)
+                    .then(function (response) {
+                        let statusCode = response.data.statusCode;
+                        if (200 === statusCode) {
+                            popover.append("修改成功", true);
+                            main.updateStructureVersion(updateStructureVersionModal.index, updateStructureVersionModal.structure.version);
+                            updateStructureVersionModal.invisible();
+                        } else {
+                            popover.append("修改失败", false);
+                        }
+                        updateStructureVersionModal.updateCallback();
+                    })
+                    .catch(function () {
+                        popover.append("服务器访问失败", false);
+                        updateStructureVersionModal.updateCallback();
+                    });
+            }
+        },
+        updateCallback: function () {
+            this.action = "修改";
+            this.isDisabled = false;
+        }
+    }
+});
