@@ -1,14 +1,20 @@
 const main = new Vue({
     el: "#main",
     data: {
-        resultList: []
+        resultList: [],
+        user: {}
     },
     methods: {
+        setUser: function (user) {
+            this.user = user;
+        },
         setResultList: function (resultList) {
             this.resultList = resultList;
         }
     },
     mounted: function () {
+        let user = JSON.parse(localStorage.getItem("user"));
+        this.setUser(user);
         let url = window.location;
         let machineName = getUrlParam(url, "machineName");
         axios.get(requestContext + "api/machines/" + machineName + "/results")

@@ -16,6 +16,17 @@ public class Constant {
         public static final String CSE = "CSE";
     }
 
+    public static final class Database {
+        public static final String DEV = "DEV";
+        public static final String UAT = "UAT";
+        public static final String PRO = "PRO";
+        public static final class Name {
+            public static final String DMS_DEV = "dms_dev";
+            public static final String DMS_UAT = "dms_uat";
+            public static final String DMS_PRO = "dms_pro";
+        }
+    }
+
     public static final class Role {
         public static final int COMMON = 1;
         public static final int DESIGNER = 2;

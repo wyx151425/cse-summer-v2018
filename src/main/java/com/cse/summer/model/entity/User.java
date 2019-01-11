@@ -37,6 +37,9 @@ public class User extends SummerEntity {
     @Transient
     private Map<String, Boolean> permissions;
 
+    @Transient
+    private String token;
+
     public User() {
     }
 
@@ -86,5 +89,13 @@ public class User extends SummerEntity {
 
     public void setPermissions(Map<String, Boolean> permissions) {
         this.permissions = permissions;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

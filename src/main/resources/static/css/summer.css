@@ -665,3 +665,31 @@ span.progress-bar {
 [v-cloak] {
     display: none !important;
 }
+
+/* 环境名称和字体颜色 */
+.env-dev {
+    width: 80px;
+    height: 34px;
+    color: #409eff;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 34px;
+}
+
+.env-uat {
+    width: 80px;
+    height: 34px;
+    color: #f56c6c;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 34px;
+}
+
+.env-pro {
+    width: 80px;
+    height: 34px;
+    color: #67c23a;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 34px;
+}

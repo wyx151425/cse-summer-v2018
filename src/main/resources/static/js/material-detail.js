@@ -5,9 +5,13 @@ const main = new Vue({
         machine: {
             name: ""
         },
-        material: null
+        material: null,
+        user: {}
     },
     methods: {
+        setUser: function (user) {
+            this.user = user;
+        },
         show: function () {
             this.isVisible = true;
         },
@@ -61,6 +65,8 @@ const main = new Vue({
         }
     },
     mounted: function () {
+        let user = JSON.parse(localStorage.getItem("user"));
+        this.setUser(user);
         let url = window.location;
         let machineName = getUrlParam(url, "machineName");
         this.setMachineName(machineName);

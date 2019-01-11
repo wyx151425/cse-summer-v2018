@@ -4,8 +4,10 @@ import com.cse.summer.context.exception.SummerException;
 import com.cse.summer.model.dto.Response;
 import com.cse.summer.model.entity.User;
 import com.cse.summer.service.UserService;
+import com.cse.summer.util.Constant;
 import com.cse.summer.util.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -16,15 +18,27 @@ import org.springframework.web.bind.annotation.*;
 public class UserController extends BaseFacade {
 
     private final UserService userService;
+    private final Environment env;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, Environment env) {
         this.userService = userService;
+        this.env = env;
     }
 
     @PostMapping(value = "users/login")
     public Response<User> actionUserLogin(@RequestBody User user) {
         User targetUser = userService.login(user);
+        String dbUrl = env.getProperty("spring.datasource.url");
+        if (dbUrl.contains(Constant.Database.Name.DMS_DEV)) {
+            targetUser.setToken(Constant.Database.DEV);
+        } else if (dbUrl.contains(Constant.Database.Name.DMS_UAT)) {
+            targetUser.setToken(Constant.Database.UAT);
+        } else if (dbUrl.contains(Constant.Database.Name.DMS_PRO)) {
+            targetUser.setToken(Constant.Database.PRO);
+        } else {
+            targetUser.setToken(Constant.Database.DEV);
+        }
         addSessionUser(targetUser);
         return new Response<>(targetUser);
     }

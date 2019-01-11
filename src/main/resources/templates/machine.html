@@ -23,6 +23,9 @@
 <main id="main" class="container">
     <div class="panel">
         <div class="btn-list">
+            <p class="env-dev pull-left" v-if="'DEV' == user.token" v-cloak>开发环境</p>
+            <p class="env-uat pull-left" v-if="'UAT' == user.token" v-cloak>测试环境</p>
+            <p class="env-pro pull-left" v-if="'PRO' == user.token" v-cloak>正式环境</p>
             <a class="pull-right" href="index">
                 <button class="btn">返回</button>
             </a>
