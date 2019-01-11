@@ -61,7 +61,7 @@ function getMessage(statusCode) {
     }
 }
 
-function createAndDownload(filename, content, contentType) {
+function createAndDownload(filename, content, contentType, reload) {
     if (!contentType) {
         contentType = "application/octet-stream";
     }
@@ -70,6 +70,10 @@ function createAndDownload(filename, content, contentType) {
     a.href = window.URL.createObjectURL(blob);
     a.download = filename;
     a.click();
+
+    if (reload) {
+        window.location.reload();
+    }
 }
 
 function download(file) {

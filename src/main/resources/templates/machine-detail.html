@@ -55,62 +55,62 @@
                 <th>值</th>
             </tr>
             </thead>
-            <tbody v-if="material">
+            <tbody>
             <tr>
                 <td>物料号</td>
-                <td>{{material.materialNo}}</td>
+                <td><span v-if="material">{{material.materialNo}}</span></td>
             </tr>
             <tr>
                 <td>图号</td>
-                <td>{{material.drawingNo}}</td>
+                <td><span v-if="material">{{material.drawingNo}}</span></td>
             </tr>
             <tr>
                 <td>图幅</td>
-                <td>{{material.drawingSize}}</td>
+                <td><span v-if="material">{{material.drawingSize}}</span></td>
             </tr>
             <tr>
                 <td>名称（中文）</td>
-                <td>{{material.chinese}}</td>
+                <td><span v-if="material">{{material.chinese}}</span></td>
             </tr>
             <tr>
                 <td>名称（英文）</td>
-                <td>{{material.name}}</td>
+                <td><span v-if="material">{{material.name}}</span></td>
             </tr>
             <tr>
                 <td>专利材料</td>
-                <td>{{material.material}}</td>
+                <td><span v-if="material">{{material.material}}</span></td>
             </tr>
             <tr>
                 <td>国标材料</td>
-                <td>{{material.standard}}</td>
+                <td><span v-if="material">{{material.standard}}</span></td>
             </tr>
             <tr>
                 <td>层数量</td>
-                <td>{{material.absoluteAmount}}</td>
+                <td><span v-if="material">{{material.absoluteAmount}}</span></td>
             </tr>
             <tr>
                 <td>重量</td>
-                <td>{{material.weight}}</td>
+                <td><span v-if="material">{{material.weight}}</span></td>
             </tr>
             <tr>
                 <td>货源</td>
-                <td>{{material.source}}</td>
+                <td><span v-if="material">{{material.source}}</span></td>
             </tr>
             <tr>
                 <td>设计备注</td>
-                <td>{{material.designNote}}</td>
+                <td><span v-if="material">{{material.designNote}}</span></td>
             </tr>
             <tr>
                 <td>喷涂防护</td>
-                <td>{{material.paintProtect}}</td>
+                <td><span v-if="material">{{material.paintProtect}}</span></td>
             </tr>
             <tr>
                 <td>更改</td>
-                <td>{{material.modifyNote}}</td>
+                <td><span v-if="material">{{material.modifyNote}}</span></td>
             </tr>
             <tr>
                 <td>ERP父项</td>
-                <td>{{material.erpParent}}</td>
+                <td><span v-if="material">{{material.erpParent}}</span></td>
             </tr>
             </tbody>
         </table>

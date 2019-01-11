@@ -118,10 +118,9 @@ const importStructureModal = new Vue({
                     content += this.importResult[index].result;
                     content += "\r\n";
                 }
-                createAndDownload("部套导入结果.txt", content);
+                createAndDownload("部套导入结果.txt", content, null,true);
             }
             importStructureModal.invisible();
-            window.location.reload();
         },
         changeTab: function (index) {
             this.tabIndex = index;
