@@ -18,7 +18,7 @@
 .right-panel {
     float: right;
     width: 380px;
-    height: 800px;
+    min-height: 800px;
     padding: 30px;
     margin-bottom: 60px;
     box-sizing: border-box;
@@ -42,26 +42,17 @@ ul.list {
 li.item {
     list-style: none;
     padding-left: 16px;
-    line-height: 22px;
-}
-
-ul li {
-    cursor: pointer;
+    line-height: 24px;
 }
 
 li.item .icon {
     top: 0;
-    font-size: 11px;
-    color: #c0c0c0;
+    font-size: 12px;
+    color: #bbb;
 }
 
 li.item span:nth-child(2).code {
-    font-size: 14px;
-}
-
-li.item span:nth-child(3).icon {
-    top: 1px;
-    font-size: 12px;
+    cursor: pointer;
 }
 
 .icon-triangle-right:before {

@@ -12,10 +12,10 @@ public interface MachineService {
     /**
      * 获得机器数据
      *
-     * @param id 机器ID
+     * @param machineName 机器名称
      * @return 机器数据
      */
-    Machine findMachine(Integer id);
+    Machine findMachine(String machineName);
 
     /**
      * 获取所有机器数据

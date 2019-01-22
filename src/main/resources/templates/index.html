@@ -26,8 +26,12 @@
             <p class="env-dev pull-left" v-if="'DEV' == user.token" v-cloak>开发环境</p>
             <p class="env-uat pull-left" v-if="'UAT' == user.token" v-cloak>测试环境</p>
             <p class="env-pro pull-left" v-if="'PRO' == user.token" v-cloak>正式环境</p>
-            <button class="btn pull-right" @click="deleteAllMachineModalVisible" v-if="user.permissions.DELETE_ALL_MACHINE" v-cloak>清空数据</button>
-            <button class="btn pull-right" @click="importMachineBOMModalVisible" v-if="user.permissions.IMPORT_MACHINE_BOM || user.permissions.IMPORT_NEW_MACHINE_BOM">导入BOM</button>
+            <button class="btn pull-right" @click="deleteAllMachineModalVisible"
+                    v-if="user.permissions.DELETE_ALL_MACHINE" v-cloak>清空数据
+            </button>
+            <button class="btn pull-right" @click="importMachineBOMModalVisible"
+                    v-if="user.permissions.IMPORT_MACHINE_BOM || user.permissions.IMPORT_NEW_MACHINE_BOM">导入BOM
+            </button>
             <button class="btn pull-right" @click="verifyStructureListModalVisible">检查部套</button>
             <button class="btn pull-right" @click="queryRelationModalVisible">查询关联</button>
         </div>
@@ -62,8 +66,8 @@
                             @click="exportMachineBOMModalVisible(machine.name)"
                             v-if="user.permissions.EXPORT_MACHINE_BOM">导出BOM
                     </button>
+                    <a class="btn-link pull-left" :href="'machineDetail?machineName=' + machine.name">查看BOM结构</a>
                     <a class="btn-link pull-left" :href="'importResult?machineName=' + machine.name">导入记录</a>
-                    <a class="btn-link pull-left" :href="'machineDetail?machineName=' + machine.name">结构分析</a>
                 </td>
             </tr>
             </tbody>
@@ -71,7 +75,7 @@
     </div>
 </main>
 <footer class="footer">
-    <span>&copy;2018 中国船舶重工集团柴油机有限公司</span>
+    <span>&copy;2019 中国船舶重工集团柴油机有限公司</span>
 </footer>
 <div id="importMachineBOMModal" class="modal" v-if="isVisible" v-cloak>
     <div class="modal-box">

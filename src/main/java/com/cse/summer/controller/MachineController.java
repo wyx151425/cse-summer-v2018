@@ -6,6 +6,7 @@ import com.cse.summer.model.dto.Excel;
 import com.cse.summer.model.dto.MachineRequest;
 import com.cse.summer.model.entity.Machine;
 import com.cse.summer.model.dto.Response;
+import com.cse.summer.model.entity.Structure;
 import com.cse.summer.model.entity.User;
 import com.cse.summer.service.FileService;
 import com.cse.summer.service.MachineService;
@@ -104,5 +105,11 @@ public class MachineController extends BaseFacade {
     public Response<List<Machine>> actionQueryMachineList() {
         List<Machine> machineList = machineService.findMachineList();
         return new Response<>(machineList);
+    }
+
+    @GetMapping(value = "machines/{machineName}")
+    public Response<Machine> actionQueryMachineAndStructureListByMachineName(@PathVariable(value = "machineName") String machineName) {
+        Machine machine = machineService.findMachine(machineName);
+        return new Response<>(machine);
     }
 }

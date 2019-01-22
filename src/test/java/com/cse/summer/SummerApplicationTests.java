@@ -1,21 +1,13 @@
 package com.cse.summer;
 
-import com.cse.summer.model.entity.Permission;
-import com.cse.summer.model.entity.User;
 import com.cse.summer.repository.NameRepository;
 import com.cse.summer.repository.PermissionRepository;
 import com.cse.summer.repository.UserRepository;
-import com.cse.summer.util.Constant;
-import com.cse.summer.util.Generator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

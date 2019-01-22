@@ -40,8 +40,8 @@ public class MachineServiceImpl implements MachineService {
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
-    public Machine findMachine(Integer id) {
-        Machine machine = machineRepository.getOne(id);
+    public Machine findMachine(String machineName) {
+        Machine machine = machineRepository.findMachineByNameAndStatus(machineName, 1);
 
         List<StructMater> list = structureRepository.findAllStructureMaterial(machine.getName());
         List<Structure> structures = new ArrayList<>();
