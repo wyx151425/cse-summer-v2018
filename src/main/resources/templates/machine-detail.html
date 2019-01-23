@@ -23,7 +23,7 @@
 <main id="main" class="container">
     <div class="left-panel">
         <div class="list-form">
-            <ul class="list" v-cloak>
+            <ul class="list" style="border-left-color: #fff" v-cloak>
                 <li class="item">
                     <span class="icon icon-triangle-bottom"></span>
                     <span class="code" @click="queryStructure(machine.name)">{{machine.name}}</span>
@@ -36,7 +36,7 @@
                             <span class="icon" v-if="0 == structure.material.childCount"
                                   style="margin-right: 12px"></span>
                             <span class="code" @click="queryMaterial(structure.material)"
-                                  style="display: inline-block; width: 855px; background-color: #92d050; border-bottom: 1px solid #aaa">{{structure.structureNo}}&nbsp;&nbsp;{{structure.materialNo}}&nbsp;&nbsp;{{structure.material.chinese}}</span>
+                                  style="display: inline-block; width: 852px; background-color: #92d050; border-bottom: 1px solid #fff">{{structure.structureNo}}&nbsp;&nbsp;{{structure.materialNo}}&nbsp;&nbsp;{{structure.material.chinese}}</span>
                             <ul class="list"
                                 v-if="structure.material.materialList && structure.material.materialList.length > 0">
                                 <material-node v-for="material in structure.material.materialList"
