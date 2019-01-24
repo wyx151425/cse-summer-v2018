@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>设计BOM管理工具</title>
+    <link rel="shortcut icon" th:href="@{/images/cse.png}" type="image/x-icon"/>
+    <link rel="stylesheet" th:href="@{/css/summer.css}"/>
+</head>
+<body>
+<header id="header" class="header">
+    <div class="header-fixed">
+        <div class="container">
+            <img class="logo" th:src="@{/images/cse.png}" alt=""/>
+            <div class="account">
+                <span class="account-name">{{user.name}}</span>
+                <a class="icon icon-off" th:href="@{/logout}"></a>
+            </div>
+        </div>
+    </div>
+</header>
+<main class="container"></main>
+</body>
+</html>
