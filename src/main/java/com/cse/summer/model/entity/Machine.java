@@ -1,8 +1,11 @@
 package com.cse.summer.model.entity;
 
+import com.cse.summer.util.Generator;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -120,5 +123,23 @@ public class Machine extends SummerEntity {
 
     public void setStructureList(List<Structure> structureList) {
         this.structureList = structureList;
+    }
+
+    public static Machine getInstance(String name) {
+        Machine machine = new Machine();
+        machine.setObjectId(Generator.getObjectId());
+        machine.setStatus(1);
+        LocalDateTime dateTime = LocalDateTime.now();
+        machine.setCreateAt(dateTime);
+        machine.setUpdateAt(dateTime);
+        machine.setName(name);
+        machine.setPatent("MAN");
+        machine.setMachineNo("");
+        machine.setType("");
+        machine.setCylinderAmount(0);
+        machine.setShipNo("");
+        machine.setClassificationSociety("");
+        machine.setComplete(false);
+        return machine;
     }
 }

@@ -74,4 +74,31 @@ public class Constant {
         public static final String UPDATE_PERMISSION = "UPDATE_PERMISSION";
         public static final String DELETE_ALL_MACHINE = "DELETE_ALL_MACHINE";
     }
+
+    public static final class MAN {
+        public static final class Node {
+            public static final String DESIGN_SPEC = "designSpec";
+            public static final String MODULE = "module";
+            public static final String PART = "part";
+            public static final String STANDARD_PART = "standardPart";
+            public static final String DOCUMENT = "document";
+            public static final String SUP_DRAWING = "supDrawing";
+            public static final String LIC_DATA = "licData";
+        }
+
+        public static final class Attr {
+            public static final String ID = "id";
+            public static final String NAME = "name";
+            public static final String REVISION = "revision";
+            public static final String MODULE_LIST = "moduleList";
+            public static final String PART_LIST = "partList";
+            public static final String SEQUENCE_NO = "sequenceNo";
+            public static final String QUANTITY = "quantity";
+            public static final String STRUCTURE_NO = "structureNo";
+            public static final String POS_NO = "posNo";
+            public static final String MASS = "mass";
+            public static final String DRAWING_SIZE = "drawingSize";
+            public static final String MATERIAL = "material";
+        }
+    }
 }

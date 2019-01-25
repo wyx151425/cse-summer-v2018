@@ -1,8 +1,11 @@
 package com.cse.summer.model.entity;
 
+import com.cse.summer.util.Generator;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.time.LocalDateTime;
 
 /**
  * @author 王振琦
@@ -366,5 +369,32 @@ public class Material extends SummerEntity {
 
     public void setAuditor(String auditor) {
         this.auditor = auditor;
+    }
+
+    public static Material getInstance() {
+        Material material = new Material();
+        material.setObjectId(Generator.getObjectId());
+        material.setStatus(1);
+        LocalDateTime dateTime = LocalDateTime.now();
+        material.setCreateAt(dateTime);
+        material.setUpdateAt(dateTime);
+        material.setLevel(-1);
+        material.setPositionNo("");
+        material.setMaterialNo("");
+        material.setDrawingNo("");
+        material.setDrawingSize("");
+        material.setName("");
+        material.setChinese("");
+        material.setMaterial("");
+        material.setStandard("");
+        material.setWeight("");
+        material.setSource("");
+        material.setSpareExp("");
+        material.setSpareSrc("");
+        material.setDesignNote("");
+        material.setPaintProtect("");
+        material.setModifyNote("");
+        material.setErpParent("");
+        return material;
     }
 }

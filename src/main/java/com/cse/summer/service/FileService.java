@@ -55,6 +55,7 @@ public interface FileService {
      *
      * @param structure 封装了部套信息的部套对象
      * @param file      部套Excel文件
+     * @return 导入结果
      * @throws InvalidFormatException 格式错误异常
      * @throws IOException            输入输出异常
      */
@@ -71,12 +72,13 @@ public interface FileService {
     void importNewVersionStructureBOM(Structure structure, MultipartFile file) throws InvalidFormatException, IOException;
 
     /**
-     * 导出机器的完整BOM文件
+     * 导出机器的BOM
      *
      * @param machineName 机器名
-     * @return Excel文件
+     * @param type        BOM类型
+     * @return Excel表对象
      */
-    Excel exportMachineBOM(String machineName, Integer status);
+    Excel exportMachineBOM(String machineName, Integer type);
 
     /**
      * 导出机器指定版本的部套的BOM文件

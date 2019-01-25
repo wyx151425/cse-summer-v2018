@@ -1,8 +1,11 @@
 package com.cse.summer.model.entity;
 
+import com.cse.summer.util.Generator;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.time.LocalDateTime;
 
 /**
  * @author 王振琦
@@ -87,6 +90,17 @@ public class Structure extends SummerEntity {
 
     public void setMaterial(Material material) {
         this.material = material;
+    }
+
+    public static Structure getInstance(String machineName) {
+        Structure structure = new Structure();
+        structure.setObjectId(Generator.getObjectId());
+        structure.setStatus(1);
+        LocalDateTime dateTime = LocalDateTime.now();
+        structure.setCreateAt(dateTime);
+        structure.setUpdateAt(dateTime);
+        structure.setMachineName(machineName);
+        return structure;
     }
 
     @Override
