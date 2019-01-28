@@ -319,9 +319,11 @@ public class FileServiceImpl implements FileService {
     private void handleMANMachineBOM(Element element, List<Material> materialList, List<Structure> structureList,
                                      String parentId, String machineName, int parentLevel, String atNo, List<Name> names, List<AnalyzeResult> analyzeResults, List<ImportResult> importResults) {
         if (Constant.MAN.Node.DESIGN_SPEC.equals(element.getName())) {
-            Element revision = element.element("revision");
-            Element modules = revision.element("moduleList");
-            List<Element> moduleList = modules.elements("module");
+            // 解析BOM图纸根节点
+            Element revisionElement = element.element(Constant.MAN.Attr.REVISION);
+            Element moduleListElement = revisionElement.element(Constant.MAN.Attr.MODULE_LIST);
+            // 获取部套节点
+            List<Element> moduleList = moduleListElement.elements(Constant.MAN.Node.MODULE);
             for (Element module : moduleList) {
                 handleMANMachineBOM(module, materialList, structureList, null, machineName, parentLevel, null, names, analyzeResults, importResults);
             }
