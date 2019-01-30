@@ -332,10 +332,10 @@ public class FileServiceImpl implements FileService {
             if (0 == level) {
                 AnalyzeResult analyzeResult;
                 ImportResult importResult;
-                Element revision = element.element("revision");
+                Element revision = element.element(Constant.MAN.Attr.REVISION);
                 String structNoM = revision.element("structureNo").getText();
-                String materNoM = element.attributeValue("id");
-                String revisionM = revision.attributeValue("revision");
+                String materNoM = element.attributeValue(Constant.MAN.Attr.ID);
+                String revisionM = revision.attributeValue(Constant.MAN.Attr.REVISION);
                 String materialNo = materNoM + "." + revisionM;
                 // 判断部套是否存在，不存在的情况下才需要保存该部套信息
                 Structure targetStruct = structureRepository.findExistStructure(machineName, structNoM, materialNo);
@@ -390,9 +390,9 @@ public class FileServiceImpl implements FileService {
                 material.setLatestVersion(0);
                 material.setParentId(parentId);
 
-                String materNoM = element.attributeValue("id");
-                Element revision = element.element("revision");
-                String revisionM = revision.attributeValue("revision");
+                String materNoM = element.attributeValue(Constant.MAN.Attr.ID);
+                Element revision = element.element(Constant.MAN.Attr.REVISION);
+                String revisionM = revision.attributeValue(Constant.MAN.Attr.REVISION);
                 String materialNo = materNoM + "." + revisionM;
 
                 material.setMaterialNo(materialNo);
@@ -403,27 +403,16 @@ public class FileServiceImpl implements FileService {
                 if (null != revision.element("mass")) {
                     material.setWeight(revision.element("mass").getText());
                 }
-                if (null != revision.element("quantity")) {
-                    // 可能存在数量为1.00的形式，所以字符串先转为double再转为int
-                    if ("".equals(revision.element("quantity").getText())) {
-                        material.setAbsoluteAmount(0);
-                    } else {
-                        material.setAbsoluteAmount((int) Double.parseDouble(revision.element("quantity").getText()));
-                    }
-                } else {
-                    material.setAbsoluteAmount(0);
-                }
+                int quantity = handleMANQuantityProperty(revision);
+                material.setAbsoluteAmount(quantity);
                 if (null != revision.element("drawingSize")) {
                     material.setDrawingSize(revision.element("drawingSize").getText());
                 }
                 if (null != revision.element("material")) {
                     material.setMaterial(revision.element("material").getText());
                 }
-                if (null != revision.element("posNo")) {
-                    material.setPositionNo(revision.element("posNo").getText().substring(1));
-                } else {
-                    material.setPositionNo("000");
-                }
+                String posNo = handleMANPosNoProperty(revision);
+                material.setPositionNo(posNo);
                 materialList.add(material);
                 Element parts = revision.element("partList");
                 int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, atNo, names);
@@ -439,9 +428,9 @@ public class FileServiceImpl implements FileService {
             material.setLatestVersion(0);
             material.setParentId(parentId);
 
-            String materNoM = element.attributeValue("id");
-            Element revision = element.element("revision");
-            String revisionM = revision.attributeValue("revision");
+            String materNoM = element.attributeValue(Constant.MAN.Attr.ID);
+            Element revision = element.element(Constant.MAN.Attr.REVISION);
+            String revisionM = revision.attributeValue(Constant.MAN.Attr.REVISION);
             String materialNo = materNoM + "." + revisionM;
 
             material.setMaterialNo(materialNo);
@@ -460,11 +449,8 @@ public class FileServiceImpl implements FileService {
             if (null != revision.element("material")) {
                 material.setMaterial(revision.element("material").getText());
             }
-            if (null != revision.element("posNo")) {
-                material.setPositionNo(revision.element("posNo").getText().substring(1));
-            } else {
-                material.setPositionNo("000");
-            }
+            String posNo = handleMANPosNoProperty(revision);
+            material.setPositionNo(posNo);
             materialList.add(material);
             Element parts = revision.element("partList");
             int childCount = xmlPartsRecursiveTraversal(parts, materialList, material.getObjectId(), machineName, level, atNo, names);
@@ -482,9 +468,9 @@ public class FileServiceImpl implements FileService {
             material.setLatestVersion(0);
             material.setParentId(parentId);
 
-            String materNoM = element.attributeValue("id");
-            Element revision = element.element("revision");
-            String revisionM = revision.attributeValue("revision");
+            String materNoM = element.attributeValue(Constant.MAN.Attr.ID);
+            Element revision = element.element(Constant.MAN.Attr.REVISION);
+            String revisionM = revision.attributeValue(Constant.MAN.Attr.REVISION);
             String materialNo = materNoM + "." + revisionM;
 
             material.setMaterialNo(materialNo);
@@ -503,11 +489,8 @@ public class FileServiceImpl implements FileService {
             if (null != revision.element("material")) {
                 material.setMaterial(revision.element("material").getText());
             }
-            if (null != revision.element("posNo")) {
-                material.setPositionNo(revision.element("posNo").getText().substring(1));
-            } else {
-                material.setPositionNo("000");
-            }
+            String posNo = handleMANPosNoProperty(revision);
+            material.setPositionNo(posNo);
             material.setChildCount(0);
             materialList.add(material);
         }
