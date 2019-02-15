@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author 王振琦
@@ -1029,13 +1031,22 @@ public class FileServiceImpl implements FileService {
             if (0 == material.getLevel()) {
                 material.setAmount(structure.getAmount());
                 material.setAbsoluteAmount(structure.getAmount());
+                materArray[0] = material;
             }
 
-            if (null != material.getAbsoluteAmount() && 0 != material.getAbsoluteAmount()) {
-                materArray[material.getLevel()] = material;
+            if (0 != material.getLevel() && null != material.getAbsoluteAmount()) {
+                if (null == material.getPositionNo() || "".equals(material.getPositionNo())) {
+                    material.setPositionNo("000");
+                }
+                Pattern pattern = Pattern.compile("^[0-9]*$");
+                Matcher matcher = pattern.matcher(material.getPositionNo());
+                if (matcher.matches() && 0 != Integer.parseInt(material.getPositionNo())) {
+                    materArray[material.getLevel()] = material;
+                }
             }
 
             if (0 != material.getLevel()) {
+
                 if (null != materArray[material.getLevel() - 1]) {
                     Material parent = materArray[material.getLevel() - 1];
                     if (null != material.getAbsoluteAmount()) {
