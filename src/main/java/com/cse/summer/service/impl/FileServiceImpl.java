@@ -809,7 +809,7 @@ public class FileServiceImpl implements FileService {
             if (index < 4) {
                 index++;
             } else {
-                if (null == row.getCell(3)) {
+                if (null == row.getCell(3) || "".equals(row.getCell(3).toString().trim())) {
                     break;
                 }
 

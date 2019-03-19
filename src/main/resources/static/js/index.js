@@ -124,8 +124,7 @@ const importMachineBOMModal = new Vue({
                             }
                             content += "\r\n";
                         }
-                        createAndDownload(name + "导入结果.txt", content);
-                        window.location.reload();
+                        createAndDownload(name + "导入结果.txt", content, null, true);
                     } else {
                         let message = getMessage(statusCode);
                         popover.append(message, false);

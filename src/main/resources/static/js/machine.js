@@ -118,7 +118,7 @@ const importStructureModal = new Vue({
                     content += this.importResult[index].result;
                     content += "\r\n";
                 }
-                createAndDownload("部套导入结果.txt", content, null,true);
+                createAndDownload("部套导入结果.txt", content, null, true);
             }
             importStructureModal.invisible();
         },
@@ -127,7 +127,7 @@ const importStructureModal = new Vue({
         },
         analyzeFile: function () {
             let file = document.getElementById("newStructureFile").files[0];
-                if (!file) {
+            if (!file) {
                 this.isNewStructureFileChosen = false;
             } else {
                 this.isNewStructureFileChosen = true;
@@ -157,6 +157,10 @@ const importStructureModal = new Vue({
             this.isNewStructureFileChosen = false;
         },
         importNewStructure: function () {
+            if (this.isNewStructureFileChosen) {
+                popover.append("请确认部套号和总数量", false);
+                return;
+            }
             this.isImportNewStructureDisabled = true;
             this.importNewStructureAction = "正在导入";
             this.importResult = [];
@@ -292,6 +296,8 @@ const appendStructureModal = new Vue({
         isVisible: false,
         isDisabled: false,
         action: "添加",
+        materialNoDef: "请选择",
+        versionDef: "请选择",
         structure: {
             machineName: "",
             materialNo: "请选择",
@@ -312,6 +318,8 @@ const appendStructureModal = new Vue({
             this.isVisible = false;
         },
         initStructure: function () {
+            this.materialNoDef = "请选择";
+            this.versionDef = "请选择";
             this.structure.materialNo = "请选择";
             this.structure.version = "请选择";
             this.structure.structureNo = "";
@@ -336,6 +344,11 @@ const appendStructureModal = new Vue({
             }
         },
         queryStructure: function () {
+            this.materialNoDef = "正在查询";
+            this.versionDef = "正在查询";
+            this.structure.materialNo = "正在查询";
+            this.structure.version = "正在查询";
+            this.structureList = [];
             axios.get(requestContext + "api/materials/query?materialNo=" + this.structureStr)
                 .then(function (response) {
                     let statusCode = response.data.statusCode;

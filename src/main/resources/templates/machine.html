@@ -22,6 +22,7 @@
 <main id="main" class="container">
     <div class="panel">
         <div class="btn-list">
+            <p class="caption pull-left">{{machine.name}}</p>
             <p class="env-dev pull-left" v-if="'DEV' == user.token" v-cloak>开发环境</p>
             <p class="env-uat pull-left" v-if="'UAT' == user.token" v-cloak>测试环境</p>
             <p class="env-pro pull-left" v-if="'PRO' == user.token" v-cloak>正式环境</p>
@@ -210,7 +211,7 @@
             <div class="form-group">
                 <label class="form-label">物料号</label>
                 <select class="form-control" v-model="structure.materialNo" @change="selectStructure">
-                    <option selected disabled>请选择</option>
+                    <option selected disabled>{{materialNoDef}}</option>
                     <option v-for="structure in structureList" :value="structure.materialNo">
                         {{structure.materialNo}}
                     </option>
@@ -219,7 +220,7 @@
             <div class="form-group">
                 <label class="form-label">版本号</label>
                 <select class="form-control" v-model="structure.version">
-                    <option selected disabled>请选择</option>
+                    <option selected disabled>{{versionDef}}</option>
                     <option v-for="version in versionList" :value="version">{{version}}</option>
                 </select>
             </div>

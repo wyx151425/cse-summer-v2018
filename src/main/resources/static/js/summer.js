@@ -69,9 +69,11 @@ function createAndDownload(filename, content, contentType, reload) {
     let blob = new Blob([content], {"type": contentType});
     a.href = window.URL.createObjectURL(blob);
     a.download = filename;
+    document.body.appendChild(a);
     a.click();
 
-    if (reload) {
+    let userAgent = navigator.userAgent;
+    if (reload && userAgent.indexOf("Edge") < 0) {
         window.location.reload();
     }
 }

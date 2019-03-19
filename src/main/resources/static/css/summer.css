@@ -214,6 +214,15 @@ caption {
     text-align: left;
 }
 
+.caption {
+    height: 32px;
+    line-height: 32px;
+    padding: 0 16px;
+    font-size: 16px;
+    font-weight: 700;
+    border: 1px solid #ddd;
+}
+
 th {
     text-align: left;
 }
