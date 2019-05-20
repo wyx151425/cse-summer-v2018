@@ -1,6 +1,7 @@
 package com.cse.summer.service.impl;
 
 import com.cse.summer.context.exception.SummerException;
+import com.cse.summer.model.dto.AnalyzeResult;
 import com.cse.summer.model.entity.Machine;
 import com.cse.summer.model.dto.StructMater;
 import com.cse.summer.model.entity.Structure;
@@ -12,11 +13,15 @@ import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.MachineService;
 import com.cse.summer.util.Constant;
 import com.cse.summer.util.StatusCode;
+import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,6 +44,11 @@ public class MachineServiceImpl implements MachineService {
     }
 
     @Override
+    public List<AnalyzeResult> importMANMachineBOM(String machineName, MultipartFile file) throws DocumentException, IOException {
+        return null;
+    }
+
+    @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public Machine findMachine(String machineName) {
         Machine machine = machineRepository.findMachineByNameAndStatus(machineName, 1);
@@ -58,7 +68,9 @@ public class MachineServiceImpl implements MachineService {
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List<Machine> findMachineList() {
-        return machineRepository.findAllByStatus(1);
+        List<Machine> machines = machineRepository.findAllByStatus(1);
+        Collections.reverse(machines);
+        return machines;
     }
 
     @Override

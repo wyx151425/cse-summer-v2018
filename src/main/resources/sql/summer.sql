@@ -74,3 +74,18 @@ CREATE TABLE `cse_user` (
   `password` varchar(32),
   PRIMARY KEY (`id`)
 )  ENGINE=INNODB DEFAULT CHARSET=UTF8;
+
+CREATE TABLE `cse_structure_note` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `object_id` CHAR(32),
+  `status` INT(1),
+  `create_at` DATETIME,
+  `update_at` DATETIME,
+  `organizer` VARCHAR(16),
+  `proofreader` varchar(16),
+  `auditor` varchar(16),
+  `materialNo` varchar(32),
+  `version` INT(2),
+  `note` varchar(255),
+  PRIMARY KEY (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=UTF8;

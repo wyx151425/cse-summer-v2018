@@ -25,7 +25,7 @@ public class StructureNote extends SummerEntity {
     /**
      * 部套的版本号
      */
-    private String version;
+    private Integer version;
     /**
      * 部套版本备注信息
      */
@@ -63,11 +63,11 @@ public class StructureNote extends SummerEntity {
         this.materialNo = materialNo;
     }
 
-    public String getVersion() {
+    public Integer getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(Integer version) {
         this.version = version;
     }
 

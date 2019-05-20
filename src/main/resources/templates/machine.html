@@ -115,6 +115,12 @@
                 <div class="modal-area" v-if="newStructureList.length > 0">
                     <p v-for="newStructure in newStructureList">{{newStructure.structureNo}}%{{newStructure.amount}}%{{newStructure.file.name}}</p>
                 </div>
+                <p class="modal-note">
+                    功能说明：<br/>
+                    1. 该功能用于导入库中不存在的部套，使用该功能时请务必确认库中不包含即将导入的部套。<br/>
+                    2. 若对部套进行了技术版本升级，如升级后部套的0层物料号为PAAD282215BR1，而库中部套的0层物料号为PAAD282215B，
+                    则系统认为PAAD282215B与PAAD282215BR1是不同的部套，且PAAD282215BR1部套在库中不存在。该情况下，请使用该功能进行导入。
+                </p>
             </div>
             <div class="modal-footer">
                 <button class="btn-default pull-right" @click="invisible" :disabled="isImportNewStructureDisabled">取消
@@ -143,6 +149,12 @@
                     <label class="form-label">文件</label>
                     <input id="newVersionStructureFile" class="form-control" type="file"/>
                 </div>
+                <p class="modal-note">
+                    功能说明：<br/>
+                    1. 该功能用于为库中已有的部套升级版本，若使用该功能更新部套版本，请务必确认库中已有该部套。<br/>
+                    2. 若对部套进行了技术版本升级，如升级后部套的0层物料号为PAAD282215BR1，而库中部套的0层物料号为PAAD282215B，
+                    则系统会认为PAAD282215B与PAAD282215BR1是不同的部套。对于这种情况，请使用导入“新部套”的方式进行导入。
+                </p>
             </div>
             <div class="modal-footer">
                 <button class="btn-default pull-right" @click="invisible"

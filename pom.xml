@@ -85,7 +85,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
-        <finalName>dmsuat</finalName>
+        <finalName>dmsdev</finalName>
     </build>
 
 </project>

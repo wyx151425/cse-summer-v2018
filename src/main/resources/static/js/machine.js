@@ -105,6 +105,7 @@ const importStructureModal = new Vue({
             this.isVisible = true;
         },
         invisible: function () {
+            this.isNewStructureFileChosen = false;
             this.isVisible = false;
         },
         pushResult: function (result) {
@@ -157,6 +158,10 @@ const importStructureModal = new Vue({
             this.isNewStructureFileChosen = false;
         },
         importNewStructure: function () {
+            if (0 === this.newStructureList.length && !this.isNewStructureFileChosen) {
+                popover.append("请选择部套文件", false);
+                return;
+            }
             if (this.isNewStructureFileChosen) {
                 popover.append("请确认部套号和总数量", false);
                 return;

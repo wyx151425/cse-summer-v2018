@@ -1,14 +1,30 @@
 package com.cse.summer.service;
 
+import com.cse.summer.model.dto.AnalyzeResult;
 import com.cse.summer.model.entity.Machine;
 import com.cse.summer.model.entity.User;
+import org.dom4j.DocumentException;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
  * @author 王振琦
  */
 public interface MachineService {
+
+    /**
+     * 导入并解析MAN XML文件
+     *
+     * @param machineName 机器名
+     * @param file        MAN XML文件
+     * @return 导入结果标识
+     * @throws DocumentException 文档处理异常
+     * @throws IOException       输入输出异常
+     */
+    List<AnalyzeResult> importMANMachineBOM(String machineName, MultipartFile file) throws DocumentException, IOException;
+
     /**
      * 获得机器数据
      *

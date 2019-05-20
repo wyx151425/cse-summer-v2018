@@ -1038,16 +1038,14 @@ public class FileServiceImpl implements FileService {
                 if (null == material.getPositionNo() || "".equals(material.getPositionNo())) {
                     material.setPositionNo("000");
                 }
-                Pattern pattern = Pattern.compile("^[0-9]*$");
-                Matcher matcher = pattern.matcher(material.getPositionNo());
-                if (matcher.matches() && 0 != Integer.parseInt(material.getPositionNo())) {
+                if (!"000".equals(material.getPositionNo())) {
                     materArray[material.getLevel()] = material;
                 }
             }
 
             if (0 != material.getLevel()) {
 
-                if (null != materArray[material.getLevel() - 1]) {
+                if (null != materArray[material.getLevel() - 1] && !"000".equals(material.getPositionNo())) {
                     Material parent = materArray[material.getLevel() - 1];
                     if (null != material.getAbsoluteAmount()) {
                         material.setAmount(parent.getAmount() * material.getAbsoluteAmount());

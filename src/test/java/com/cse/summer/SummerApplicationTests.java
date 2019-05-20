@@ -31,8 +31,11 @@ public class SummerApplicationTests {
 //        User user = new User();
 //        user.setObjectId(Generator.getObjectId());
 //        user.setStatus(1);
-//        user.setUsername("sumengmeng");
-//        user.setName("苏猛猛");
+//        LocalDateTime dateTime = LocalDateTime.now().withNano(0);
+//        user.setCreateAt(dateTime);
+//        user.setUpdateAt(dateTime);
+//        user.setUsername("wangshidong");
+//        user.setName("王世栋");
 //        user.setPassword("123456");
 //        user.setRole(2);
 //        userRepository.save(user);
