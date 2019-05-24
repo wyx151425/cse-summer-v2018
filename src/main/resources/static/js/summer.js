@@ -50,6 +50,8 @@ function getMessage(statusCode) {
             return "部套号解析错误";
         case 3004:
             return "机器已包含该部套";
+        case 3005:
+            return "请填写部套版本描述信息";
         case 4001:
             return "存在物料号为空的物料";
         case 4002:

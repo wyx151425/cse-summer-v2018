@@ -2,7 +2,9 @@ package com.cse.summer.controller;
 
 import com.cse.summer.model.entity.Material;
 import com.cse.summer.model.dto.Response;
+import com.cse.summer.model.entity.StructureNote;
 import com.cse.summer.service.MaterialService;
+import com.cse.summer.service.StructureNoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,10 +19,12 @@ import java.util.Map;
 public class MaterialController {
 
     private final MaterialService materialService;
+    private final StructureNoteService structureNoteService;
 
     @Autowired
-    public MaterialController(MaterialService materialService) {
+    public MaterialController(MaterialService materialService, StructureNoteService structureNoteService) {
         this.materialService = materialService;
+        this.structureNoteService = structureNoteService;
     }
 
     @GetMapping(value = "materials")
@@ -41,5 +45,14 @@ public class MaterialController {
     public Response<List<Map<String, String>>> actionSearchStructureMaterialVersion(@RequestParam("materialNo") String materialNo) {
         List<Map<String, String>> list = materialService.findMaterialNoAndLatestVersion(materialNo);
         return new Response<>(list);
+    }
+
+    @GetMapping(value = "structureNotes")
+    public Response<StructureNote> actionGetStructureNoteByMaterialNoAndVersion(
+            @RequestParam(value = "materialNo") String materialNo,
+            @RequestParam(value = "version") Integer version
+    ) {
+        StructureNote structureNote = structureNoteService.findStructureNoteByMaterialNoAndVersion(materialNo, version);
+        return new Response<>(structureNote);
     }
 }

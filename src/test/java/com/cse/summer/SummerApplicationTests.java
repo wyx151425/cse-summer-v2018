@@ -1,8 +1,6 @@
 package com.cse.summer;
 
-import com.cse.summer.repository.NameRepository;
-import com.cse.summer.repository.PermissionRepository;
-import com.cse.summer.repository.UserRepository;
+import com.cse.summer.repository.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +20,34 @@ public class SummerApplicationTests {
     @Autowired
     private PermissionRepository permissionRepository;
 
+    @Autowired
+    private MaterialRepository materialRepository;
+
+    @Autowired
+    private StructureNoteRepository structureNoteRepository;
+
     @Test
     public void contextLoads() {
     }
+
+//    @Test
+//    public void test() {
+//        List<Material> materialList = materialRepository.test();
+//        List<StructureNote> structureNotes = new ArrayList<>();
+//        for (Material material : materialList) {
+//            StructureNote structureNote = StructureNote.newInstance();
+//            structureNote.setStructureId(material.getObjectId());
+//            structureNote.setMaterialNo(material.getMaterialNo());
+//            structureNote.setVersion(material.getVersion());
+//            structureNote.setNote("");
+//            structureNote.setOrganizer(material.getOrganizer());
+//            structureNote.setProofreader(material.getProofreader());
+//            structureNote.setAuditor(material.getAuditor());
+//            structureNotes.add(structureNote);
+//        }
+//        structureNoteRepository.saveAll(structureNotes);
+//    }
+
 
 //    @Test
 //    public void addUser() {
@@ -34,10 +57,11 @@ public class SummerApplicationTests {
 //        LocalDateTime dateTime = LocalDateTime.now().withNano(0);
 //        user.setCreateAt(dateTime);
 //        user.setUpdateAt(dateTime);
-//        user.setUsername("wangshidong");
-//        user.setName("王世栋");
+//        user.setUsername("ZhaohaihuiA");
+//        user.setName("赵海辉A");
 //        user.setPassword("123456");
-//        user.setRole(2);
+//        user.setRoles("ROLE_CHIEF_DESIGNER");
+//        user.setRole(3);
 //        userRepository.save(user);
 //    }
 //

@@ -250,6 +250,7 @@ const exportStructureModal = new Vue({
         isVisible: false,
         isDisabled: false,
         action: "导出",
+        note: "",
         structure: {},
         versionList: []
     },
@@ -262,6 +263,7 @@ const exportStructureModal = new Vue({
                 this.versionList.push(version);
             }
             this.isVisible = true;
+            this.queryStructureNote();
         },
         invisible: function () {
             this.isVisible = false;
@@ -291,6 +293,16 @@ const exportStructureModal = new Vue({
         exportCallback: function () {
             this.action = "导出";
             this.isDisabled = false;
+        },
+        queryStructureNote: function () {
+            let url = requestContext + "api/structureNotes?materialNo=" + this.structure.materialNo + "&version=" + this.structure.version;
+            axios.get(url).then(function (response) {
+                if (200 === response.data.statusCode && null != response.data.data) {
+                    exportStructureModal.note = response.data.data.note;
+                } else {
+                    exportStructureModal.note = "";
+                }
+            });
         }
     }
 });
@@ -506,6 +518,7 @@ const updateStructureVersionModal = new Vue({
         isVisible: false,
         isDisabled: false,
         action: "修改",
+        note: "",
         index: 0,
         version: 0,
         structure: {},
@@ -521,6 +534,7 @@ const updateStructureVersionModal = new Vue({
                 this.versionList.push(version);
             }
             this.isVisible = true;
+            this.queryStructureNote();
         },
         invisible: function () {
             this.isVisible = false;
@@ -560,6 +574,16 @@ const updateStructureVersionModal = new Vue({
         updateCallback: function () {
             this.action = "修改";
             this.isDisabled = false;
+        },
+        queryStructureNote: function () {
+            let url = requestContext + "api/structureNotes?materialNo=" + this.structure.materialNo + "&version=" + this.structure.version;
+            axios.get(url).then(function (response) {
+                if (200 === response.data.statusCode && null != response.data.data) {
+                    updateStructureVersionModal.note = response.data.data.note;
+                } else {
+                    updateStructureVersionModal.note = "";
+                }
+            });
         }
     }
 });

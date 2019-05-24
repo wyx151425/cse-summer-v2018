@@ -32,8 +32,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author 王振琦
@@ -46,14 +44,23 @@ public class FileServiceImpl implements FileService {
     private final MachineRepository machineRepository;
     private final MaterialRepository materialRepository;
     private final StructureRepository structureRepository;
+    private final StructureNoteRepository structureNoteRepository;
     private final NameRepository nameRepository;
     private final ResultRepository resultRepository;
 
     @Autowired
-    public FileServiceImpl(MachineRepository machineRepository, MaterialRepository materialRepository, StructureRepository structureRepository, NameRepository nameRepository, ResultRepository resultRepository) {
+    public FileServiceImpl(
+            MachineRepository machineRepository,
+            MaterialRepository materialRepository,
+            StructureRepository structureRepository,
+            StructureNoteRepository structureNoteRepository,
+            NameRepository nameRepository,
+            ResultRepository resultRepository
+    ) {
         this.machineRepository = machineRepository;
         this.materialRepository = materialRepository;
         this.structureRepository = structureRepository;
+        this.structureNoteRepository = structureNoteRepository;
         this.nameRepository = nameRepository;
         this.resultRepository = resultRepository;
     }
@@ -762,6 +769,12 @@ public class FileServiceImpl implements FileService {
         if (null != topRow.getCell(10)) {
             auditor = topRow.getCell(10).toString();
         }
+        Row secondRow = workbook.getSheetAt(0).getRow(1);
+        String note = "";
+        if (null == secondRow.getCell(3) || "".equals(secondRow.getCell(3).toString().trim())) {
+            throw new SummerException(StatusCode.STRUCTURE_VERSION_NOTE_DEFECT);
+        }
+        note = secondRow.getCell(3).toString();
 
         Row structRow = workbook.getSheetAt(0).getRow(4);
         String materNo = structRow.getCell(3).toString();
@@ -786,11 +799,6 @@ public class FileServiceImpl implements FileService {
             }
 
             newStructureAnalysis(sheet, structure, materialList, 0);
-
-            materialList.get(0).setOrganizer(organizer);
-            materialList.get(0).setProofreader(proofreader);
-            materialList.get(0).setAuditor(auditor);
-
             materialRepository.saveAll(materialList);
 
             structure.setObjectId(Generator.getObjectId());
@@ -798,6 +806,17 @@ public class FileServiceImpl implements FileService {
             structure.setMaterialNo(materNo);
             structure.setVersion(0);
             structureRepository.save(structure);
+
+            StructureNote structureNote = StructureNote.newInstance();
+            structureNote.setStructureId(materialList.get(0).getObjectId());
+            structureNote.setOrganizer(organizer);
+            structureNote.setProofreader(proofreader);
+            structureNote.setAuditor(auditor);
+            structureNote.setMaterialNo(materialList.get(0).getMaterialNo());
+            structureNote.setVersion(materialList.get(0).getVersion());
+            structureNote.setNote(note);
+            structureNoteRepository.save(structureNote);
+
             return new AnalyzeResult(structure.getStructureNo(), true);
         }
     }
@@ -939,6 +958,13 @@ public class FileServiceImpl implements FileService {
             auditor = topRow.getCell(10).toString();
         }
 
+        Row secondRow = workbook.getSheetAt(0).getRow(1);
+        String note = "";
+        if (null == secondRow.getCell(3) || "".equals(secondRow.getCell(3).toString().trim())) {
+            throw new SummerException(StatusCode.STRUCTURE_VERSION_NOTE_DEFECT);
+        }
+        note = secondRow.getCell(3).toString();
+
         Row structRow = workbook.getSheetAt(0).getRow(4);
         String materNo = structRow.getCell(3).toString();
         if ("".equals(materNo)) {
@@ -975,11 +1001,17 @@ public class FileServiceImpl implements FileService {
 
         newStructureAnalysis(sheet, structure, materialList, latestVersion);
 
-        materialList.get(0).setOrganizer(organizer);
-        materialList.get(0).setProofreader(proofreader);
-        materialList.get(0).setAuditor(auditor);
-
         materialRepository.saveAll(materialList);
+
+        StructureNote structureNote = StructureNote.newInstance();
+        structureNote.setStructureId(materialList.get(0).getObjectId());
+        structureNote.setOrganizer(organizer);
+        structureNote.setProofreader(proofreader);
+        structureNote.setAuditor(auditor);
+        structureNote.setMaterialNo(materialList.get(0).getMaterialNo());
+        structureNote.setVersion(materialList.get(0).getVersion());
+        structureNote.setNote(note);
+        structureNoteRepository.save(structureNote);
     }
 
     @Override
@@ -1188,25 +1220,37 @@ public class FileServiceImpl implements FileService {
         XSSFRow row0;
 
         if (0 == type) {
+            StructureNote structureNote = structureNoteRepository.findOneByStructureId(materialList.get(0).getObjectId());
             row0 = sheet.createRow(i);
             XSSFCell cell0 = row0.createCell(0);
             cell0.setCellValue("文件号");
             cell0.setCellStyle(blue);
             XSSFCell cell1 = row0.createCell(1);
-            cell1.setCellValue(materialList.get(0).getMaterialNo());
+            if (null == structureNote) {
+                cell1.setCellValue(materialList.get(0).getMaterialNo());
+            } else {
+                cell1.setCellValue(structureNote.getMaterialNo());
+            }
             cell1.setCellStyle(border);
             XSSFCell cell2 = row0.createCell(2);
             cell2.setCellValue("版本");
             cell2.setCellStyle(blue);
             XSSFCell cell3 = row0.createCell(3);
-            cell3.setCellValue("" + materialList.get(0).getVersion());
+            if (null == structureNote) {
+                cell3.setCellValue("" + materialList.get(0).getVersion());
+            } else {
+                cell3.setCellValue("" + structureNote.getVersion());
+            }
+            if (null == structureNote) {
+                structureNote = StructureNote.newInstance();
+            }
             cell3.setCellStyle(border);
             XSSFCell cell4 = row0.createCell(4);
             cell4.setCellValue("编制");
             cell4.setCellStyle(blue);
             XSSFCell cell5 = row0.createCell(5);
-            if (null != materialList.get(0).getOrganizer()) {
-                cell5.setCellValue(materialList.get(0).getOrganizer());
+            if (null != structureNote.getOrganizer()) {
+                cell5.setCellValue(structureNote.getOrganizer());
             } else {
                 cell5.setCellValue("");
             }
@@ -1215,8 +1259,8 @@ public class FileServiceImpl implements FileService {
             cell6.setCellValue("校对");
             cell6.setCellStyle(blue);
             XSSFCell cell7 = row0.createCell(8);
-            if (null != materialList.get(0).getProofreader()) {
-                cell7.setCellValue(materialList.get(0).getProofreader());
+            if (null != structureNote.getProofreader()) {
+                cell7.setCellValue(structureNote.getProofreader());
             } else {
                 cell7.setCellValue("");
             }
@@ -1225,8 +1269,8 @@ public class FileServiceImpl implements FileService {
             cell8.setCellValue("审核");
             cell8.setCellStyle(blue);
             XSSFCell cell9 = row0.createCell(10);
-            if (null != materialList.get(0).getAuditor()) {
-                cell9.setCellValue(materialList.get(0).getAuditor());
+            if (null != structureNote.getAuditor()) {
+                cell9.setCellValue(structureNote.getAuditor());
             } else {
                 cell9.setCellValue("");
             }
@@ -1239,8 +1283,17 @@ public class FileServiceImpl implements FileService {
             cell10.setCellStyle(blue);
             XSSFCell cell11 = row1.createCell(1);
             cell11.setCellStyle(border);
-            row1.createCell(2);
-            row1.createCell(3);
+
+            XSSFCell cell12 = row1.createCell(2);
+            cell12.setCellValue("描述");
+            cell12.setCellStyle(blue);
+            XSSFCell cell13 = row1.createCell(3);
+            if (null != structureNote.getNote()) {
+                cell13.setCellValue(structureNote.getNote());
+            } else {
+                cell13.setCellValue("");
+            }
+            cell13.setCellStyle(border);
             i++;
 
             cell4.setCellStyle(centerBlue);

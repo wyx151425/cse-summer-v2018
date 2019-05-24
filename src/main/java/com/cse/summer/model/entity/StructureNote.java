@@ -1,11 +1,24 @@
 package com.cse.summer.model.entity;
 
+import com.cse.summer.util.Constant;
+import com.cse.summer.util.Generator;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.time.LocalDateTime;
+
 /**
  * 部套备注类
  *
  * @author WangZhenqi
  */
+@Entity
+@Table(name = "cse_structure_note")
 public class StructureNote extends SummerEntity {
+    /**
+     * 所属部套的ID
+     */
+    private String structureId;
     /**
      * 编制者
      */
@@ -30,6 +43,14 @@ public class StructureNote extends SummerEntity {
      * 部套版本备注信息
      */
     private String note;
+
+    public String getStructureId() {
+        return structureId;
+    }
+
+    public void setStructureId(String structureId) {
+        this.structureId = structureId;
+    }
 
     public String getOrganizer() {
         return organizer;
@@ -77,5 +98,15 @@ public class StructureNote extends SummerEntity {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public static StructureNote newInstance() {
+        StructureNote structureNote = new StructureNote();
+        structureNote.setObjectId(Generator.getObjectId());
+        structureNote.setStatus(Constant.Status.ENABLE);
+        LocalDateTime dateTime = LocalDateTime.now().withNano(0);
+        structureNote.setCreateAt(dateTime);
+        structureNote.setUpdateAt(dateTime);
+        return structureNote;
     }
 }

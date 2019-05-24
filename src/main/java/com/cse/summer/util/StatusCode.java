@@ -23,6 +23,7 @@ public class StatusCode {
     public static final int STRUCTURE_HAS_EXISTED = 3002;
     public static final int STRUCTURE_NO_ANALYZE_ERROR = 3003;
     public static final int STRUCTURE_HAS_RELATED = 3004;
+    public static final int STRUCTURE_VERSION_NOTE_DEFECT = 3005;
     public static final int MATERIAL_NO_BLANK = 4001;
     public static final int MATERIAL_LEVEL_BLANK = 4002;
     public static final int MATERIAL_AMOUNT_IS_NULL = 4003;
