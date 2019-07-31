@@ -79,6 +79,6 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
      * @param materialNo 物料号
      * @return 关联的部套数据集合
      */
-    @Query("select s from Structure s where s.materialNo = :materialNo and s.status > 0")
+    @Query("select s from Structure s where s.materialNo like :materialNo and s.status > 0")
     List<Structure> findAllByMaterialNo(@Param("materialNo") String materialNo);
 }

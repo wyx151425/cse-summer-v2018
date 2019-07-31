@@ -90,7 +90,7 @@ public class StructureServiceImpl implements StructureService {
     @Override
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<Structure> findRelationStructure(String materialNo) {
-        return structureRepository.findAllByMaterialNo(materialNo);
+        return structureRepository.findAllByMaterialNo(materialNo + "%");
     }
 
     @Override

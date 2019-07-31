@@ -43,3 +43,22 @@
 .icon-search:before {
     content: "\e003";
 }
+
+.query-relation-modal {
+
+}
+
+.query-relation-modal .modal-box {
+    width: 500px;
+}
+
+.query-relation-modal .form-control {
+    width: 365px;
+}
+
+.query-relation-modal .table-wrap {
+    width: 100%;
+    max-height: 500px;
+    overflow: scroll;
+    margin-top: 40px;
+}

@@ -194,7 +194,7 @@
         </div>
     </div>
 </div>
-<div id="queryRelationModal" class="modal" v-if="isVisible" v-cloak>
+<div id="queryRelationModal" class="modal query-relation-modal" v-if="isVisible" v-cloak>
     <div class="modal-box">
         <div class="modal-header">
             <p class="modal-title">查询关联关系</p>
@@ -206,22 +206,26 @@
                 <input class="form-control" type="text" v-model="materialNo" placeholder="请填写完整物料号"/>
                 <span class="icon icon-search" @click="queryRelation"></span>
             </div>
-            <table class="table table-bordered table-hover" v-if="structureList.length > 0" style="margin-top: 40px">
-                <thead>
-                <tr>
-                    <th>机器名</th>
-                    <th>版本</th>
-                    <th>总数量</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="structure in structureList">
-                    <td>{{structure.machineName}}</td>
-                    <td>{{structure.version}}</td>
-                    <td>{{structure.amount}}</td>
-                </tr>
-                </tbody>
-            </table>
+            <div class="table-wrap" v-if="structureList.length > 0">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>物料号</th>
+                        <th>机器名</th>
+                        <th>版本</th>
+                        <th>总数量</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="structure in structureList">
+                        <td>{{structure.materialNo}}</td>
+                        <td>{{structure.machineName}}</td>
+                        <td>{{structure.version}}</td>
+                        <td>{{structure.amount}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
