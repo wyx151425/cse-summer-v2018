@@ -18,10 +18,6 @@ import java.time.LocalDateTime;
 @Table(name = "cse_structure_feature")
 public class StructureFeature extends SummerEntity {
     /**
-     * 所属部套的ID
-     */
-    private Integer materialId;
-    /**
      * 所属部套
      */
     @OneToOne(targetEntity = Material.class)
@@ -50,7 +46,7 @@ public class StructureFeature extends SummerEntity {
     /**
      * 冰区加强
      */
-    private Boolean iceAreaEnhance;
+    private String iceAreaEnhance;
     /**
      * 增压器布置
      */
@@ -82,11 +78,11 @@ public class StructureFeature extends SummerEntity {
     /**
      * 自由端二阶力矩补偿器
      */
-    private Boolean freeEndSecCompensator;
+    private String freeEndSecCompensator;
     /**
      * 输出端二阶力矩补偿器
      */
-    private Boolean outEndSecCompensator;
+    private String outEndSecCompensator;
     /**
      * 阀杆材料
      */
@@ -110,11 +106,11 @@ public class StructureFeature extends SummerEntity {
     /**
      * EGB
      */
-    private Boolean egb;
+    private String egb;
     /**
      * 扭振减震器
      */
-    private Boolean torsionalShockAbsorber;
+    private String torsionalShockAbsorber;
     /**
      * 扫气箱灭火方式
      */
@@ -138,7 +134,7 @@ public class StructureFeature extends SummerEntity {
     /**
      * PTO
      */
-    private Boolean pto;
+    private String pto;
     /**
      * 起吊方式
      */
@@ -146,15 +142,15 @@ public class StructureFeature extends SummerEntity {
     /**
      * SCR
      */
-    private Boolean scr;
+    private String scr;
     /**
      * 排气阀研磨机
      */
-    private Boolean exhaustValveGrinder;
+    private String exhaustValveGrinder;
     /**
      * 排气阀工作台
      */
-    private Boolean exhaustValveWorkbench;
+    private String exhaustValveWorkbench;
 
     public StructureFeature() {
     }
@@ -174,15 +170,41 @@ public class StructureFeature extends SummerEntity {
         LocalDateTime dateTime = LocalDateTime.now().withNano(0);
         structureFeature.setCreateAt(dateTime);
         structureFeature.setUpdateAt(dateTime);
+
+        structureFeature.setEfficiency("");
+        structureFeature.setRotateRate("");
+        structureFeature.setDebugMode("");
+        structureFeature.setCylinderAmount("");
+        structureFeature.setSuperchargerType("");
+        structureFeature.setIceAreaEnhance("");
+        structureFeature.setSuperchargerArrange("");
+        structureFeature.setExhaustBackPressure("");
+        structureFeature.setHostRotateDirection("");
+        structureFeature.setPropellerType("");
+        structureFeature.setHostElectric("");
+        structureFeature.setFireExtMedium("");
+        structureFeature.setTopSupportMode("");
+        structureFeature.setFreeEndSecCompensator("");
+        structureFeature.setOutEndSecCompensator("");
+        structureFeature.setStemMaterial("");
+        structureFeature.setFivaValveManufacturer("");
+        structureFeature.setElectricStartPumpManufacturer("");
+        structureFeature.setHydraulicPumpManufacturer("");
+        structureFeature.setCylinderFuelInjectorManufacturer("");
+        structureFeature.setEgb("");
+        structureFeature.setTorsionalShockAbsorber("");
+        structureFeature.setScavengerFireExtMethod("");
+        structureFeature.setHydraulicOilFilterManufacturer("");
+        structureFeature.setRemoteControlManufacturer("");
+        structureFeature.setPmiSensorManufacturer("");
+        structureFeature.setOilMistDetectorManufacturer("");
+        structureFeature.setPto("");
+        structureFeature.setLiftMethod("");
+        structureFeature.setScr("");
+        structureFeature.setExhaustValveGrinder("");
+        structureFeature.setExhaustValveWorkbench("");
+
         return structureFeature;
-    }
-
-    public Integer getMaterialId() {
-        return materialId;
-    }
-
-    public void setMaterialId(Integer materialId) {
-        this.materialId = materialId;
     }
 
     public Material getMaterial() {
@@ -233,11 +255,11 @@ public class StructureFeature extends SummerEntity {
         this.superchargerType = superchargerType;
     }
 
-    public Boolean getIceAreaEnhance() {
+    public String getIceAreaEnhance() {
         return iceAreaEnhance;
     }
 
-    public void setIceAreaEnhance(Boolean iceAreaEnhance) {
+    public void setIceAreaEnhance(String iceAreaEnhance) {
         this.iceAreaEnhance = iceAreaEnhance;
     }
 
@@ -297,19 +319,19 @@ public class StructureFeature extends SummerEntity {
         this.topSupportMode = topSupportMode;
     }
 
-    public Boolean getFreeEndSecCompensator() {
+    public String getFreeEndSecCompensator() {
         return freeEndSecCompensator;
     }
 
-    public void setFreeEndSecCompensator(Boolean freeEndSecCompensator) {
+    public void setFreeEndSecCompensator(String freeEndSecCompensator) {
         this.freeEndSecCompensator = freeEndSecCompensator;
     }
 
-    public Boolean getOutEndSecCompensator() {
+    public String getOutEndSecCompensator() {
         return outEndSecCompensator;
     }
 
-    public void setOutEndSecCompensator(Boolean outEndSecCompensator) {
+    public void setOutEndSecCompensator(String outEndSecCompensator) {
         this.outEndSecCompensator = outEndSecCompensator;
     }
 
@@ -353,19 +375,19 @@ public class StructureFeature extends SummerEntity {
         this.cylinderFuelInjectorManufacturer = cylinderFuelInjectorManufacturer;
     }
 
-    public Boolean getEgb() {
+    public String getEgb() {
         return egb;
     }
 
-    public void setEgb(Boolean egb) {
+    public void setEgb(String egb) {
         this.egb = egb;
     }
 
-    public Boolean getTorsionalShockAbsorber() {
+    public String getTorsionalShockAbsorber() {
         return torsionalShockAbsorber;
     }
 
-    public void setTorsionalShockAbsorber(Boolean torsionalShockAbsorber) {
+    public void setTorsionalShockAbsorber(String torsionalShockAbsorber) {
         this.torsionalShockAbsorber = torsionalShockAbsorber;
     }
 
@@ -409,11 +431,11 @@ public class StructureFeature extends SummerEntity {
         this.oilMistDetectorManufacturer = oilMistDetectorManufacturer;
     }
 
-    public Boolean getPto() {
+    public String getPto() {
         return pto;
     }
 
-    public void setPto(Boolean pto) {
+    public void setPto(String pto) {
         this.pto = pto;
     }
 
@@ -425,27 +447,27 @@ public class StructureFeature extends SummerEntity {
         this.liftMethod = liftMethod;
     }
 
-    public Boolean getScr() {
+    public String getScr() {
         return scr;
     }
 
-    public void setScr(Boolean scr) {
+    public void setScr(String scr) {
         this.scr = scr;
     }
 
-    public Boolean getExhaustValveGrinder() {
+    public String getExhaustValveGrinder() {
         return exhaustValveGrinder;
     }
 
-    public void setExhaustValveGrinder(Boolean exhaustValveGrinder) {
+    public void setExhaustValveGrinder(String exhaustValveGrinder) {
         this.exhaustValveGrinder = exhaustValveGrinder;
     }
 
-    public Boolean getExhaustValveWorkbench() {
+    public String getExhaustValveWorkbench() {
         return exhaustValveWorkbench;
     }
 
-    public void setExhaustValveWorkbench(Boolean exhaustValveWorkbench) {
+    public void setExhaustValveWorkbench(String exhaustValveWorkbench) {
         this.exhaustValveWorkbench = exhaustValveWorkbench;
     }
 }

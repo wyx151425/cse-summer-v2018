@@ -29,6 +29,12 @@ const main = new Vue({
         verifyStructureListModalVisible: function () {
             verifyStructureListModal.visible();
         },
+        editStructureFeatureModalVisible: function () {
+            editStructureFeatureModal.visible();
+        },
+        matchStructureModalVisible: function () {
+            matchStructureModal.visible();
+        },
         checkMachineDetail: function (machine) {
             if (machine.complete) {
                 let link = document.createElement("a");
@@ -421,4 +427,196 @@ const deleteAllMachineModal = new Vue({
             this.isDisabled = false;
         }
     }
+});
+
+const editStructureFeatureModal = new Vue({
+    el: "#editStructureFeatureModal",
+    data: {
+        isVisible: false,
+        isDisabled: false,
+        action: "保存",
+        structureStr: "",
+        materialNo: "",
+        version: "",
+        structureList: [],
+        versionList: [],
+        structureFeature: {}
+        //     efficiency: "",
+        //     rotateRate: "",
+        //     debugMode: "",
+        //     cylinderAmount: "",
+        //     superchargerType: "",
+        //     iceAreaEnhance: "",
+        //     superchargerArrange: "",
+        //     exhaustBackPressure: "",
+        //     hostRotateDirection: "",
+        //     propellerType: "",
+        //     hostElectric: "",
+        //     fireExtMedium: "",
+        //     topSupportMode: "",
+        //     freeEndSecCompensator: "",
+        //     outEndSecCompensator: "",
+        //     stemMaterial: "",
+        //     fivaValveManufacturer: "",
+        //     electricStartPumpManufacturer: "",
+        //     hydraulicPumpManufacturer: "",
+        //     cylinderFuelInjectorManufacturer: "",
+        //     egb: "",
+        //     torsionalShockAbsorber: "",
+        //     scavengerFireExtMethod: "",
+        //     hydraulicOilFilterManufacturer: "",
+        //     remoteControlManufacturer: "",
+        //     pmiSensorManufacturer: "",
+        //     oilMistDetectorManufacturer: "",
+        //     pto: "",
+        //     liftMethod: "",
+        //     scr: "",
+        //     exhaustValveGrinder: "",
+        //     exhaustValveWorkbench: ""
+        // }
+    },
+    methods: {
+        visible: function () {
+            this.isVisible = true;
+        },
+        invisible: function () {
+            this.isVisible = false;
+            this.structureStr = "";
+            this.materialNo = "";
+            this.version = "";
+            this.structureList = [];
+            this.versionList = [];
+            this.structureFeature = {};
+        },
+        setStructureList: function (structureList) {
+            this.structureList = structureList;
+        },
+        setStructureFeature: function (structureFeature) {
+            this.structureFeature = structureFeature;
+        },
+        selectStructure: function () {
+            let latestVersion;
+            for (let index = 0; index < this.structureList.length; index++) {
+                if (this.structureList[index].materialNo === this.materialNo) {
+                    latestVersion = this.structureList[index].latestVersion;
+                    break;
+                }
+            }
+            this.versionList = [];
+            for (let version = 0; version <= latestVersion; version++) {
+                this.versionList.push(version);
+            }
+        },
+        queryStructure: function () {
+            this.materialNo = "";
+            this.version = "";
+            this.structureList = [];
+            axios.get(requestContext + "api/materials/query?materialNo=" + this.structureStr)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        editStructureFeatureModal.setStructureList(response.data.data);
+                    } else {
+                        popover.append("数据获取失败", false);
+                    }
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                });
+        },
+        queryStructureFeature: function () {
+            if ("" === this.materialNo) {
+                popover.append("请选择部套的物料号", false);
+                return;
+            }
+            if ("" === this.version) {
+                popover.append("请选择部套版本", false);
+                return;
+            }
+            axios.get(requestContext + "api/structureFeatures/materialNo?materialNo=" + this.materialNo
+                + "&version=" + this.version)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        editStructureFeatureModal.setStructureFeature(response.data.data);
+                    } else {
+                        popover.append("数据获取失败", false);
+                    }
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                });
+        },
+        saveStructureFeature: function () {
+            if (null === this.structureFeature.id) {
+                axios.post(requestContext + "api/structureFeatures", this.structureFeature)
+                    .then(function (response) {
+                        let statusCode = response.data.statusCode;
+                        if (200 === statusCode) {
+                            popover.append("保存成功", true);
+                        } else {
+                            popover.append("保存失败", false);
+                        }
+                    })
+                    .catch(function () {
+                        popover.append("服务器访问失败", false);
+                    });
+            } else {
+                axios.put(requestContext + "api/structureFeatures", this.structureFeature)
+                    .then(function (response) {
+                        let statusCode = response.data.statusCode;
+                        if (200 === statusCode) {
+                            popover.append("保存成功", true);
+                        } else {
+                            popover.append("保存失败", false);
+                        }
+                    })
+                    .catch(function () {
+                        popover.append("服务器访问失败", false);
+                    });
+            }
+        }
+    }
+});
+
+const matchStructureModal = new Vue({
+    el: "#matchStructureModal",
+    data: {
+        isVisible: false,
+        isDisabled: false,
+        action: "保存",
+        structureFeature: {},
+        structureFeatureList: []
+    },
+    methods: {
+        visible: function () {
+            this.isVisible = true;
+        },
+        invisible: function () {
+            this.isVisible = false;
+        },
+        setStructureFeatureList: function (structureFeatureList) {
+            this.structureFeatureList = structureFeatureList;
+        },
+        queryStructure: function () {
+            this.structureFeatureList = [];
+            axios.post(requestContext + "api/structureFeatures/property", this.structureFeature)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        matchStructureModal.setStructureFeatureList(response.data.data);
+                    } else {
+                        popover.append("查询失败", false);
+                    }
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                })
+        },
+        resetStructureFeature: function () {
+            this.structureFeature = {};
+            this.structureFeatureList = [];
+        }
+    }
+
 });

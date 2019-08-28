@@ -12,7 +12,7 @@ public class SummerApplicationTests {
     @Test
     public void contextLoads() {
     }
-//
+
 //    @Test
 //    public void addUser() {
 //        User user = new User();
@@ -22,10 +22,18 @@ public class SummerApplicationTests {
 //        LocalDateTime dateTime = LocalDateTime.now().withNano(0);
 //        user.setCreateAt(dateTime);
 //        user.setUpdateAt(dateTime);
-//        user.setName("田文博");
-//        user.setUsername("tianwenbo");
+//        user.setName("秦芬芬");
+//        user.setUsername("qinfenfen");
 //        user.setPassword("123456");
-//        user.setRoles("ROLE_CHIEF_DESIGNER");
+//        user.setRoles("ROLE_PROJECT_MANAGER");
 //        userRepository.save(user);
+//    }
+
+//    @Test
+//    public void addPermission() {
+//        Permission permission = Permission.newInstance();
+//        permission.setRole(Constant.Roles.ADMIN);
+//        permission.setCode(Constant.Permissions.EDIT_STRUCTURE_FEATURE);
+//        permissionRepository.save(permission);
 //    }
 }

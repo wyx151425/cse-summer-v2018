@@ -1,5 +1,6 @@
 package com.cse.summer.service;
 
+import com.cse.summer.model.entity.Material;
 import com.cse.summer.model.entity.StructureFeature;
 
 import java.util.List;
@@ -25,12 +26,21 @@ public interface StructureFeatureService {
     void updateStructureFeature(StructureFeature structureFeature);
 
     /**
-     * 根据部套ID查询部套特征
+     * 根据部套查询部套特征
      *
-     * @param materialId 部套特征
+     * @param material 部套
      * @return 部套特征信息
      */
-    StructureFeature findStructureFeatureByMaterialId(Integer materialId);
+    StructureFeature findStructureFeatureByMaterial(Material material);
+
+    /**
+     * 根据部套号和版本查询部套特征
+     *
+     * @param materialNo 部套物料号
+     * @param version    部套版本
+     * @return 部套特征信息
+     */
+    StructureFeature findStructureFeatureByMaterialNoAndVersion(String materialNo, Integer version);
 
     /**
      * 根据特征属性查询相关的部套及特征信息

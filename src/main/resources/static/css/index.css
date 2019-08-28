@@ -62,3 +62,161 @@
     overflow: scroll;
     margin-top: 40px;
 }
+
+.property-modal {
+ }
+
+.property-modal .modal-box {
+    width: 860px;
+}
+
+.property-modal .modal-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    height: 500px;
+}
+
+.property-master {
+    width: 320px;
+    height: 100%;
+    padding-left: 20px;
+    border: 1px solid #dedfe0;
+}
+
+.property-detail {
+    padding-left: 12px;
+    width: 385px;
+    height: 100%;
+    border: 1px solid #dedfe0;
+    overflow-y: scroll;
+}
+
+.property-master .form-group {
+    width: 300px;
+}
+
+.property-master .form-label {
+    display: block;
+    width: 300px;
+}
+
+.property-master .form-control {
+    display: block;
+    width: 300px;
+}
+
+.property-detail .form-group {
+    width: 350px;
+}
+
+.property-detail .form-label {
+    display: block;
+    width: 350px;
+}
+
+.property-detail .form-control {
+    display: block;
+    width: 350px;
+}
+
+.property-group {
+    position: relative;
+}
+
+.property-group .form-control {
+    padding-right: 36px;
+}
+
+.property-group .form-action {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    color: #CCCCCC;
+    font-size: 20px;
+    line-height: 36px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.property-group .form-action:hover {
+    color: #B0B0B0;
+}
+
+.property-group .form-action:active {
+    color: #A0A0A0;
+}
+
+.match-modal {
+}
+
+.match-modal .modal-box {
+    width: 875px;
+}
+
+.match-modal .modal-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    height: 540px;
+}
+
+.match-master {
+    width: 370px;
+    height: 100%;
+    padding-left: 12px;
+    border: 1px solid #dedfe0;
+    overflow-y: scroll;
+}
+
+.match-detail {
+    width: 370px;
+    height: 100%;
+    border: 1px solid #dedfe0;
+    overflow-y: scroll;
+}
+
+.match-master .form-group {
+    width: 320px;
+}
+
+.match-master .form-label {
+    display: block;
+    width: 320px;
+}
+
+.match-master .form-control {
+    display: block;
+    width: 320px;
+}
+
+.match-group {
+    position: relative;
+}
+
+.match-group .form-control {
+    padding-right: 36px;
+}
+
+.match-group .form-action {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    color: #CCCCCC;
+    font-size: 20px;
+    line-height: 36px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.match-group .form-action:hover {
+    color: #B0B0B0;
+}
+
+.match-group .form-action:active {
+    color: #A0A0A0;
+}
