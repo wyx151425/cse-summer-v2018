@@ -1,0 +1,20 @@
+.property-modal .modal-box {
+    width: 855px;
+}
+
+.property-modal .form-group {
+    width: 360px;
+}
+
+.property-modal .form-label {
+    display: block;
+}
+
+.property-modal .form-control {
+    display: block;
+}
+
+.property-modal .modal-content {
+    height: 500px;
+    overflow-y: scroll;
+}

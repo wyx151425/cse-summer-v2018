@@ -81,4 +81,13 @@ public interface StructureRepository extends JpaRepository<Structure, Integer> {
      */
     @Query("select s from Structure s where s.materialNo like :materialNo and s.status > 0")
     List<Structure> findAllByMaterialNo(@Param("materialNo") String materialNo);
+
+    /**
+     * 根据物料号和版本查询部套
+     *
+     * @param materialNo 物料号
+     * @param version    版本
+     * @return 查询到的部套
+     */
+    List<Structure> findAllByMaterialNoAndVersion(String materialNo, Integer version);
 }

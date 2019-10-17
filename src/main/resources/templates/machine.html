@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <title>设计BOM管理工具</title>
     <link rel="shortcut icon" th:href="@{/images/cse.png}" type="image/x-icon"/>
-    <link rel="stylesheet" th:href="@{/css/summer.css}">
-    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <link rel="stylesheet" th:href="@{/css/summer.css}"/>
+    <link rel="stylesheet" th:href="@{/css/index.css}"/>
+    <link rel="stylesheet" th:href="@{/css/machine.css}"/>
 </head>
 <body>
 <header id="header" class="header">
@@ -65,13 +66,20 @@
                 <td class="col-yellow" v-if="1 == structure.status && !user.permissions.RELEASE_STRUCTURE">设计</td>
                 <td class="col-green" v-if="2 == structure.status">发布</td>
                 <td>
-                    <button class="btn-link pull-left" @click="exportStructureModalVisible(structure)">导出</button>
+                    <button class="btn-link pull-left" @click="exportStructureModalVisible(structure)" type="button">
+                        导出
+                    </button>
                     <button class="btn-link pull-left" @click="deleteStructureModalVisible(structure, index)"
-                            v-if="user.permissions.DELETE_STRUCTURE" v-cloak>删除
+                            v-if="user.permissions.DELETE_STRUCTURE" type="button" v-cloak>删除
                     </button>
                     <button class="btn-link pull-left" @click="updateStructureVersionModalVisible(structure, index)"
                             v-if="0 != structure.material.latestVersion && user.permissions.UPDATE_STRUCTURE_VERSION"
+                            type="button"
                             v-cloak>修改版本
+                    </button>
+                    <button class="btn-link pull-left" @click="editStructureFeatureModalVisible(structure.material)"
+                            v-if="user.permissions.EDIT_STRUCTURE_FEATURE" type="button" v-cloak>
+                        属性
                     </button>
                 </td>
             </tr>
@@ -113,7 +121,8 @@
                     </div>
                 </div>
                 <div class="modal-area" v-if="newStructureList.length > 0">
-                    <p v-for="newStructure in newStructureList">{{newStructure.structureNo}}%{{newStructure.amount}}%{{newStructure.file.name}}</p>
+                    <p v-for="newStructure in newStructureList">
+                        {{newStructure.structureNo}}%{{newStructure.amount}}%{{newStructure.file.name}}</p>
                 </div>
                 <p class="modal-note">
                     功能说明：<br/>
@@ -328,6 +337,290 @@
                 <span class="icon icon-cog rotate" v-if="isDisabled"></span>{{action}}
             </button>
         </div>
+    </div>
+</div>
+<div id="editStructureFeatureModal" class="modal property-modal" v-if="isVisible" v-cloak>
+    <div class="modal-box">
+        <header class="modal-header">
+            <p class="modal-title">编辑部套特征属性</p>
+            <div class="modal-dismiss"><span class="icon icon-remove" @click="invisible"></span></div>
+        </header>
+        <section class="modal-content">
+            <div class="form-group">
+                <label class="form-label">物料号</label>
+                <p class="form-control">{{material.materialNo}}</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">版本号</label>
+                <p class="form-control">{{material.version}}</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">通用部套</label>
+                <select class="form-control" v-model="structureFeature.universal">
+                    <option value=""></option>
+                    <option value="通用">通用</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">待定部套</label>
+                <select class="form-control" v-model="structureFeature.pending">
+                    <option value=""></option>
+                    <option value="待定">待定</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">功率</label>
+                <input class="form-control" type="text" v-model="structureFeature.efficiency"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label">转速</label>
+                <input class="form-control" type="text" v-model="structureFeature.rotateRate"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label">调试方式</label>
+                <select class="form-control" v-model="structureFeature.debugMode">
+                    <option value=""></option>
+                    <option value="高负荷模式">高负荷模式</option>
+                    <option value="部分负荷模式">部分负荷模式</option>
+                    <option value="低负荷模式">低负荷模式</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">缸数</label>
+                <select class="form-control" v-model="structureFeature.cylinderAmount">
+                    <option value=""></option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">增压器型号</label>
+                <input class="form-control" type="text" v-model="structureFeature.superchargerType"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label">冰区加强</label>
+                <select class="form-control" v-model="structureFeature.iceAreaEnhance">
+                    <option value=""></option>
+                    <option value="是">是</option>
+                    <option value="否">否</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">增压器布置</label>
+                <select class="form-control" v-model="structureFeature.superchargerArrange">
+                    <option value=""></option>
+                    <option value="输出端">输出端</option>
+                    <option value="排气端">排气端</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">排气背压</label>
+                <select class="form-control" v-model="structureFeature.exhaustBackPressure">
+                    <option value=""></option>
+                    <option value="30mbar">30mbar</option>
+                    <option value="60mbar">60mbar</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">主机转向</label>
+                <select class="form-control" v-model="structureFeature.hostRotateDirection">
+                    <option value=""></option>
+                    <option value="顺时针">顺时针</option>
+                    <option value="逆时针">逆时针</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">螺旋桨</label>
+                <select class="form-control" v-model="structureFeature.propellerType">
+                    <option value=""></option>
+                    <option value="定距桨">定距桨</option>
+                    <option value="可调桨">可调桨</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">主机电制</label>
+                <select class="form-control" v-model="structureFeature.hostElectric">
+                    <option value=""></option>
+                    <option value="440V*60Hz">440V*60Hz</option>
+                    <option value="380V*50Hz">380V*50Hz</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">加热介质</label>
+                <input class="form-control" type="text" v-model="structureFeature.heatingMedium"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label">顶部支撑</label>
+                <select class="form-control" v-model="structureFeature.topSupportMode">
+                    <option value=""></option>
+                    <option value="机械式">机械式</option>
+                    <option value="液压式">液压式</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">自由端二阶力矩补偿器</label>
+                <select class="form-control" v-model="structureFeature.freeEndSecCompensator">
+                    <option value=""></option>
+                    <option value="带">带</option>
+                    <option value="不带">不带</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">输出端二阶力矩补偿器</label>
+                <select class="form-control" v-model="structureFeature.outEndSecCompensator">
+                    <option value=""></option>
+                    <option value="带">带</option>
+                    <option value="不带">不带</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">阀杆材料</label>
+                <select class="form-control" v-model="structureFeature.stemMaterial">
+                    <option value=""></option>
+                    <option value="Dura Spindle">Dura Spindle</option>
+                    <option value="Nimonic">Nimonic</option>
+                    <option value="DS760">DS760</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">FIVA阀厂家</label>
+                <select class="form-control" v-model="structureFeature.fivaValveManufacturer">
+                    <option value=""></option>
+                    <option value="Parker">Parker</option>
+                    <option value="Moog">Moog</option>
+                    <option value="Nabtesco">Nabtesco</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">电动液压起动泵厂家</label>
+                <select class="form-control" v-model="structureFeature.electricStartPumpManufacturer">
+                    <option value=""></option>
+                    <option value="Parker">Parker</option>
+                    <option value="Roxroth">Roxroth</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">液压泵厂家</label>
+                <select class="form-control" v-model="structureFeature.hydraulicPumpManufacturer">
+                    <option value=""></option>
+                    <option value="Parker">Parker</option>
+                    <option value="Roxroth">Roxroth</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">气缸注油器厂家</label>
+                <select class="form-control" v-model="structureFeature.cylinderFuelInjectorManufacturer">
+                    <option value=""></option>
+                    <option value="Alpha">Alpha</option>
+                    <option value="Hans Jensen">Hans Jensen</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">EGB</label>
+                <select class="form-control" v-model="structureFeature.egb">
+                    <option value=""></option>
+                    <option value="带">带</option>
+                    <option value="不带">不带</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">扭振减震器</label>
+                <select class="form-control" v-model="structureFeature.torsionalShockAbsorber">
+                    <option value=""></option>
+                    <option value="带">带</option>
+                    <option value="不带">不带</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">扫气箱灭火方式</label>
+                <select class="form-control" v-model="structureFeature.scavengerFireExtMethod">
+                    <option value=""></option>
+                    <option value="蒸汽">蒸汽</option>
+                    <option value="CO2">CO2</option>
+                    <option value="水雾">水雾</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">液压油滤器厂家</label>
+                <select class="form-control" v-model="structureFeature.hydraulicOilFilterManufacturer">
+                    <option value=""></option>
+                    <option value="Boll & kirch">Boll & kirch</option>
+                    <option value="Kanagawa">Kanagawa</option>
+                    <option value="Hydac">Hydac</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">遥控厂家</label>
+                <input class="form-control" type="text" v-model="structureFeature.remoteControlManufacturer"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label">PMI传感器厂家</label>
+                <input class="form-control" type="text" v-model="structureFeature.pmiSensorManufacturer"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label">油雾探测器厂家</label>
+                <input class="form-control" type="text" v-model="structureFeature.oilMistDetectorManufacturer"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label">PTO</label>
+                <select class="form-control" v-model="structureFeature.pto">
+                    <option value=""></option>
+                    <option value="带">带</option>
+                    <option value="不带">不带</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">起吊方式</label>
+                <select class="form-control" v-model="structureFeature.liftMethod">
+                    <option value=""></option>
+                    <option value="标准高度">标准高度</option>
+                    <option value="降低高度">降低高度</option>
+                    <option value="双轨吊">双轨吊</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">SCR</label>
+                <select class="form-control" v-model="structureFeature.scr">
+                    <option value=""></option>
+                    <option value="带">带</option>
+                    <option value="不带">不带</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">排气阀研磨机</label>
+                <select class="form-control" v-model="structureFeature.exhaustValveGrinder">
+                    <option value=""></option>
+                    <option value="带">带</option>
+                    <option value="不带">不带</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">排气阀工作台</label>
+                <select class="form-control" v-model="structureFeature.exhaustValveWorkbench">
+                    <option value=""></option>
+                    <option value="带">带</option>
+                    <option value="不带">不带</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">燃油硫含量</label>
+                <select class="form-control" v-model="structureFeature.fuelOilSulphurContent">
+                    <option value=""></option>
+                    <option value="HS">HS</option>
+                    <option value="LS">LS</option>
+                </select>
+            </div>
+        </section>
+        <footer class="modal-footer">
+            <button class="btn-default pull-right" @click="invisible" :disabled="isDisabled">取消</button>
+            <button class="btn pull-right" @click="saveStructureFeature" :disabled="isDisabled">
+                <span class="icon icon-cog rotate" v-if="isDisabled"></span>{{action}}
+            </button>
+        </footer>
     </div>
 </div>
 <div id="popover" class="popover" v-if="prompts.length > 0">

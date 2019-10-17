@@ -1,5 +1,6 @@
 package com.cse.summer.service;
 
+import com.cse.summer.model.dto.Excel;
 import com.cse.summer.model.entity.Material;
 import com.cse.summer.model.entity.StructureFeature;
 
@@ -49,4 +50,12 @@ public interface StructureFeatureService {
      * @return 部套及部套特征信息
      */
     List<StructureFeature> findStructureFeatureListByProperty(StructureFeature structureFeature);
+
+    /**
+     * 根据查询条件导出部套
+     *
+     * @param structureFeature 部套特征
+     * @return 包含部套数据的EXCEL文件
+     */
+    Excel exportStructureListByStructureFeature(StructureFeature structureFeature);
 }

@@ -1,5 +1,6 @@
 package com.cse.summer.controller;
 
+import com.cse.summer.model.dto.Excel;
 import com.cse.summer.model.dto.Response;
 import com.cse.summer.model.entity.Material;
 import com.cse.summer.model.entity.StructureFeature;
@@ -8,6 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -17,7 +23,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "api")
-public class StructureFeatureController {
+public class StructureFeatureController extends BaseFacade {
 
     private final StructureFeatureService structureFeatureService;
 
@@ -25,6 +31,7 @@ public class StructureFeatureController {
     public StructureFeatureController(StructureFeatureService structureFeatureService) {
         this.structureFeatureService = structureFeatureService;
     }
+
     @PostMapping(value = "structureFeatures")
     public Response<StructureFeature> saveStructureFeature(@RequestBody StructureFeature structureFeature) {
         structureFeatureService.saveStructureFeature(structureFeature);
@@ -58,5 +65,19 @@ public class StructureFeatureController {
     public Response<List<StructureFeature>> findStructureFeatureListByProperty(@RequestBody StructureFeature structureFeature) {
         List<StructureFeature> structureFeatures = structureFeatureService.findStructureFeatureListByProperty(structureFeature);
         return new Response<>(structureFeatures);
+    }
+
+    @PostMapping(value = "structureFeatures/export")
+    public void exportStructureListByStructureFeature(@RequestBody StructureFeature structureFeature) throws IOException {
+        Excel excel = structureFeatureService.exportStructureListByStructureFeature(structureFeature);
+        getResponse().reset();
+        getResponse().setHeader("Content-Disposition", "attachment;filename="
+                + URLEncoder.encode(excel.getName(), "UTF-8"));
+        getResponse().setHeader("Content-Type", "application/octet-stream");
+        OutputStream out = getResponse().getOutputStream();
+        BufferedOutputStream buffer = new BufferedOutputStream(out);
+        buffer.flush();
+        excel.getWorkbook().write(buffer);
+        buffer.close();
     }
 }

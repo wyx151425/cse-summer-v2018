@@ -17,6 +17,12 @@ const main = new Vue({
         getMachineName: function () {
             return this.machine.name;
         },
+        setMachine: function (machine) {
+            this.machine = machine;
+        },
+        getMachineType: function () {
+            return this.machine.type;
+        },
         setStructureList: function (structureList) {
             this.structureList = structureList;
         },
@@ -50,6 +56,9 @@ const main = new Vue({
         updateStructureVersion: function (index, version) {
             this.structureList[index].status = 1;
             this.structureList[index].version = version;
+        },
+        editStructureFeatureModalVisible: function (material) {
+            editStructureFeatureModal.visible(material);
         }
     },
     mounted: function () {
@@ -58,11 +67,12 @@ const main = new Vue({
         let url = window.location;
         let machineName = getUrlParam(url, "machineName");
         this.setMachineName(machineName);
-        axios.get(requestContext + "api/machines/" + machineName + "/structures")
+        axios.get(requestContext + "api/machines/" + machineName)
             .then(function (response) {
                 let statusCode = response.data.statusCode;
                 if (200 === statusCode) {
-                    main.setStructureList(response.data.data);
+                    main.setMachine(response.data.data);
+                    main.setStructureList(response.data.data.structureList);
                 } else {
                     popover.append("数据获取失败", false);
                 }
@@ -584,6 +594,78 @@ const updateStructureVersionModal = new Vue({
                     updateStructureVersionModal.note = "";
                 }
             });
+        }
+    }
+});
+
+const editStructureFeatureModal = new Vue({
+    el: "#editStructureFeatureModal",
+    data: {
+        isVisible: false,
+        isDisabled: false,
+        action: "保存",
+        material: {},
+        structureFeature: {}
+    },
+    methods: {
+        visible: function (material) {
+            this.material = material;
+            this.isVisible = true;
+            axios.get(requestContext + "api/structureFeatures/materialNo?materialNo=" + this.material.materialNo
+                + "&version=" + this.material.version)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        editStructureFeatureModal.setStructureFeature(response.data.data);
+                    } else {
+                        popover.append("数据获取失败", false);
+                    }
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                });
+        },
+        invisible: function () {
+            this.isVisible = false;
+            this.structureStr = "";
+            this.materialNo = "";
+            this.version = "";
+            this.structureList = [];
+            this.versionList = [];
+            this.structureFeature = {};
+        },
+        setStructureFeature: function (structureFeature) {
+            this.structureFeature = structureFeature;
+        },
+        saveStructureFeature: function () {
+            this.structureFeature.machineType = main.getMachineType();
+            if (null === this.structureFeature.id) {
+                axios.post(requestContext + "api/structureFeatures", this.structureFeature)
+                    .then(function (response) {
+                        let statusCode = response.data.statusCode;
+                        if (200 === statusCode) {
+                            popover.append("保存成功", true);
+                        } else {
+                            popover.append("保存失败", false);
+                        }
+                    })
+                    .catch(function () {
+                        popover.append("服务器访问失败", false);
+                    });
+            } else {
+                axios.put(requestContext + "api/structureFeatures", this.structureFeature)
+                    .then(function (response) {
+                        let statusCode = response.data.statusCode;
+                        if (200 === statusCode) {
+                            popover.append("保存成功", true);
+                        } else {
+                            popover.append("保存失败", false);
+                        }
+                    })
+                    .catch(function () {
+                        popover.append("服务器访问失败", false);
+                    });
+            }
         }
     }
 });

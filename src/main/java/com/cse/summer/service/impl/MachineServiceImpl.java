@@ -6,10 +6,7 @@ import com.cse.summer.model.entity.Machine;
 import com.cse.summer.model.dto.StructMater;
 import com.cse.summer.model.entity.Structure;
 import com.cse.summer.model.entity.User;
-import com.cse.summer.repository.MachineRepository;
-import com.cse.summer.repository.MaterialRepository;
-import com.cse.summer.repository.ResultRepository;
-import com.cse.summer.repository.StructureRepository;
+import com.cse.summer.repository.*;
 import com.cse.summer.service.MachineService;
 import com.cse.summer.util.Constant;
 import com.cse.summer.util.StatusCode;
@@ -34,13 +31,15 @@ public class MachineServiceImpl implements MachineService {
     private final StructureRepository structureRepository;
     private final MaterialRepository materialRepository;
     private final ResultRepository resultRepository;
+    private final StructureFeatureRepository structureFeatureRepository;
 
     @Autowired
-    public MachineServiceImpl(MachineRepository machineRepository, StructureRepository structureRepository, MaterialRepository materialRepository, ResultRepository resultRepository) {
+    public MachineServiceImpl(MachineRepository machineRepository, StructureRepository structureRepository, MaterialRepository materialRepository, ResultRepository resultRepository, StructureFeatureRepository structureFeatureRepository) {
         this.machineRepository = machineRepository;
         this.structureRepository = structureRepository;
         this.materialRepository = materialRepository;
         this.resultRepository = resultRepository;
+        this.structureFeatureRepository = structureFeatureRepository;
     }
 
     @Override
@@ -77,6 +76,7 @@ public class MachineServiceImpl implements MachineService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteAllMachine(User user) {
         if (user.getPermissions().getOrDefault(Constant.Permissions.DELETE_ALL_MACHINE, false)) {
+            structureFeatureRepository.deleteAll();
             materialRepository.deleteAll();
             structureRepository.deleteAll();
             machineRepository.deleteAll();

@@ -68,9 +68,9 @@ public class StructureFeature extends SummerEntity {
      */
     private String hostElectric;
     /**
-     * 灭火介质
+     * 加热介质
      */
-    private String fireExtMedium;
+    private String heatingMedium;
     /**
      * 顶部支撑方式
      */
@@ -151,6 +151,22 @@ public class StructureFeature extends SummerEntity {
      * 排气阀工作台
      */
     private String exhaustValveWorkbench;
+    /**
+     * 通用情况
+     */
+    private String universal;
+    /**
+     * 机型
+     */
+    private String machineType;
+    /**
+     * 待定
+     */
+    private String pending;
+    /**
+     * 燃油硫含量
+     */
+    private String fuelOilSulphurContent;
 
     public StructureFeature() {
     }
@@ -182,7 +198,7 @@ public class StructureFeature extends SummerEntity {
         structureFeature.setHostRotateDirection("");
         structureFeature.setPropellerType("");
         structureFeature.setHostElectric("");
-        structureFeature.setFireExtMedium("");
+        structureFeature.setHeatingMedium("");
         structureFeature.setTopSupportMode("");
         structureFeature.setFreeEndSecCompensator("");
         structureFeature.setOutEndSecCompensator("");
@@ -203,6 +219,10 @@ public class StructureFeature extends SummerEntity {
         structureFeature.setScr("");
         structureFeature.setExhaustValveGrinder("");
         structureFeature.setExhaustValveWorkbench("");
+        structureFeature.setUniversal("");
+        structureFeature.setMachineType("");
+        structureFeature.setPending("");
+        structureFeature.setFuelOilSulphurContent("");
 
         return structureFeature;
     }
@@ -303,12 +323,12 @@ public class StructureFeature extends SummerEntity {
         this.hostElectric = hostElectric;
     }
 
-    public String getFireExtMedium() {
-        return fireExtMedium;
+    public String getHeatingMedium() {
+        return heatingMedium;
     }
 
-    public void setFireExtMedium(String fireExtMedium) {
-        this.fireExtMedium = fireExtMedium;
+    public void setHeatingMedium(String heatingMedium) {
+        this.heatingMedium = heatingMedium;
     }
 
     public String getTopSupportMode() {
@@ -469,5 +489,37 @@ public class StructureFeature extends SummerEntity {
 
     public void setExhaustValveWorkbench(String exhaustValveWorkbench) {
         this.exhaustValveWorkbench = exhaustValveWorkbench;
+    }
+
+    public String getUniversal() {
+        return universal;
+    }
+
+    public void setUniversal(String universal) {
+        this.universal = universal;
+    }
+
+    public String getMachineType() {
+        return machineType;
+    }
+
+    public void setMachineType(String machineType) {
+        this.machineType = machineType;
+    }
+
+    public String getPending() {
+        return pending;
+    }
+
+    public void setPending(String pending) {
+        this.pending = pending;
+    }
+
+    public String getFuelOilSulphurContent() {
+        return fuelOilSulphurContent;
+    }
+
+    public void setFuelOilSulphurContent(String fuelOilSulphurContent) {
+        this.fuelOilSulphurContent = fuelOilSulphurContent;
     }
 }

@@ -616,6 +616,21 @@ const matchStructureModal = new Vue({
         resetStructureFeature: function () {
             this.structureFeature = {};
             this.structureFeatureList = [];
+        },
+        exportMatchedStructures: function () {
+            axios({
+                method: "post",
+                url: requestContext + "api/structureFeatures/export",
+                data: this.structureFeature,
+                responseType: "blob"
+            }).then(function (response) {
+                download(response);
+                exportMachineBOMModal.exportCallback();
+                exportMachineBOMModal.invisible();
+            }).catch(function () {
+                popover.append("服务器访问失败", false);
+                exportMachineBOMModal.exportCallback();
+            });
         }
     }
 

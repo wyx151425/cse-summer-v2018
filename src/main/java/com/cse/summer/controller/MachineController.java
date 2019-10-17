@@ -85,6 +85,7 @@ public class MachineController extends BaseFacade {
         BufferedOutputStream buffer = new BufferedOutputStream(out);
         buffer.flush();
         excel.getWorkbook().write(buffer);
+
         buffer.close();
     }
 

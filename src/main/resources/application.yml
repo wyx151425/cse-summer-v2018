@@ -18,7 +18,7 @@ spring:
     password: Cse@dms01
   jpa:
     database: MySQL
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: none
     properties:
