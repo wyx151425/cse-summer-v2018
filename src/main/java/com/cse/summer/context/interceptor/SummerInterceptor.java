@@ -26,6 +26,12 @@ public class SummerInterceptor implements HandlerInterceptor {
 
     private static final String LOGIN_PAGE_URI = "%s/login";
     private static final String USER_LOGIN_URI = "%s/api/users/login";
+    private static final String MATERIAL_IMPORT = "%s/api/materialNames/import";
+    private static final String MATERIAL_EXPORT = "%s/api/materialNames/export";
+    private static final String MATERIA_NO_QUERY = "%s/api/materials/queryNoChinese";
+    private static final String MATERIA_chineseN = "%s/api/materials/chineseName";
+    private static final String MATERIA_2 = "%s/api/materials/exportNoChinese";
+    private static final String MATERIA_3 = "%s/api/materials/importPerfectChinese";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -43,7 +49,13 @@ public class SummerInterceptor implements HandlerInterceptor {
 
         /* 2.非拦截路由 检查 */
         if (String.format(LOGIN_PAGE_URI, contextPath).equals(uri)
-                || String.format(USER_LOGIN_URI, contextPath).equals(uri)) {
+                || String.format(USER_LOGIN_URI, contextPath).equals(uri)
+                || String.format(MATERIAL_IMPORT, contextPath).equals(uri)
+                || String.format(MATERIAL_EXPORT, contextPath).equals(uri)
+                || String.format(MATERIA_NO_QUERY, contextPath).equals(uri)
+                || String.format(MATERIA_chineseN, contextPath).equals(uri)
+                || String.format(MATERIA_2, contextPath).equals(uri)
+                || String.format(MATERIA_3, contextPath).equals(uri)) {
             return true;
         }
 
