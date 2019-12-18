@@ -68,7 +68,7 @@ public class FileServiceImpl implements FileService {
     // 从数据库中英文名称参照表中查找中文名称
     private String findChineseName(String englishName, List<Name> names) {
         for (Name name : names) {
-            if (name.getEnglish().equals(englishName)) {
+            if (name.getEnglish().equals(englishName.toUpperCase())) {
                 return name.getChinese();
             }
         }
@@ -194,7 +194,7 @@ public class FileServiceImpl implements FileService {
                     material.setDrawingSize(row.getCell(5).toString());
                 }
                 if (null != row.getCell(6)) {
-                    material.setName(row.getCell(6).toString());
+                    material.setName(row.getCell(6).toString().toUpperCase());
                 }
                 if (null != row.getCell(7)) {
                     material.setChinese(row.getCell(7).toString());
@@ -366,7 +366,7 @@ public class FileServiceImpl implements FileService {
                         material.setVersion(0);
                         material.setLatestVersion(0);
                         material.setMaterialNo(materialNo);
-                        material.setName(element.element("name").getText());
+                        material.setName(element.element("name").getText().toUpperCase());
                         String chineseName = findChineseName(element.element("name").getText().toUpperCase(), names);
                         material.setChinese(chineseName);
                         material.setWeight(revision.element("mass").getText());
@@ -405,7 +405,7 @@ public class FileServiceImpl implements FileService {
                 String materialNo = materNoM + "." + revisionM;
 
                 material.setMaterialNo(materialNo);
-                material.setName(element.element("name").getText());
+                material.setName(element.element("name").getText().toUpperCase());
                 String chineseName = findChineseName(element.element("name").getText().toUpperCase(), names);
                 material.setChinese(chineseName);
 
@@ -443,7 +443,7 @@ public class FileServiceImpl implements FileService {
             String materialNo = materNoM + "." + revisionM;
 
             material.setMaterialNo(materialNo);
-            material.setName(element.element("name").getText());
+            material.setName(element.element("name").getText().toUpperCase());
             String chineseName = findChineseName(element.element("name").getText().toUpperCase(), names);
             material.setChinese(chineseName);
 
@@ -483,7 +483,7 @@ public class FileServiceImpl implements FileService {
             String materialNo = materNoM + "." + revisionM;
 
             material.setMaterialNo(materialNo);
-            material.setName(element.element("name").getText());
+            material.setName(element.element("name").getText().toUpperCase());
             String chineseName = findChineseName(element.element("name").getText().toUpperCase(), names);
             material.setChinese(chineseName);
 
@@ -691,7 +691,7 @@ public class FileServiceImpl implements FileService {
                 }
 
                 if (null != row.getCell(7)) {
-                    material.setName(row.getCell(7).toString());
+                    material.setName(row.getCell(7).toString().toUpperCase());
                 }
                 if (null != row.getCell(9) && !"".equals(row.getCell(9).toString())) {
                     material.setMaterial(row.getCell(9).toString());
@@ -873,7 +873,7 @@ public class FileServiceImpl implements FileService {
                     material.setDrawingSize(row.getCell(5).toString());
                 }
                 if (null != row.getCell(6)) {
-                    material.setName(row.getCell(6).toString());
+                    material.setName(row.getCell(6).toString().toUpperCase());
                 }
                 if (null != row.getCell(7)) {
                     material.setChinese(row.getCell(7).toString());

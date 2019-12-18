@@ -51,7 +51,8 @@ const main = new Vue({
             this.structureList[index].status = 2;
         },
         deleteStructure: function (index) {
-            this.structureList.splice(index, 1);
+            // this.structureList.splice(index, 1);
+            this.structureList[index].status = 1;
         },
         updateStructureVersion: function (index, version) {
             this.structureList[index].status = 1;

@@ -107,6 +107,7 @@ public class MaterialServiceImpl implements MaterialService {
     @Transactional(rollbackFor = Exception.class)
     public void updateMaterialChineseName(Material material) {
         Material target = materialRepository.findById(material.getId()).get();
+        target.setName(material.getName().toUpperCase());
         target.setChinese(material.getChinese());
         materialRepository.save(target);
     }

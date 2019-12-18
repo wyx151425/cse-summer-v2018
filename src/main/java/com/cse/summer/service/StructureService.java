@@ -41,6 +41,13 @@ public interface StructureService {
     void releaseStructure(Integer id);
 
     /**
+     * 取消发布部套
+     *
+     * @param id 部套ID
+     */
+    void cancelStructure(Integer id);
+
+    /**
      * 根据物料号查询关联的部套
      *
      * @param materialNo 关联物料号

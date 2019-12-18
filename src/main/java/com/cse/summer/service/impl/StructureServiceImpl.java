@@ -75,7 +75,7 @@ public class StructureServiceImpl implements StructureService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteStructure(Integer id) {
         Structure structure = structureRepository.getOne(id);
-        structure.setStatus(0);
+        structure.setStatus(1);
         structureRepository.save(structure);
     }
 
@@ -84,6 +84,14 @@ public class StructureServiceImpl implements StructureService {
     public void releaseStructure(Integer id) {
         Structure structure = structureRepository.getOne(id);
         structure.setStatus(2);
+        structureRepository.save(structure);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelStructure(Integer id) {
+        Structure structure = structureRepository.getOne(id);
+        structure.setStatus(1);
         structureRepository.save(structure);
     }
 

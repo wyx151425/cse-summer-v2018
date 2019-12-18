@@ -93,7 +93,7 @@
 <div id="perfectChineseNameModal" class="modal" v-if="isVisible" v-cloak>
     <div class="modal-box">
         <div class="modal-header">
-            <p class="modal-title">完善物料中文名称</p>
+            <p class="modal-title">完善物料名称</p>
             <div class="modal-dismiss"><span class="icon icon-remove" @click="invisible"></span></div>
         </div>
         <div class="modal-content form-horizontal form-horizon4">
@@ -107,7 +107,7 @@
             </div>
             <div class="form-group">
                 <label class="form-label">英文名称</label>
-                <p class="form-control">{{material.name}}</p>
+                <input class="form-control" type="text" v-model="material.name"/>
             </div>
             <div class="form-group">
                 <label class="form-label">中文名称</label>
