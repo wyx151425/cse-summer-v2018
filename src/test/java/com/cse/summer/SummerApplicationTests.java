@@ -87,10 +87,5 @@ public class SummerApplicationTests {
 //        permission1.setRole(Constant.Roles.ADMIN);
 //        permission1.setCode(Constant.Permissions.EDIT_STRUCTURE_FEATURE);
 //        permissionRepository.save(permission1);
-//
-//        Permission permission2 = Permission.newInstance();
-//        permission2.setRole(Constant.Roles.CHIEF_DESIGNER);
-//        permission2.setCode(Constant.Permissions.EDIT_STRUCTURE_FEATURE);
-//        permissionRepository.save(permission2);
 //    }
 }
