@@ -1,13 +1,20 @@
 package com.cse.summer;
 
+import com.cse.summer.model.entity.Permission;
+import com.cse.summer.repository.PermissionRepository;
+import com.cse.summer.util.Constant;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SummerApplicationTests {
+
+    @Autowired
+    private PermissionRepository permissionRepository;
 
     @Test
     public void contextLoads() {
@@ -85,7 +92,7 @@ public class SummerApplicationTests {
 //    public void addPermission() {
 //        Permission permission1 = Permission.newInstance();
 //        permission1.setRole(Constant.Roles.ADMIN);
-//        permission1.setCode(Constant.Permissions.EDIT_STRUCTURE_FEATURE);
+//        permission1.setCode(Constant.Permissions.MANAGE_USER_ROLE);
 //        permissionRepository.save(permission1);
 //    }
 }

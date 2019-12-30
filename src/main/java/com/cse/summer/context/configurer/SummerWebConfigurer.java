@@ -37,6 +37,7 @@ public class SummerWebConfigurer implements WebMvcConfigurer {
         registry.addViewController("/machineDetail").setViewName("machine-detail");
         registry.addViewController("/importResult").setViewName("import-result");
         registry.addViewController("/manageName").setViewName("manage-name");
+        registry.addViewController("/manageAccount").setViewName("manage-account");
         registry.addViewController("/login").setViewName("login");
     }
 }

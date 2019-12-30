@@ -74,6 +74,7 @@ public class Constant {
         public static final String UPDATE_PERMISSION = "UPDATE_PERMISSION";
         public static final String DELETE_ALL_MACHINE = "DELETE_ALL_MACHINE";
         public static final String EDIT_STRUCTURE_FEATURE = "EDIT_STRUCTURE_FEATURE";
+        public static final String MANAGE_USER_ROLE = "MANAGE_USER_ROLE";
     }
 
     public static final class MAN {
