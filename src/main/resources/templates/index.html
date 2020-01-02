@@ -28,7 +28,7 @@
             <button class="btn pull-right" @click="deleteAllMachineModalVisible"
                     v-if="user.permissions.DELETE_ALL_MACHINE" v-cloak>清空数据
             </button>
-            <a class="pull-right" th:href="@{/manageAccount}" v-if="user.permissions.MANAGE_USER_ROLE"><button class="btn" type="button">用户管理</button></a>
+            <a class="pull-right" th:href="@{/manageAccount}" v-if="user.permissions.MANAGE_ACCOUNT"><button class="btn" type="button">用户管理</button></a>
             <a class="pull-right" th:href="@{/manageName}" v-if="'yangzhiming' === user.username || 'admin' === user.username"><button class="btn" type="button">名称维护</button></a>
             <button class="btn pull-right" @click="importMachineBOMModalVisible"
                     v-if="user.permissions.IMPORT_MACHINE_BOM || user.permissions.IMPORT_NEW_MACHINE_BOM">导入BOM

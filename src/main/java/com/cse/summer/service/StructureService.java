@@ -27,6 +27,13 @@ public interface StructureService {
     void updateStructureVersion(Structure structure);
 
     /**
+     * 更新部套总数量
+     *
+     * @param structure 部套对象
+     */
+    void updateStructureAmount(Structure structure);
+
+    /**
      * 删除部套
      *
      * @param id 待删除部套的ID

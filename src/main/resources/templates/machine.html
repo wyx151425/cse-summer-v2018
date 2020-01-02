@@ -59,7 +59,10 @@
                 <td>{{structure.material.latestVersion}}</td>
                 <td>{{structure.material.name}}</td>
                 <td>{{structure.material.chinese}}</td>
-                <td>{{structure.amount}}</td>
+                <td>
+                    <span v-if="!user.permissions.UPDATE_STRUCTURE_AMOUNT">{{structure.amount}}</span>
+                    <button class="btn-link" v-if="user.permissions.UPDATE_STRUCTURE_AMOUNT" @click="showUpdateStructureAmountModal(structure, index)">{{structure.amount}}</button>
+                </td>
                 <td class="col-yellow" v-if="1 == structure.status && user.permissions.RELEASE_STRUCTURE" v-cloak>
                     <button class="btn-link" @click="releaseStructureModalVisible(structure, index)">设计</button>
                 </td>
@@ -334,6 +337,42 @@
         <div class="modal-footer">
             <button class="btn-default pull-right" @click="invisible" :disabled="isDisabled">取消</button>
             <button class="btn pull-right" @click="updateStructureVersion" :disabled="isDisabled">
+                <span class="icon icon-cog rotate" v-if="isDisabled"></span>{{action}}
+            </button>
+        </div>
+    </div>
+</div>
+<div id="updateStructureAmountModal" class="modal" v-if="isVisible" v-cloak="">
+    <div class="modal-box">
+        <div class="modal-header">
+            <p class="modal-title">修改部套总数量</p>
+            <div class="modal-dismiss"><span class="icon icon-remove" @click="invisible"></span></div>
+        </div>
+        <div class="modal-content form-horizontal form-horizon3">
+            <div class="form-group">
+                <label class="form-label">机器名</label>
+                <p class="form-control">{{structure.machineName}}</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">部套号</label>
+                <p class="form-control">{{structure.structureNo}}</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">物料号</label>
+                <p class="form-control">{{structure.materialNo}}</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">版本号</label>
+                <p class="form-control">{{structure.version}}</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">总数量</label>
+                <input class="form-control" v-model="structure.amount" type="text"/>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-default pull-right" @click="invisible" :disabled="isDisabled">取消</button>
+            <button class="btn pull-right" @click="updateStructureAmount" :disabled="isDisabled">
                 <span class="icon icon-cog rotate" v-if="isDisabled"></span>{{action}}
             </button>
         </div>

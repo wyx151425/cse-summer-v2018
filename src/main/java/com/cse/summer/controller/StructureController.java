@@ -61,6 +61,12 @@ public class StructureController extends BaseFacade {
         return new Response<>();
     }
 
+    @PutMapping(value = "structures/amount")
+    public Response<Structure> actionUpdateStructureAmount(@RequestBody Structure structure) {
+        structureService.updateStructureAmount(structure);
+        return new Response<>();
+    }
+
     @GetMapping(value = "structures/query")
     public Response<List<Structure>> actionStructuresSearch(@RequestParam("materialNo") String materialNo) {
         List<Structure> structureList = structureService.findRelationStructure(materialNo);

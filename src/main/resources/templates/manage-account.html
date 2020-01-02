@@ -26,6 +26,10 @@
             <p class="env-dev pull-left" v-if="'DEV' == user.token" v-cloak>开发环境</p>
             <p class="env-uat pull-left" v-if="'UAT' == user.token" v-cloak>测试环境</p>
             <p class="env-pro pull-left" v-if="'PRO' == user.token" v-cloak>正式环境</p>
+            <a class="pull-right" href="index">
+                <button class="btn">返回</button>
+            </a>
+            <button class="btn pull-right" type="button" @click="showAddAccountModal">添加账号</button>
         </div>
         <table class="table table-bordered table-hover" style="table-layout: fixed">
             <thead>
@@ -104,7 +108,7 @@
         <div class="modal-content form-horizontal form-horizon2">
             <div class="form-group">
                 <label class="form-label">角色</label>
-                <select class="form-control" v-model="account.roles">
+                <select class="form-control" v-model="newRole">
                     <option selected disabled>请选择</option>
                     <option value="ROLE_STRUCTURE_MANAGER">部套负责人</option>
                     <option value="ROLE_PROJECT_MANAGER">项目负责人</option>
@@ -129,11 +133,11 @@
         <div class="modal-content form-horizontal form-horizon4">
             <div class="form-group">
                 <label class="form-label">新设密码</label>
-                <input id="newPassword" class="form-control" type="password"/>
+                <input id="newPassword" class="form-control" v-model="newPassword" type="password"/>
             </div>
             <div class="form-group">
                 <label class="form-label">确认密码</label>
-                <input id="confirmPassword" class="form-control" type="password"/>
+                <input id="confirmPassword" class="form-control" v-model="confirmPassword" type="password"/>
             </div>
         </div>
         <div class="modal-footer">
@@ -151,11 +155,49 @@
             <div class="modal-dismiss"><span class="icon icon-remove" @click="invisible"></span></div>
         </div>
         <div class="modal-content">
-            <p class="modal-prompt">您确定要<span v-if="0 === account.status">启用</span><span v-if="1 === account.status">禁用</span><span>{{account.name}}</span>的账号吗？</p>
+            <p class="modal-prompt">您确定要<span v-if="0 === account.status">启用</span><span
+                    v-if="1 === account.status">禁用</span><span>{{account.name}}</span>的账号吗？</p>
         </div>
         <div class="modal-footer">
             <button class="btn-default pull-right" @click="invisible" :disabled="isDisabled">取消</button>
             <button class="btn pull-right" @click="saveAccountStatus" :disabled="isDisabled">
+                <span class="icon icon-cog rotate" v-if="isDisabled"></span>{{action}}
+            </button>
+        </div>
+    </div>
+</div>
+<div id="addAccountModal" class="modal" v-if="isVisible" v-cloak>
+    <div class="modal-box">
+        <div class="modal-header">
+            <p class="modal-title">添加账号</p>
+            <div class="modal-dismiss"><span class="icon icon-remove" @click="invisible"></span></div>
+        </div>
+        <div class="modal-content form-horizontal form-horizon3">
+            <div class="form-group">
+                <label class="form-label">姓名</label>
+                <input id="name" class="form-control" v-model="account.name" type="text"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label">用户名</label>
+                <input id="username" class="form-control" v-model="account.username" type="text"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label">密码</label>
+                <input id="password" class="form-control" v-model="account.password" type="password"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label">角色</label>
+                <select class="form-control" v-model="account.roles">
+                    <option selected disabled>请选择</option>
+                    <option value="ROLE_STRUCTURE_MANAGER">部套负责人</option>
+                    <option value="ROLE_PROJECT_MANAGER">项目负责人</option>
+                    <option value="ROLE_CHIEF_DESIGNER">主任设计师</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-default pull-right" @click="invisible" :disabled="isDisabled">取消</button>
+            <button class="btn pull-right" @click="addAccount" :disabled="isDisabled">
                 <span class="icon icon-cog rotate" v-if="isDisabled"></span>{{action}}
             </button>
         </div>

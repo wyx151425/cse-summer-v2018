@@ -22,15 +22,15 @@ const main = new Vue({
         },
         login: function () {
             if ("" === this.user.username) {
-                popoverSpace.append("请输入用户名", false);
+                popover.append("请输入用户名", false);
                 return;
             }
             if ("" === this.user.password) {
-                popoverSpace.append("请输入密码", false);
+                popover.append("请输入密码", false);
                 return;
             }
             if (this.user.password.length < 6 || this.user.password.length > 32) {
-                popoverSpace.append("请输入正确格式的密码", false);
+                popover.append("请输入正确格式的密码", false);
                 return;
             }
             this.isDisabled = true;

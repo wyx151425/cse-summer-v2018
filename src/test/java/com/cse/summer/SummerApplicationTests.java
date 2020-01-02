@@ -92,7 +92,7 @@ public class SummerApplicationTests {
 //    public void addPermission() {
 //        Permission permission1 = Permission.newInstance();
 //        permission1.setRole(Constant.Roles.ADMIN);
-//        permission1.setCode(Constant.Permissions.MANAGE_USER_ROLE);
+//        permission1.setCode(Constant.Permissions.MANAGE_ACCOUNT);
 //        permissionRepository.save(permission1);
 //    }
 }

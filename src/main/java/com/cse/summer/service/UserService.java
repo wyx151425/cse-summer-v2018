@@ -18,11 +18,36 @@ public interface UserService {
     User login(User user);
 
     /**
-     * 更新密码
+     * 保存用户账号
      *
-     * @param user 用户对象
+     * @param user        用户对象
+     * @param currentUser 当前用户
      */
-    void updatePassword(User user);
+    void saveAccount(User user, User currentUser);
+
+    /**
+     * 更新账户密码
+     *
+     * @param user        用户对象
+     * @param currentUser 当前用户
+     */
+    void updateAccountPassword(User user, User currentUser);
+
+    /**
+     * 更新账户角色
+     *
+     * @param user        用户对象
+     * @param currentUser 当前用户
+     */
+    void updateAccountRole(User user, User currentUser);
+
+    /**
+     * 更新账户状态
+     *
+     * @param user        用户对象
+     * @param currentUser 当前用户
+     */
+    void updateAccountStatus(User user, User currentUser);
 
     /**
      * 清空数据库中的数据

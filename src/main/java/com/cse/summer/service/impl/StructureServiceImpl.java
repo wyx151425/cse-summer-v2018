@@ -5,6 +5,7 @@ import com.cse.summer.model.dto.AnalyzeResult;
 import com.cse.summer.model.dto.StructMater;
 import com.cse.summer.model.entity.Material;
 import com.cse.summer.model.entity.Structure;
+import com.cse.summer.model.entity.User;
 import com.cse.summer.repository.MaterialRepository;
 import com.cse.summer.repository.StructureRepository;
 import com.cse.summer.service.StructureService;
@@ -73,6 +74,14 @@ public class StructureServiceImpl implements StructureService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void updateStructureAmount(Structure structure) {
+        Structure target = structureRepository.getOne(structure.getId());
+        target.setAmount(structure.getAmount());
+        structureRepository.save(target);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteStructure(Integer id) {
         Structure structure = structureRepository.getOne(id);
         structure.setStatus(1);
@@ -115,9 +124,9 @@ public class StructureServiceImpl implements StructureService {
                     String code = row.getCell(3).toString().trim();
                     List<Material> materials = materialRepository.findAllByMaterialNoAndLevel(code, 0);
                     if (materials.size() > 0) {
-                        results.add(new AnalyzeResult(structureNo + "(" + code +")", false));
+                        results.add(new AnalyzeResult(structureNo + "(" + code + ")", false));
                     } else {
-                        results.add(new AnalyzeResult(structureNo + "(" + code +")", true));
+                        results.add(new AnalyzeResult(structureNo + "(" + code + ")", true));
                     }
                 }
             }

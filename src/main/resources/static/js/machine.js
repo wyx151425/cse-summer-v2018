@@ -47,6 +47,9 @@ const main = new Vue({
         updateStructureVersionModalVisible: function (structure, index) {
             updateStructureVersionModal.visible(structure, index);
         },
+        showUpdateStructureAmountModal: function (structure, index) {
+            updateStructureAmountModal.visible(structure, index);
+        },
         releaseStructure: function (index) {
             this.structureList[index].status = 2;
         },
@@ -57,6 +60,9 @@ const main = new Vue({
         updateStructureVersion: function (index, version) {
             this.structureList[index].status = 1;
             this.structureList[index].version = version;
+        },
+        updateStructureAmount: function (index, amount) {
+            this.structureList[index].amount = amount;
         },
         editStructureFeatureModalVisible: function (material) {
             editStructureFeatureModal.visible(material);
@@ -595,6 +601,59 @@ const updateStructureVersionModal = new Vue({
                     updateStructureVersionModal.note = "";
                 }
             });
+        }
+    }
+});
+
+const updateStructureAmountModal = new Vue({
+    el: "#updateStructureAmountModal",
+    data: {
+        isVisible: false,
+        isDisabled: false,
+        action: "修改",
+        index: 0,
+        structure: {}
+    },
+    methods: {
+        visible: function (structure, index) {
+            this.index = index;
+            this.setStructure(structure);
+            this.isVisible = true;
+        },
+        invisible: function () {
+            this.isVisible = false;
+        },
+        setStructure: function (structure) {
+            this.structure.id = structure.id;
+            this.structure.machineName = structure.machineName;
+            this.structure.structureNo = structure.structureNo;
+            this.structure.materialNo = structure.materialNo;
+            this.structure.version = structure.version;
+            this.structure.amount = structure.amount;
+        },
+        updateStructureAmount: function () {
+            this.isDisabled = true;
+            this.action = "正在修改";
+            axios.put(requestContext + "api/structures/amount", this.structure)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        popover.append("修改成功", true);
+                        main.updateStructureAmount(updateStructureAmountModal.index, updateStructureAmountModal.structure.amount);
+                        updateStructureAmountModal.invisible();
+                    } else {
+                        popover.append("修改失败", false);
+                    }
+                    updateStructureAmountModal.updateCallback();
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                    updateStructureAmountModal.updateCallback();
+                });
+        },
+        updateCallback: function () {
+            this.action = "修改";
+            this.isDisabled = false;
         }
     }
 });

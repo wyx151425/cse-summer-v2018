@@ -27,7 +27,7 @@ function getMessage(statusCode) {
         case 1001:
             return "用户未注册";
         case 1002:
-            return "用户已注册";
+            return "用户已存在";
         case 1003:
             return "用户被禁用";
         case 1004:

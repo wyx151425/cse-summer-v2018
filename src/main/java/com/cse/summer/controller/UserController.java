@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
  * @author 王振琦
  */
@@ -52,14 +50,6 @@ public class UserController extends BaseFacade {
         return new Response<>();
     }
 
-    @PutMapping(value = "users/password")
-    public Response<User> actionUpdatePassword(@RequestBody User reqUser) {
-        User user = getSessionUser();
-        user.setPassword(reqUser.getPassword());
-        userService.updatePassword(user);
-        return new Response<>();
-    }
-
     @PostMapping(value = "data/clear")
     public Response<Object> actionClearData() {
         User user = getSessionUser();
@@ -76,5 +66,33 @@ public class UserController extends BaseFacade {
         User user = getSessionUser();
         PageContext<User> pageContext = userService.findAllAccounts(pageNum, user);
         return new Response<>(pageContext);
+    }
+
+    @PostMapping(value = "accounts")
+    public Response<User> actionSaveUserAccount(@RequestBody User reqUser) {
+        User currentUser = getSessionUser();
+        userService.saveAccount(reqUser, currentUser);
+        return new Response<>();
+    }
+
+    @PutMapping(value = "accounts/password")
+    public Response<User> actionUpdatePassword(@RequestBody User reqUser) {
+        User currentUser = getSessionUser();
+        userService.updateAccountPassword(reqUser, currentUser);
+        return new Response<>();
+    }
+
+    @PutMapping(value = "accounts/role")
+    public Response<User> actionUpdateAccountRole(@RequestBody User reqUser) {
+        User currentUser = getSessionUser();
+        userService.updateAccountRole(reqUser, currentUser);
+        return new Response<>();
+    }
+
+    @PutMapping(value = "accounts/status")
+    public Response<User> actionUpdateAccountStatus(@RequestBody User reqUser) {
+        User currentUser = getSessionUser();
+        userService.updateAccountStatus(reqUser, currentUser);
+        return new Response<>();
     }
 }

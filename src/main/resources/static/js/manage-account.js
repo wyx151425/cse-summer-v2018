@@ -69,6 +69,9 @@ const main = new Vue({
         showManageAccountStatusModal: function (account) {
             manageAccountStatusModal.visible(account);
         },
+        showAddAccountModal: function () {
+            addAccountModal.visible();
+        }
     },
     mounted: function () {
         let user = JSON.parse(localStorage.getItem("user"));
@@ -95,19 +98,41 @@ const manageAccountRoleModal = new Vue({
     data: {
         isVisible: false,
         isDisabled: false,
-        action: "保存",
-        account: {}
+        action: "修改",
+        account: {},
+        newRole: ''
     },
     methods: {
         visible: function (account) {
             this.isVisible = true;
             this.account = account;
+            this.newRole = this.account.roles;
         },
         invisible: function () {
             this.isVisible = false;
         },
         saveAccountRole: function () {
-
+            this.isDisabled = true;
+            this.action = "正在修改";
+            let target = {username: this.account.username, roles: this.newRole};
+            axios.put(requestContext + "api/accounts/role", target)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        popover.append("修改成功", true);
+                        manageAccountRoleModal.account.roles = target.roles;
+                        manageAccountRoleModal.invisible();
+                    } else {
+                        popover.append("修改失败", false);
+                    }
+                    manageAccountRoleModal.isDisabled = false;
+                    manageAccountRoleModal.action = "修改";
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                    manageAccountRoleModal.isDisabled = false;
+                    manageAccountRoleModal.action = "修改";
+                });
         }
     }
 });
@@ -117,8 +142,10 @@ const manageAccountPasswordModal = new Vue({
     data: {
         isVisible: false,
         isDisabled: false,
-        action: "保存",
-        account: {}
+        action: "修改",
+        account: {},
+        newPassword: '',
+        confirmPassword: ''
     },
     methods: {
         visible: function (account) {
@@ -129,7 +156,43 @@ const manageAccountPasswordModal = new Vue({
             this.isVisible = false;
         },
         saveAccountPassword: function () {
-
+            if ("" === this.newPassword) {
+                popover.append("请填写新密码", false);
+                return;
+            }
+            if (this.newPassword.length < 6 || this.newPassword.length > 32) {
+                popover.append("请填写正确格式的新密码", false);
+                return;
+            }
+            if ("" === this.confirmPassword) {
+                popover.append("请确认新密码", false);
+                return;
+            }
+            if (this.confirmPassword !== this.newPassword) {
+                popover.append("两次填写的密码不匹配", false);
+                return;
+            }
+            this.isDisabled = true;
+            this.action = "正在修改";
+            let target = {username: this.account.username, password: this.newPassword};
+            axios.put(requestContext + "api/accounts/password", target)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        popover.append("修改成功", true);
+                        manageAccountPasswordModal.account.password = target.password;
+                        manageAccountPasswordModal.invisible();
+                    } else {
+                        popover.append("修改失败", false);
+                    }
+                    manageAccountPasswordModal.isDisabled = false;
+                    manageAccountPasswordModal.action = "修改";
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                    manageAccountPasswordModal.isDisabled = false;
+                    manageAccountPasswordModal.action = "修改";
+                });
         }
     }
 });
@@ -151,7 +214,91 @@ const manageAccountStatusModal = new Vue({
             this.isVisible = false;
         },
         saveAccountStatus: function () {
+            this.isDisabled = true;
+            this.action = "正在修改";
+            let newStatus;
+            if (1 === this.account.status) {
+                newStatus = 0;
+            } else if (0 === this.account.status) {
+                newStatus = 1;
+            } else {
+                return;
+            }
+            let target = {username: this.account.username, status: newStatus};
+            axios.put(requestContext + "api/accounts/status", target)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        popover.append("修改成功", true);
+                        manageAccountStatusModal.account.status = target.status;
+                        manageAccountStatusModal.invisible();
+                    } else {
+                        popover.append("修改失败", false);
+                    }
+                    manageAccountStatusModal.isDisabled = false;
+                    manageAccountStatusModal.action = "确定";
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                    manageAccountStatusModal.isDisabled = false;
+                    manageAccountStatusModal.action = "确定";
+                });
+        }
+    }
+});
 
+const addAccountModal = new Vue({
+    el: "#addAccountModal",
+    data: {
+        isVisible: false,
+        isDisabled: false,
+        action: "添加",
+        account: {}
+    },
+    methods: {
+        visible: function () {
+            this.isVisible = true;
+            this.account = {name: "", username: "", password: "", roles: "ROLE_STRUCTURE_MANAGER"};
+        },
+        invisible: function () {
+            this.isVisible = false;
+        },
+        addAccount: function () {
+            if ("" === this.account.name) {
+                popover.append("请填写账号的姓名", false);
+                return;
+            }
+            if ("" === this.account.username) {
+                popover.append("请填写账号的用户名", false);
+                return;
+            }
+            if ("" === this.account.password) {
+                popover.append("请填写账号的密码", false);
+                return;
+            }
+            if (this.account.password.length < 6 || this.account.password.length > 32) {
+                popover.append("请填写正确格式的的密码", false);
+                return;
+            }
+            this.isDisabled = true;
+            this.action = "正在保存";
+            axios.post(requestContext + "api/accounts", this.account)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        popover.append("添加成功", true);
+                        addAccountModal.invisible();
+                    } else {
+                        popover.append(getMessage(statusCode), false);
+                    }
+                    addAccountModal.isDisabled = false;
+                    addAccountModal.action = "添加";
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                    addAccountModal.isDisabled = false;
+                    addAccountModal.action = "添加";
+                });
         }
     }
 });
