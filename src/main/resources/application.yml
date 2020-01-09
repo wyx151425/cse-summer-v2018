@@ -13,9 +13,9 @@ spring:
     cache: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/dms_dev?characterEncoding=utf-8&useSSL=true&serverTimezone=GMT%2B8
-    username: root
-    password: 151425
+    url: jdbc:mysql://10.10.20.103:3306/dms_pro?characterEncoding=utf-8&useSSL=true&serverTimezone=GMT%2B8
+    username: dms01
+    password: Cse@dms01
   jpa:
     database: MySQL
     show-sql: true
