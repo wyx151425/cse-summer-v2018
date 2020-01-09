@@ -9,7 +9,7 @@
     <packaging>war</packaging>
 
     <name>summer</name>
-    <description>Design BOM management system of CSE</description>
+    <description>Design BOM Management System (All rights reserved by Wang Zhenqi).</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

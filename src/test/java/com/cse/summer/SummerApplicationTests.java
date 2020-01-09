@@ -1,8 +1,7 @@
 package com.cse.summer;
 
-import com.cse.summer.model.entity.Permission;
 import com.cse.summer.repository.PermissionRepository;
-import com.cse.summer.util.Constant;
+import com.cse.summer.service.FileService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +15,27 @@ public class SummerApplicationTests {
     @Autowired
     private PermissionRepository permissionRepository;
 
+    @Autowired
+    private FileService fileService;
+
     @Test
     public void contextLoads() {
     }
+
+//    @Test
+//    public void exportStructureBOM() {
+//        Structure structure = new Structure();
+//        structure.setStructureNo("21-3822");
+//        structure.setMaterialNo("5309458-7.0");
+//        structure.setVersion(0);
+//        Excel excel = fileService.exportStructureBOM(new User(), structure);
+//        try {
+//            BufferedOutputStream buffer = new BufferedOutputStream(new FileOutputStream(new File("excel.xlsx")));
+//            excel.getWorkbook().write(buffer);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 //    @Test
 //    public void addUser() {

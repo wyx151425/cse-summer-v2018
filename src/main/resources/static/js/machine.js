@@ -125,21 +125,6 @@ const importStructureModal = new Vue({
             this.isNewStructureFileChosen = false;
             this.isVisible = false;
         },
-        pushResult: function (result) {
-            this.importResult.push(result);
-            if (this.importResult.length === this.newStructureList.length) {
-                importStructureModal.importNewStructureCallback();
-                let content = "";
-                for (let index = 0; index < this.importResult.length; index++) {
-                    content += this.importResult[index].structureNo;
-                    content += " ";
-                    content += this.importResult[index].result;
-                    content += "\r\n";
-                }
-                createAndDownload("部套导入结果.txt", content, null, true);
-            }
-            importStructureModal.invisible();
-        },
         changeTab: function (index) {
             this.tabIndex = index;
         },
@@ -186,31 +171,49 @@ const importStructureModal = new Vue({
             this.isImportNewStructureDisabled = true;
             this.importNewStructureAction = "正在导入";
             this.importResult = [];
-            for (let index = 0; index < this.newStructureList.length; index++) {
-                let file = this.newStructureList[index];
-                let param = new FormData();  // 创建Form对象
-                // 通过append向Form对象添加数据
-                param.append("machineName", this.machineName);
-                param.append("structureNo", file.structureNo);
-                param.append("amount", file.amount);
-                param.append("file", file.file, file.file.name);
-                let config = {
-                    headers: {"Content-Type": "multipart/form-data"}
-                };  // 添加请求头
-                axios.post(requestContext + "api/structures/import", param, config)
-                    .then(function (response) {
-                        let statusCode = response.data.statusCode;
-                        if (200 === statusCode) {
-                            importStructureModal.pushResult({structureNo: file.structureNo, result: "导入成功"});
-                        } else {
-                            let message = getMessage(statusCode);
-                            importStructureModal.pushResult({structureNo: file.structureNo, result: message});
-                        }
-                    })
-                    .catch(function () {
-                        popover.append("服务器访问失败", false);
-                        importStructureModal.importNewStructureCallback();
-                    });
+            this.importStructureExecutor();
+        },
+        importStructureExecutor: function () {
+            let file = this.newStructureList[importStructureModal.importResult.length];
+            let param = new FormData();  // 创建Form对象
+            // 通过append向Form对象添加数据
+            param.append("machineName", this.machineName);
+            param.append("structureNo", file.structureNo);
+            param.append("amount", file.amount);
+            param.append("file", file.file, file.file.name);
+            let config = {
+                headers: {"Content-Type": "multipart/form-data"}
+            };  // 添加请求头
+            axios.post(requestContext + "api/structures/import", param, config)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        importStructureModal.pushResult({structureNo: file.structureNo, result: "导入成功"});
+                    } else {
+                        let message = getMessage(statusCode);
+                        importStructureModal.pushResult({structureNo: file.structureNo, result: message});
+                    }
+                })
+                .catch(function () {
+                    popover.append("服务器访问失败", false);
+                    importStructureModal.importNewStructureCallback();
+                });
+        },
+        pushResult: function (result) {
+            this.importResult.push(result);
+            if (this.importResult.length === this.newStructureList.length) {
+                importStructureModal.importNewStructureCallback();
+                let content = "";
+                for (let index = 0; index < this.importResult.length; index++) {
+                    content += this.importResult[index].structureNo;
+                    content += " ";
+                    content += this.importResult[index].result;
+                    content += "\r\n";
+                }
+                createAndDownload("部套导入结果.txt", content, null, true);
+                importStructureModal.invisible();
+            } else {
+                importStructureModal.importStructureExecutor();
             }
         },
         importNewStructureCallback: function () {
