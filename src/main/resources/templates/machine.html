@@ -59,9 +59,11 @@
                 <td>{{structure.material.latestVersion}}</td>
                 <td>{{structure.material.name}}</td>
                 <td>{{structure.material.chinese}}</td>
-                <td>
-                    <span v-if="!user.permissions.UPDATE_STRUCTURE_AMOUNT">{{structure.amount}}</span>
-                    <button class="btn-link" v-if="user.permissions.UPDATE_STRUCTURE_AMOUNT" @click="showUpdateStructureAmountModal(structure, index)">{{structure.amount}}</button>
+                <td v-if="!user.permissions.UPDATE_STRUCTURE_AMOUNT">
+                    <span>{{structure.amount}}</span>
+                </td>
+                <td v-if="user.permissions.UPDATE_STRUCTURE_AMOUNT" @click="showUpdateStructureAmountModal(structure, index)" v-cloak>
+                    <button class="btn-link">{{structure.amount}}</button>
                 </td>
                 <td class="col-yellow" v-if="1 == structure.status && user.permissions.RELEASE_STRUCTURE" v-cloak>
                     <button class="btn-link" @click="releaseStructureModalVisible(structure, index)">设计</button>
