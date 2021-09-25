@@ -6,7 +6,7 @@ import com.cse.summer.model.dto.Excel;
 import com.cse.summer.model.dto.MachineRequest;
 import com.cse.summer.model.entity.Machine;
 import com.cse.summer.model.dto.Response;
-import com.cse.summer.model.entity.Structure;
+import com.cse.summer.model.dto.PageContext;
 import com.cse.summer.model.entity.User;
 import com.cse.summer.service.FileService;
 import com.cse.summer.service.MachineService;
@@ -29,7 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "api")
-public class MachineController extends BaseFacade {
+public class MachineController extends SummerController {
 
     private final MachineService machineService;
     private final FileService fileService;
@@ -76,7 +76,7 @@ public class MachineController extends BaseFacade {
 
     @PostMapping(value = "machines/export")
     public void actionExportMachineBOM(@RequestBody MachineRequest request) throws IOException {
-        Excel excel =  fileService.exportMachineBOM(request.getName(), request.getStatus());
+        Excel excel = fileService.exportMachineBOM(request.getName(), request.getStatus());
         getResponse().reset();
         getResponse().setHeader("Content-Disposition", "attachment;filename="
                 + URLEncoder.encode(excel.getName(), "UTF-8"));
@@ -103,9 +103,37 @@ public class MachineController extends BaseFacade {
     }
 
     @GetMapping(value = "machines")
-    public Response<List<Machine>> actionQueryMachineList() {
-        List<Machine> machineList = machineService.findMachineList();
-        return new Response<>(machineList);
+    public Response<PageContext<Machine>> actionQueryMachineList(
+            @RequestParam(value = "pageIndex") Integer pageIndex,
+            @RequestParam(value = "pageSize") Integer pageSize
+    ) {
+        PageContext<Machine> pageContext = machineService.findMachineListByPagination(pageIndex, pageSize);
+        return new Response<>(pageContext);
+    }
+
+    @GetMapping(value = "machines/patent/{patent}")
+    public Response<PageContext<Machine>> actionQueryMachineListByPatent(
+            @PathVariable(value = "patent") String patent,
+            @RequestParam(value = "pageIndex") Integer pageIndex,
+            @RequestParam(value = "pageSize") Integer pageSize
+    ) {
+        PageContext<Machine> pageContext;
+        if (patent.equals("全部")) {
+            pageContext = machineService.findMachineListByPagination(pageIndex, pageSize);
+        } else {
+            pageContext = machineService.findMachineListByPatentAndPagination(patent, pageIndex, pageSize);
+        }
+        return new Response<>(pageContext);
+    }
+
+    @GetMapping(value = "machines/nameLike/{name}")
+    public Response<PageContext<Machine>> actionQueryMachineListByNameLike(
+            @PathVariable(value = "name") String name,
+            @RequestParam(value = "pageIndex") Integer pageIndex,
+            @RequestParam(value = "pageSize") Integer pageSize
+    ) {
+        PageContext<Machine> pageContext = machineService.findMachineListByNameLikeAndPagination(name, pageIndex, pageSize);
+        return new Response<>(pageContext);
     }
 
     @GetMapping(value = "machines/{machineName}")

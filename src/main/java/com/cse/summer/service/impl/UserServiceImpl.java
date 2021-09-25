@@ -1,8 +1,7 @@
 package com.cse.summer.service.impl;
 
 import com.cse.summer.context.exception.SummerException;
-import com.cse.summer.model.entity.Material;
-import com.cse.summer.model.entity.PageContext;
+import com.cse.summer.model.dto.PageContext;
 import com.cse.summer.model.entity.Permission;
 import com.cse.summer.model.entity.User;
 import com.cse.summer.repository.*;
@@ -149,10 +148,10 @@ public class UserServiceImpl implements UserService {
             }, PageRequest.of(pageNum - 1, 20));
 
             PageContext<User> pageContext = new PageContext<>();
-            pageContext.setPageNum(pageNum);
+            pageContext.setPageIndex(pageNum);
             pageContext.setPageSize(materialPage.getContent().size());
-            pageContext.setTotal(materialPage.getTotalElements());
-            pageContext.setPages(materialPage.getTotalPages());
+            pageContext.setDataTotal(materialPage.getTotalElements());
+            pageContext.setPageTotal(materialPage.getTotalPages());
             pageContext.setData(materialPage.getContent());
             return pageContext;
         } else {

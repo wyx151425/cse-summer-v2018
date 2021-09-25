@@ -2,8 +2,7 @@ package com.cse.summer.service.impl;
 
 import com.cse.summer.model.entity.Material;
 import com.cse.summer.model.dto.StructMater;
-import com.cse.summer.model.entity.Name;
-import com.cse.summer.model.entity.PageContext;
+import com.cse.summer.model.dto.PageContext;
 import com.cse.summer.model.entity.Structure;
 import com.cse.summer.repository.MaterialRepository;
 import com.cse.summer.repository.StructureRepository;
@@ -95,10 +94,10 @@ public class MaterialServiceImpl implements MaterialService {
         }, PageRequest.of(pageNum - 1, 30));
 
         PageContext<Material> pageContext = new PageContext<>();
-        pageContext.setPageNum(pageNum);
+        pageContext.setPageIndex(pageNum);
         pageContext.setPageSize(materialPage.getContent().size());
-        pageContext.setTotal(materialPage.getTotalElements());
-        pageContext.setPages(materialPage.getTotalPages());
+        pageContext.setDataTotal(materialPage.getTotalElements());
+        pageContext.setPageTotal(materialPage.getTotalPages());
         pageContext.setData(materialPage.getContent());
         return pageContext;
     }

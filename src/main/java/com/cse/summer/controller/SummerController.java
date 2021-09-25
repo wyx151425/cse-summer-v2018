@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author 王振琦  2018/07/06
  */
-public class BaseFacade {
+public class SummerController {
 
     @Autowired
     private HttpServletRequest request;

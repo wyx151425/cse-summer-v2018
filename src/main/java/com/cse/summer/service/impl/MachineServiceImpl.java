@@ -4,6 +4,7 @@ import com.cse.summer.context.exception.SummerException;
 import com.cse.summer.model.dto.AnalyzeResult;
 import com.cse.summer.model.entity.Machine;
 import com.cse.summer.model.dto.StructMater;
+import com.cse.summer.model.dto.PageContext;
 import com.cse.summer.model.entity.Structure;
 import com.cse.summer.model.entity.User;
 import com.cse.summer.repository.*;
@@ -12,10 +13,15 @@ import com.cse.summer.util.Constant;
 import com.cse.summer.util.StatusCode;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.criteria.Predicate;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,6 +76,92 @@ public class MachineServiceImpl implements MachineService {
         List<Machine> machines = machineRepository.findAllByStatus(1);
         Collections.reverse(machines);
         return machines;
+    }
+
+    @Override
+    @Transactional(readOnly = true, rollbackFor = Exception.class)
+    public PageContext<Machine> findMachineListByPagination(Integer pageIndex, Integer pageSize) {
+        // 指定排序参数对象：根据id，进行降序序查询
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        /*
+         * 封装分页实体 Pageable
+         * 参数一：pageIndex表示当前查询的第几页(默认从0开始，0表示第一页)
+         * 参数二：表示每页展示多少数据，现在设置每页展示100条数据
+         * 参数三：封装排序对象，根据该对象的参数指定根据id升序查询
+         * */
+        Page<Machine> machinePage;
+
+        machinePage = machineRepository.findAll((Specification<Machine>) (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.equal(root.get("status"), 1));
+            return criteriaQuery.where(predicates.toArray(new Predicate[0])).getRestriction();
+        }, PageRequest.of(pageIndex - 1, pageSize, sort));
+
+        PageContext<Machine> pageContext = new PageContext<>();
+        pageContext.setPageIndex(pageIndex);
+        pageContext.setPageSize(pageSize);
+        pageContext.setDataTotal(machinePage.getTotalElements());
+        pageContext.setPageTotal(machinePage.getTotalPages());
+        pageContext.setData(machinePage.getContent());
+        return pageContext;
+    }
+
+    @Override
+    @Transactional(readOnly = true, rollbackFor = Exception.class)
+    public PageContext<Machine> findMachineListByNameLikeAndPagination(String name, Integer pageIndex, Integer pageSize) {
+        // 指定排序参数对象：根据id，进行降序序查询
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        /*
+         * 封装分页实体 Pageable
+         * 参数一：pageIndex表示当前查询的第几页(默认从0开始，0表示第一页)
+         * 参数二：表示每页展示多少数据，现在设置每页展示100条数据
+         * 参数三：封装排序对象，根据该对象的参数指定根据id升序查询
+         * */
+        Page<Machine> machinePage;
+
+        machinePage = machineRepository.findAll((Specification<Machine>) (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.equal(root.get("status"), 1));
+            predicates.add(criteriaBuilder.like(root.get("name"), "%" + name + "%"));
+            return criteriaQuery.where(predicates.toArray(new Predicate[0])).getRestriction();
+        }, PageRequest.of(pageIndex - 1, pageSize, sort));
+
+        PageContext<Machine> pageContext = new PageContext<>();
+        pageContext.setPageIndex(pageIndex);
+        pageContext.setPageSize(pageSize);
+        pageContext.setDataTotal(machinePage.getTotalElements());
+        pageContext.setPageTotal(machinePage.getTotalPages());
+        pageContext.setData(machinePage.getContent());
+        return pageContext;
+    }
+
+    @Override
+    @Transactional(readOnly = true, rollbackFor = Exception.class)
+    public PageContext<Machine> findMachineListByPatentAndPagination(String patent, Integer pageIndex, Integer pageSize) {
+        // 指定排序参数对象：根据id，进行降序序查询
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        /*
+         * 封装分页实体 Pageable
+         * 参数一：pageIndex表示当前查询的第几页(默认从0开始，0表示第一页)
+         * 参数二：表示每页展示多少数据，现在设置每页展示100条数据
+         * 参数三：封装排序对象，根据该对象的参数指定根据id升序查询
+         * */
+        Page<Machine> machinePage;
+
+        machinePage = machineRepository.findAll((Specification<Machine>) (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.equal(root.get("status"), 1));
+            predicates.add(criteriaBuilder.like(root.get("patent"), patent));
+            return criteriaQuery.where(predicates.toArray(new Predicate[0])).getRestriction();
+        }, PageRequest.of(pageIndex - 1, pageSize, sort));
+
+        PageContext<Machine> pageContext = new PageContext<>();
+        pageContext.setPageIndex(pageIndex);
+        pageContext.setPageSize(pageSize);
+        pageContext.setDataTotal(machinePage.getTotalElements());
+        pageContext.setPageTotal(machinePage.getTotalPages());
+        pageContext.setData(machinePage.getContent());
+        return pageContext;
     }
 
     @Override

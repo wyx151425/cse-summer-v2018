@@ -2,7 +2,7 @@ package com.cse.summer.controller;
 
 import com.cse.summer.context.exception.SummerException;
 import com.cse.summer.model.dto.Response;
-import com.cse.summer.model.entity.PageContext;
+import com.cse.summer.model.dto.PageContext;
 import com.cse.summer.model.entity.User;
 import com.cse.summer.service.UserService;
 import com.cse.summer.util.Constant;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping(value = "api")
-public class UserController extends BaseFacade {
+public class UserController extends SummerController {
 
     private final UserService userService;
     private final Environment env;

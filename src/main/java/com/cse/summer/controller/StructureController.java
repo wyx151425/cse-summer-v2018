@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "api")
-public class StructureController extends BaseFacade {
+public class StructureController extends SummerController {
 
     private final StructureService structureService;
     private final FileService fileService;

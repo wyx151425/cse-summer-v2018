@@ -2,7 +2,17 @@ const main = new Vue({
     el: "#main",
     data: {
         user: {},
-        machineList: []
+        machineList: [],
+        pageContext: {
+            pageIndex: 0,
+            pageSize: 0,
+            pageTotal: 0,
+            dataTotal: 0,
+            data: []
+        },
+        name: "",
+        patent: "全部",
+        filterStatus: 0  // 0是无过滤，1是patent过滤，2是name过滤
     },
     methods: {
         setUser: function (user) {
@@ -44,21 +54,90 @@ const main = new Vue({
                 popover.append("请完善机器信息", false);
             }
         },
+        queryMachineList: function (pageIndex, pageSize) {
+            this.filterStatus = 0;
+            this.patent = "全部";
+            this.name = "";
+            axios.get(requestContext + "api/machines?pageIndex=" + pageIndex + "&pageSize=" + pageSize)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        main.setMachineList(response.data.data.data);
+                        main.pageContext = response.data.data;
+                        progress.dismiss();
+                    }
+                }).catch(function () {
+                popover.append("服务器访问失败", false);
+                progress.dismiss();
+            });
+        },
+        queryMachineListByPatent: function (patent, pageIndex, pageSize) {
+            this.filterStatus = 1;
+            this.name = "";
+            axios.get(requestContext + "api/machines/patent/" + patent + "?pageIndex=" + pageIndex + "&pageSize=" + pageSize)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        main.setMachineList(response.data.data.data);
+                        main.pageContext = response.data.data;
+                        progress.dismiss();
+                    }
+                }).catch(function () {
+                popover.append("服务器访问失败", false);
+                progress.dismiss();
+            });
+        },
+        queryMachineListByNameLike: function (name, pageIndex, pageSize) {
+            this.filterStatus = 2;
+            this.patent = "全部";
+            axios.get(requestContext + "api/machines/nameLike/" + name + "?pageIndex=" + pageIndex + "&pageSize=" + pageSize)
+                .then(function (response) {
+                    let statusCode = response.data.statusCode;
+                    if (200 === statusCode) {
+                        main.setMachineList(response.data.data.data);
+                        main.pageContext = response.data.data;
+                        progress.dismiss();
+                    }
+                }).catch(function () {
+                popover.append("服务器访问失败", false);
+                progress.dismiss();
+            });
+        },
+        executeQueryMachineListByPatent: function () {
+            this.filterStatus = 1;
+            this.name = "";
+            this.pageContext.pageIndex = 1;
+            this.queryMachineListByPatent(this.patent, this.pageContext.pageIndex, this.pageContext.pageSize);
+        },
+        executeQueryMachineListByNameLike: function () {
+            this.filterStatus = 2;
+            this.patent = "全部";
+            this.pageContext.pageIndex = 1;
+            this.queryMachineListByNameLike(this.name, this.pageContext.pageIndex, this.pageContext.pageSize);
+        },
+        queryMachineListByPreviousPagination: function () {
+            if (0 === this.filterStatus) {
+                this.queryMachineList(this.pageContext.pageIndex - 1, this.pageContext.pageSize);
+            } else if (1 === this.filterStatus) {
+                this.queryMachineListByPatent(this.patent, this.pageContext.pageIndex - 1, this.pageContext.pageSize);
+            } else if (2 === this.filterStatus) {
+                this.queryMachineListByNameLike(this.name, this.pageContext.pageIndex - 1, this.pageContext.pageSize);
+            }
+        },
+        queryMachineListByNextPagination: function () {
+            if (0 === this.filterStatus) {
+                this.queryMachineList(this.pageContext.pageIndex + 1, this.pageContext.pageSize);
+            } else if (1 === this.filterStatus) {
+                this.queryMachineListByPatent(this.patent, this.pageContext.pageIndex + 1, this.pageContext.pageSize);
+            } else if (2 === this.filterStatus) {
+                this.queryMachineListByNameLike(this.name, this.pageContext.pageIndex + 1, this.pageContext.pageSize);
+            }
+        }
     },
     mounted: function () {
         let user = JSON.parse(localStorage.getItem("user"));
         this.setUser(user);
-        axios.get(requestContext + "api/machines")
-            .then(function (response) {
-                let statusCode = response.data.statusCode;
-                if (200 === statusCode) {
-                    main.setMachineList(response.data.data);
-                    progress.dismiss();
-                }
-            }).catch(function () {
-            popover.append("服务器访问失败", false);
-            progress.dismiss();
-        });
+        this.queryMachineList(1, 10);
     }
 });
 
@@ -635,3 +714,10 @@ const matchStructureModal = new Vue({
     }
 
 });
+
+var summerNav = new Vue({
+    el: '#summer-nav',
+    data: {
+        masterItem: 0
+    }
+})

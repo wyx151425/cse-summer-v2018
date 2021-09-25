@@ -26,7 +26,7 @@ import java.net.URLEncoder;
  */
 @RestController
 @RequestMapping(value = "api")
-public class MaterialNameController extends BaseFacade {
+public class MaterialNameController extends SummerController {
 
     private final MaterialNameService materialNameService;
 

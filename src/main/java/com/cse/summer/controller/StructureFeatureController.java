@@ -6,13 +6,11 @@ import com.cse.summer.model.entity.Material;
 import com.cse.summer.model.entity.StructureFeature;
 import com.cse.summer.service.StructureFeatureService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -23,7 +21,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "api")
-public class StructureFeatureController extends BaseFacade {
+public class StructureFeatureController extends SummerController {
 
     private final StructureFeatureService structureFeatureService;
 

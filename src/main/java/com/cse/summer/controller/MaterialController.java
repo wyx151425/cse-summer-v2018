@@ -3,11 +3,10 @@ package com.cse.summer.controller;
 import com.cse.summer.context.exception.SummerException;
 import com.cse.summer.model.entity.Material;
 import com.cse.summer.model.dto.Response;
-import com.cse.summer.model.entity.PageContext;
+import com.cse.summer.model.dto.PageContext;
 import com.cse.summer.model.entity.StructureNote;
 import com.cse.summer.service.MaterialService;
 import com.cse.summer.service.StructureNoteService;
-import com.cse.summer.util.Constant;
 import com.cse.summer.util.StatusCode;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -18,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +26,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = "api")
-public class MaterialController extends BaseFacade {
+public class MaterialController extends SummerController {
 
     private final MaterialService materialService;
     private final StructureNoteService structureNoteService;

@@ -2,6 +2,7 @@ package com.cse.summer.service;
 
 import com.cse.summer.model.dto.AnalyzeResult;
 import com.cse.summer.model.entity.Machine;
+import com.cse.summer.model.dto.PageContext;
 import com.cse.summer.model.entity.User;
 import org.dom4j.DocumentException;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +40,33 @@ public interface MachineService {
      * @return 机器数据列表
      */
     List<Machine> findMachineList();
+
+    /**
+     * 分页获取机器数据
+     *
+     * @param pageIndex 页码
+     * @param pageSize  页面数据量
+     * @return 查询结果
+     */
+    PageContext<Machine> findMachineListByPagination(Integer pageIndex, Integer pageSize);
+
+    /**
+     * 分页获取机器数据
+     *
+     * @param pageIndex 页码
+     * @param pageSize  页面数据量
+     * @return 查询结果
+     */
+    PageContext<Machine> findMachineListByNameLikeAndPagination(String name, Integer pageIndex, Integer pageSize);
+
+    /**
+     * 分页获取机器数据
+     *
+     * @param pageIndex 页码
+     * @param pageSize  页面数据量
+     * @return 查询结果
+     */
+    PageContext<Machine> findMachineListByPatentAndPagination(String patent, Integer pageIndex, Integer pageSize);
 
     /**
      * 删除所有机器数据

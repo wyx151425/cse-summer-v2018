@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * updateAt 2018/10/22
  */
 @Controller
-public class RouteController extends BaseFacade {
+public class RouteController extends SummerController {
 
     @RequestMapping(value = "logout")
     public String routeLogin() {

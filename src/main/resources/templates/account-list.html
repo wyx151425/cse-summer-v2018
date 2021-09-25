@@ -4,33 +4,30 @@
     <meta charset="UTF-8">
     <title>设计BOM管理工具</title>
     <link rel="shortcut icon" th:href="@{/images/cse.png}" type="image/x-icon"/>
-    <link rel="stylesheet" th:href="@{/css/summer.css}"/>
-    <link rel="stylesheet" th:href="@{/css/index.css}"/>
-    <link rel="stylesheet" th:href="@{/css/machine.css}"/>
+    <link rel="stylesheet" th:href="@{/css/summer2.css}"/>
 </head>
 <body>
-<header id="header" class="header">
-    <div class="header-fixed">
-        <div class="container">
-            <img class="logo" th:src="@{/images/cse.png}" alt=""/>
-            <div class="account">
-                <span class="account-name">{{user.name}}</span>
-                <a class="icon icon-off" th:href="@{/logout}"></a>
-            </div>
-        </div>
-    </div>
-</header>
-<main id="main" class="container">
+<summer-nav id="summer-nav" v-bind:master-item="masterItem"></summer-nav>
+<main id="master" class="master">
     <div class="panel">
-        <div class="btn-list">
-            <p class="env-dev pull-left" v-if="'DEV' == user.token" v-cloak>开发环境</p>
-            <p class="env-uat pull-left" v-if="'UAT' == user.token" v-cloak>测试环境</p>
-            <p class="env-pro pull-left" v-if="'PRO' == user.token" v-cloak>正式环境</p>
-            <a class="pull-right" href="index">
-                <button class="btn">返回</button>
-            </a>
-            <button class="btn pull-right" type="button" @click="showAddAccountModal">添加账号</button>
-        </div>
+        <header class="header">
+            <section class="filter">
+                <div class="filter-group">
+                    <label class="filter-label" for="">专利机型</label>
+                    <select class="filter-control" v-model="patent" @change="executeQueryMachineListByPatent()">
+                        <option value="全部">全部</option>
+                        <option value="MAN">MAN</option>
+                        <option value="WinGD">WinGD</option>
+                    </select>
+                </div>
+            </section>
+            <section class="filter">
+                <div class="filter-group">
+                    <input class="filter-control" type="text" placeholder="查询机器" v-model="name"/>
+                    <label class="filter-action" for="" @click="executeQueryMachineListByNameLike()"><span class="icon icon-search"></span></label>
+                </div>
+            </section>
+        </header>
         <table class="table table-bordered table-hover" style="table-layout: fixed">
             <thead>
             <tr>
@@ -88,9 +85,6 @@
         </footer>
     </div>
 </main>
-<footer class="footer">
-    <span>&copy;2019 中国船舶重工集团柴油机有限公司</span>
-</footer>
 <div id="popover" class="popover" v-if="prompts.length > 0">
     <popover v-for="prompt in prompts" :key="prompt.id" :prompt="prompt"></popover>
 </div>
@@ -216,9 +210,10 @@
         </div>
     </div>
 </div>
-<script src="js/vue.min.js"></script>
+<!--<script src="js/vue.min.js"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 <script src="js/axios.min.js"></script>
 <script src="js/summer.js"></script>
-<script th:src="@{/js/manage-account.js}"></script>
+<script th:src="@{/js/account-list.js}"></script>
 </body>
 </html>

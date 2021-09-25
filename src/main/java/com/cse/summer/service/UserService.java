@@ -1,9 +1,7 @@
 package com.cse.summer.service;
 
-import com.cse.summer.model.entity.PageContext;
+import com.cse.summer.model.dto.PageContext;
 import com.cse.summer.model.entity.User;
-
-import java.util.List;
 
 /**
  * @author 王振琦
